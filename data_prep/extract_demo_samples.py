@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """
-Extract a representative 120-sample demo subset from the full 8k CpG h5ad.
+Extract a representative 120-sample demo subset from the 21k CpG h5ad.
 
-Goal: a small file (~10 MB) that can be shared publicly with the repo so
+Goal: a small file (~50 MB) that can be shared publicly with the repo so
       tutorial notebooks show real biology, not synthetic data.
 
 Stratification:
   - Age bins (0-20, 20-30, 30-40, 40-50, 50-60, 60-70, 70-80, 80+): 15 per bin
-  - Tissue diversity: cap 25 samples from any single tissue (avoids all Whole Blood)
+  - Tissue diversity: cap 25 samples from any single tissue
   - Split: keeps train/valid/test labels intact
   - NaN rate: prefers samples with fewer missing CpGs (lower NaN fraction)
 
 Output:
-  methylllama_demo_120samples.h5ad   (~10 MB)
+  methylllama_demo_120samples.h5ad
 
 Usage on cluster:
   cd /path/to/MethylLlama
   python data_prep/extract_demo_samples.py \
-      --input  /sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_8k_h5ad/methylgpt_8k_altumage_combined.h5ad \
+      --input  /sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_21k_h5ad/altumage_21k_3way.h5ad \
       --output ./methylllama_demo_120samples.h5ad \
       --n_samples 120
 """
@@ -188,8 +188,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input",
-        default="/sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_8k_h5ad/methylgpt_8k_altumage_combined.h5ad",
-        help="Path to full 8k CpG h5ad file",
+        default="/sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_21k_h5ad/altumage_21k_3way.h5ad",
+        help="Path to full 21k CpG h5ad file",
     )
     parser.add_argument(
         "--output",
