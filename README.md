@@ -81,15 +81,22 @@ sbatch scripts/wced/pretrain_wced.sh
 
 ## Fine-tuning
 
-```bash
-# V4b warmstart (loads WCED pretrain checkpoint)
-sbatch scripts/llama/finetune_llama_small_v4b.sh
+WCED pretraining → fine-tuning comparison (main paper result):
 
-# V4b scratch (no warmstart — ablation)
-WARMSTART_WEIGHTS="" sbatch scripts/llama/finetune_llama_small_v4b.sh
+| Model | test R² | MedAE | MAE |
+|-------|---------|-------|-----|
+| WCED pretrained (job 44895876) | **0.905** | **3.65 yr** | 5.46 yr |
+| Random init (job 44981091) | 0.526 | 8.91 yr | 13.06 yr |
+
+```bash
+# Fine-tune with WCED pretrained encoder (CLS pooling)
+sbatch scripts/wced/finetune_wced.sh
+
+# Random-init ablation
+sbatch scripts/llama/finetune_llama_random_init.sh
 ```
 
-**V4b hyperparameters:**
+**Key hyperparameters (best run):**
 - Loss: Huber (δ=5yr / age_std)
 - LR: 1e-4 (head), 2e-5 (encoder), weight decay 0.01
 - Batch: 32, grad accum 4 (eff. 128)
@@ -118,8 +125,27 @@ python3.10 -m venv bmfm_methyl_env
 source bmfm_methyl_env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
+# Install bmfm_targets (the underlying single-cell foundation model framework)
 pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
+# Install bmfm_methylation as an editable package
+pip install -e .
 ```
+
+---
+
+## Running on a Cluster (SLURM)
+
+All scripts under `scripts/` are written for a SLURM cluster and contain
+cluster-specific paths. Before submitting any job, update the following
+variables at the top of each script:
+
+```bash
+REPO="/path/to/your/MethylLlama"   # clone location on your cluster
+DATA="/path/to/your/data.h5ad"     # input dataset
+```
+
+The partition (`--partition=salmon`) and GPU resource (`--gres=gpu:l40s:1`)
+lines should also be updated to match your cluster's hardware.
 
 ---
 

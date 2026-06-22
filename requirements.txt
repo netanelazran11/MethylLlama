@@ -6,6 +6,7 @@
 #   pip install --upgrade pip
 #   pip install -r requirements.txt
 #   pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
+#   pip install -e .   # install bmfm_methylation as a package
 # ==============================================================================
 
 # ==============================================================================
@@ -17,7 +18,7 @@ torchmetrics==1.1.0
 einops
 
 # ==============================================================================
-# Transformers & NLP (from bmfm_targets pyproject.toml)
+# Transformers & NLP
 # ==============================================================================
 transformers>=4.54.0
 peft
@@ -31,8 +32,6 @@ scipy<1.15.0
 anndata>=0.10.9
 scanpy
 h5py
-rdata
-rnanorm
 
 # ==============================================================================
 # Configuration & Utilities
@@ -42,30 +41,26 @@ omegaconf
 pydantic
 
 # ==============================================================================
-# Logging & Visualization (for methylation training)
+# Logging & Visualization
 # ==============================================================================
 wandb
 tensorboardX
 rich
+matplotlib
+seaborn
+umap-learn
 
 # ==============================================================================
-# bmfm_targets specific dependencies
+# bmfm_targets runtime dependencies (installed with --no-deps above,
+# so these must be listed here explicitly)
 # ==============================================================================
 captum
 litdata
 torchdata<0.10
 focal-loss-torch @ git+https://github.com/mathiaszinnen/focal_loss_torch.git
-
-# ClearML (experiment tracking used by bmfm_targets)
 clearml>1.13,<2
-
-# ==============================================================================
-# Biological data packages (required by bmfm_targets)
-# ==============================================================================
 cellxgene_census[experimental]>1.13.0
 tiledbsoma
-pysam
-hic-straw
 
 # ==============================================================================
 # Testing (optional)
