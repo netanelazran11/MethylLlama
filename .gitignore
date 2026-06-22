@@ -30,7 +30,6 @@ env/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
 
 # Logs / outputs
 *.log
@@ -41,6 +40,7 @@ lightning_logs/
 
 # Data files (large)
 *.h5ad
+!tutorials/data/methylllama_demo_120samples.h5ad
 *.h5
 *.hdf5
 *.pkl
