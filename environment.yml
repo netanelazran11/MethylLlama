@@ -1,0 +1,42 @@
+name: bmfm_methyl_env
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - torch>=2.0.0
+    - pytorch-lightning>=2.0.0
+    - torchmetrics==1.1.0
+    - einops
+    - transformers>=4.54.0
+    - peft
+    - numpy<2
+    - pandas>=2,<3
+    - scipy<1.15.0
+    - anndata>=0.10.9
+    - scanpy
+    - h5py
+    - hydra-core
+    - omegaconf
+    - pydantic
+    - wandb
+    - tensorboardX
+    - rich
+    - matplotlib
+    - seaborn
+    - umap-learn
+    - captum
+    - litdata
+    - torchdata<0.10
+    - focal-loss-torch @ git+https://github.com/mathiaszinnen/focal_loss_torch.git
+    - clearml>1.13,<2
+    - cellxgene_census[experimental]>1.13.0
+    - tiledbsoma
+    - huggingface_hub
+    - pytest
+    - pytest-cov
+    - git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git#egg=bmfm_targets&subdirectory=.&no_deps=True
