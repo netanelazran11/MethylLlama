@@ -1,0 +1,73 @@
+# Main configuration for methylation fine-tuning (Age Regression)
+#
+# Usage:
+#   python -m bmfm_methylation.finetune \
+#       data_path=/path/to/methylation.h5ad \
+#       checkpoint_path=./outputs/methylation/pretrain/best.ckpt \
+#       output_directory=./outputs
+
+defaults:
+  - data_module: methylation
+  - fields: methylation
+  - trainer: methylation
+  - task: finetune_age
+  - model: scbert_methylation
+  - _self_
+
+# Paths
+data_path: ???  # Required: path to h5ad file
+output_directory: ./outputs/methylation
+tokenizer_path: ./tokenizer
+checkpoint_path: ???  # Required: path to pretrained checkpoint
+
+# Training settings
+finetune_epochs: 100
+accumulate_grad_batches: 4  # Effective batch = 16 × 4 = 64 (adjusted for 8k seq length)
+
+# Disable MLM for fine-tuning
+mlm_enabled: false
+collation_strategy: "sequence_classification"
+
+# Encoder freeze strategy: freeze for first N epochs, then unfreeze
+# Recommended: freeze initially to let head learn, then unfreeze for fine-tuning
+freeze_encoder: true
+unfreeze_encoder_epoch: 5
+
+
+# Loss function: MSE gives stronger gradients; Huber optional
+use_huber_loss: false
+huber_delta: 2.0
+
+# WCED reconstruction regularizer weight
+# loss = age_MSE + recon_weight * recon_MSE(non-input CpGs)
+# Keeps encoder globally informative — prevents forgetting WCED pretraining
+recon_weight: 0.1
+
+# LoRA hyperparameters (used by finetune_lora.py and finetune_lora_twostage.py)
+lora_rank: 8        # rank of adapter matrices (A: in×r, B: r×out)
+lora_alpha: 16.0    # scaling = alpha/rank = 2.0
+lora_lr: 1e-4       # LoRA adapter LR (between head 1e-3 and frozen 0)
+lora_warmup_epochs: 50  # Stage 1: head only; Stage 2: LoRA unlocked (two-stage only)
+
+# Seed
+seed:
+  seed_value: 42
+
+# Regression head settings
+regression_head:
+  hidden_size: 64
+  dropout: 0.1
+  output_size: 1  # Single age prediction
+
+# WandB logging
+track_wandb:
+  enabled: true
+  project: "methylation-age"
+  entity: null  # Set to your WandB entity
+  name: "methylation_age_finetune"
+
+# Early stopping
+early_stopping:
+  monitor: "val/mae"
+  patience: 60
+  mode: "min"

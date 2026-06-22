@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MethylLlama — Dataset Statistics</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f1117;
+    color: #e8eaf0;
+    font-size: 15px;
+  }
+
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 40px auto;
+    background: #161b27;
+    border-radius: 16px;
+    padding: 48px 56px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 32px;
+    color: #ffffff;
+    border-bottom: 2px solid #2e3a5a;
+    padding-bottom: 14px;
+  }
+
+  .slide-label {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 11px;
+    color: #4a5570;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── Layout ───────────────────────────────────────────── */
+  .top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .mid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+  }
+
+  .bot-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  /* ── Stat card ────────────────────────────────────────── */
+  .stat-card {
+    background: #1e2d4a;
+    border: 1.5px solid #3b5998;
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: #7a90b8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #6fa3ef;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 12px;
+    color: #8899bb;
+  }
+
+  /* ── Panel ────────────────────────────────────────────── */
+  .panel {
+    background: #1a2035;
+    border: 1.5px solid #2e3a5a;
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #a0b4d8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2e3a5a;
+  }
+
+  /* ── Split bars ───────────────────────────────────────── */
+  .split-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+
+  .split-label {
+    font-size: 12px;
+    color: #9aabcc;
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .split-bar-bg {
+    flex: 1;
+    height: 18px;
+    background: #0f1420;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .split-bar {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .bar-train { background: linear-gradient(90deg, #2a6aaa, #4a8adf); }
+  .bar-val   { background: linear-gradient(90deg, #2a7a4a, #4aaa6a); }
+  .bar-test  { background: linear-gradient(90deg, #7a3a7a, #aa5aaa); }
+
+  .split-count {
+    font-size: 12px;
+    color: #7a90b8;
+    width: 52px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── Age histogram ────────────────────────────────────── */
+  .hist-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 90px;
+    margin-bottom: 6px;
+  }
+
+  .hist-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  .hist-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #5a9ae0, #3b6aaa);
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+  }
+
+  .hist-labels {
+    display: flex;
+    gap: 3px;
+    font-size: 9px;
+    color: #556688;
+  }
+
+  .hist-lbl { flex: 1; text-align: center; }
+
+  .age-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .age-stat {
+    background: #0f1420;
+    border-radius: 6px;
+    padding: 7px 10px;
+    text-align: center;
+  }
+
+  .age-stat .k { font-size: 10px; color: #6677aa; text-transform: uppercase; }
+  .age-stat .v { font-size: 16px; font-weight: 700; color: #a0c0f0; }
+
+  /* ── Beta distribution ────────────────────────────────── */
+  .beta-chart {
+    position: relative;
+    height: 90px;
+    margin-bottom: 10px;
+  }
+
+  .beta-bars {
+    display: flex;
+    align-items: flex-end;
+    height: 90px;
+    gap: 2px;
+  }
+
+  .beta-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+    transition: opacity 0.2s;
+  }
+
+  .beta-x-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #556688;
+    margin-top: 4px;
+  }
+
+  .beta-pcts {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .beta-pct {
+    background: #0f1420;
+    border-radius: 6px;
+    padding: 6px 8px;
+    text-align: center;
+  }
+
+  .beta-pct .pk { font-size: 10px; color: #6677aa; }
+  .beta-pct .pv { font-size: 14px; font-weight: 700; color: #b080e0; }
+
+  /* ── Quality badges ───────────────────────────────────── */
+  .quality-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .quality-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #0f1420;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .q-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .q-text .q-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #d0e0ff;
+  }
+
+  .q-text .q-val {
+    font-size: 11px;
+    color: #7a90b8;
+    margin-top: 2px;
+  }
+
+  /* ── Dataset comparison ───────────────────────────────── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .compare-table th {
+    text-align: left;
+    color: #7a90b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #2e3a5a;
+  }
+
+  .compare-table th:not(:first-child) { text-align: right; }
+
+  .compare-table td {
+    padding: 8px 10px;
+    color: #c0d0ec;
+    border-bottom: 1px solid #1e2840;
+  }
+
+  .compare-table td:not(:first-child) { text-align: right; font-family: monospace; }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+
+  .tag-orig  { color: #f0c060; font-weight: 600; }
+  .tag-clean { color: #60d090; font-weight: 600; }
+
+  .check { color: #50c878; }
+  .warn  { color: #f0c060; }
+</style>
+</head>
+<body>
+
+<div class="slide">
+  <div class="slide-label">Dataset Analysis</div>
+  <div class="slide-title">Dataset Statistics — AltumAge 21k Methylation</div>
+
+  <!-- Top stat cards -->
+  <div class="top-row">
+    <div class="stat-card">
+      <div class="label">Samples (clean)</div>
+      <div class="value">10,656</div>
+      <div class="sub">after NaN-CpG removal</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">CpG Sites</div>
+      <div class="value">19,608</div>
+      <div class="sub">zero-NaN across all samples</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total β-values</div>
+      <div class="value">208M</div>
+      <div class="sub">208,942,848 cells</div>
+    </div>
+    <div class="stat-card" style="border-color:#3a7a3a; background:#1a2e1a;">
+      <div class="label" style="color:#6a9a6a;">Data Quality</div>
+      <div class="value" style="color:#60d090;">0 NaN</div>
+      <div class="sub" style="color:#5a8a5a;">all β ∈ [0, 1]</div>
+    </div>
+  </div>
+
+  <!-- Mid row: splits + age -->
+  <div class="mid-row">
+
+    <!-- Split distribution -->
+    <div class="panel">
+      <div class="panel-title">Split Distribution</div>
+
+      <div class="split-row">
+        <div class="split-label">Train</div>
+        <div class="split-bar-bg">
+          <div class="split-bar bar-train" style="width:67.8%">67.8%</div>
+        </div>
+        <div class="split-count">7,224</div>
+      </div>
+      <div class="split-row">
+        <div class="split-label">Val</div>
+        <div class="split-bar-bg">
+          <div class="split-bar bar-val" style="width:11.9%">11.9%</div>
+        </div>
+        <div class="split-count">1,268</div>
+      </div>
+      <div class="split-row">
+        <div class="split-label">Test</div>
+        <div class="split-bar-bg">
+          <div class="split-bar bar-test" style="width:20.3%">20.3%</div>
+        </div>
+        <div class="split-count">2,164</div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div class="panel-title" style="margin-top:4px;">Age Distribution (10-year bins)</div>
+        <div class="hist-row" id="age-hist"></div>
+        <div class="hist-labels" id="age-labels"></div>
+        <div class="age-stats">
+          <div class="age-stat"><div class="k">Mean ± Std</div><div class="v">40.9 ± 26.9</div></div>
+          <div class="age-stat"><div class="k">Median</div><div class="v">47 yr</div></div>
+          <div class="age-stat"><div class="k">Range</div><div class="v">0 – 114</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Beta distribution -->
+    <div class="panel">
+      <div class="panel-title">β-Value Distribution (bimodal)</div>
+
+      <div class="beta-bars" id="beta-bars"></div>
+      <div class="beta-x-labels">
+        <span>0.0</span><span>0.1</span><span>0.2</span><span>0.3</span><span>0.4</span>
+        <span>0.5</span><span>0.6</span><span>0.7</span><span>0.8</span><span>0.9</span><span>1.0</span>
+      </div>
+
+      <div class="beta-pcts">
+        <div class="beta-pct"><div class="pk">p1</div><div class="pv">0.008</div></div>
+        <div class="beta-pct"><div class="pk">p25</div><div class="pv">0.040</div></div>
+        <div class="beta-pct"><div class="pk">p50</div><div class="pv">0.076</div></div>
+        <div class="beta-pct"><div class="pk">p75</div><div class="pv">0.501</div></div>
+        <div class="beta-pct"><div class="pk">p99</div><div class="pv">0.951</div></div>
+      </div>
+
+      <div style="margin-top:14px; font-size:12px; color:#7a90b8; line-height:1.6;">
+        <span style="color:#a0c0f0; font-weight:600;">Unmethylated peak</span> (β ≈ 0–0.2): most CpGs are stably unmethylated &nbsp;·&nbsp;
+        <span style="color:#b080e0; font-weight:600;">Methylated peak</span> (β ≈ 0.5–1.0): tissue-specific methylation signal
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bot row: quality + dataset comparison -->
+  <div class="bot-row">
+
+    <!-- Quality checks -->
+    <div class="panel">
+      <div class="panel-title">Data Quality Checks</div>
+      <div class="quality-grid">
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text">
+            <div class="q-title">Zero NaN Values</div>
+            <div class="q-val">0 missing across all 208M cells</div>
+          </div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text">
+            <div class="q-title">Valid β Range</div>
+            <div class="q-val">All values strictly in [0, 1]</div>
+          </div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text">
+            <div class="q-title">No Duplicates</div>
+            <div class="q-val">0 duplicate samples, 0 duplicate CpGs</div>
+          </div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text">
+            <div class="q-title">Split Labels Present</div>
+            <div class="q-val">train / valid / test baked into obs</div>
+          </div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text">
+            <div class="q-title">Age Labels Complete</div>
+            <div class="q-val">0 NaN ages across 10,656 samples</div>
+          </div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">ℹ️</div>
+          <div class="q-text">
+            <div class="q-title">β = 0 is Real Data</div>
+            <div class="q-val">Unmethylated CpG — not missing</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original vs clean comparison -->
+    <div class="panel">
+      <div class="panel-title">Original vs Clean Dataset</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th><span class="tag-orig">Original 21k</span></th>
+            <th><span class="tag-clean">Clean (used)</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Samples</td>
+            <td class="tag-orig">10,988</td>
+            <td class="tag-clean">10,656</td>
+          </tr>
+          <tr>
+            <td>CpG sites</td>
+            <td class="tag-orig">21,368</td>
+            <td class="tag-clean">19,608</td>
+          </tr>
+          <tr>
+            <td>Train / Val / Test</td>
+            <td class="tag-orig">7416 / 1308 / 2264</td>
+            <td class="tag-clean">7224 / 1268 / 2164</td>
+          </tr>
+          <tr>
+            <td>NaN count</td>
+            <td class="tag-orig">0 <span class="check">✓</span></td>
+            <td class="tag-clean">0 <span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Age range</td>
+            <td><span class="warn">−0.7 – 144 yr ⚠</span></td>
+            <td class="tag-clean">0 – 114 yr ✓</td>
+          </tr>
+          <tr>
+            <td>Removed</td>
+            <td>—</td>
+            <td style="color:#8899bb;">332 samples · 1,760 CpGs</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; font-size:11px; color:#556688; line-height:1.6;">
+        Cleaning removed CpGs with any NaN across all 450k-array samples (structurally missing probes),
+        and samples with biologically invalid ages (negative or &gt;120).
+        Both files have zero NaN — the original was already pre-imputed.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Age histogram ─────────────────────────────────────────
+const ageCounts = [2078, 851, 836, 747, 1219, 1912, 1641, 876, 339, 70, 20, 67];
+const ageLabels = ['0','10','20','30','40','50','60','70','80','90','100','110'];
+const maxAge = Math.max(...ageCounts);
+
+const histEl = document.getElementById('age-hist');
+const lblEl  = document.getElementById('age-labels');
+
+ageCounts.forEach((c, i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'hist-bar-wrap';
+  const bar = document.createElement('div');
+  bar.className = 'hist-bar';
+  bar.style.height = (c / maxAge * 100) + '%';
+  bar.title = `${ageLabels[i]}–${parseInt(ageLabels[i])+10} yr: ${c.toLocaleString()}`;
+  wrap.appendChild(bar);
+  histEl.appendChild(wrap);
+
+  const lbl = document.createElement('div');
+  lbl.className = 'hist-lbl';
+  lbl.textContent = ageLabels[i];
+  lblEl.appendChild(lbl);
+});
+
+// ── Beta bimodal approximation ────────────────────────────
+// Approximate density from percentiles: heavy low peak (0–0.2), heavy high peak (0.5–1.0)
+const betaBins = 50;
+const betaBarEl = document.getElementById('beta-bars');
+
+// Empirical density shape based on real percentile data
+// p1=0.008, p5=0.018, p25=0.040, p50=0.076, p75=0.501, p95=0.906, p99=0.951
+// This means ~50% of values < 0.076 (low peak), ~25% in 0.076–0.501, ~25% > 0.501 (high peak)
+function betaDensity(x) {
+  // Low peak (unmethylated): gamma-like around 0–0.15
+  const low  = 3.5 * Math.exp(-Math.pow((x - 0.03) / 0.06, 2) / 2);
+  // High peak (methylated): around 0.75–0.95
+  const high = 1.8 * Math.exp(-Math.pow((x - 0.82) / 0.12, 2) / 2);
+  // Small valley in the middle
+  return low + high;
+}
+
+const vals = [];
+for (let i = 0; i < betaBins; i++) {
+  const x = (i + 0.5) / betaBins;
+  vals.push(betaDensity(x));
+}
+const maxVal = Math.max(...vals);
+
+vals.forEach((v, i) => {
+  const bar = document.createElement('div');
+  bar.className = 'beta-bar';
+  const t = i / betaBins;
+  // Color: blue for low (unmethylated), purple for high (methylated)
+  const r = Math.round(60  + 100 * t);
+  const g = Math.round(120 - 60  * t);
+  const b = Math.round(200 + 55  * t);
+  bar.style.background = `rgb(${r},${g},${b})`;
+  bar.style.height = (v / maxVal * 90) + '%';
+  bar.title = `β ≈ ${(i/betaBins).toFixed(2)}`;
+  betaBarEl.appendChild(bar);
+});
+</script>
+
+</body>
+</html>

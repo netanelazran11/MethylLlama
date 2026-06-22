@@ -1,0 +1,20 @@
+# Field configuration for 21k methylation data
+# Same as methylation.yaml but vocab_size updated for 21,368 CpG sites
+
+- _target_: bmfm_targets.config.FieldInfo
+  field_name: "cpg_sites"
+  vocab_size: 21373  # 21,368 CpG sites + 5 special tokens
+  is_input: true
+  is_masked: false
+  tokenization_strategy: "tokenize"
+
+- _target_: bmfm_targets.config.FieldInfo
+  field_name: "beta_values"
+  is_input: true
+  is_masked: true
+  tokenization_strategy: "continuous_value_encoder"
+  num_special_tokens: 5
+  encoder_kwargs:
+    kind: "mlp_with_special_token_embedding"
+  decode_modes:
+    regression: {}

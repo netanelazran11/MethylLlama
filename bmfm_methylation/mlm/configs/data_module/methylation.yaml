@@ -1,0 +1,41 @@
+# Data module configuration for methylation data
+
+_target_: bmfm_methylation.data_module.MethylationDataModule
+_partial_: true
+
+# Data paths (set via command line)
+h5ad_path: ${data_path}
+train_split: "train"
+val_split: "valid"
+test_split: "test"
+age_column: "age"
+split_column: "split"
+
+# Data loading
+batch_size: 16  # Reduced for 8k sequence length (attention is O(n²))
+num_workers: 0  # MUST be 0 to avoid subprocess issues with PyTorch 2.6 checkpoint loading
+max_length: 8002  # subset_k + [CLS] + padding (8000 + 1 + 1 = 8002)
+padding: "max_length"
+truncation: true
+pad_to_multiple_of: 2  # Must be divisible by 2
+
+# Age normalization
+normalize_age: true
+
+# MLM settings (for pretraining)
+mlm: ${mlm_enabled}
+change_ratio: 0.25  # 25% of values masked (higher for regression)
+mask_ratio: 0.3     # 30% of candidates are replaced with [MASK]
+switch_ratio: 0.0   # No random switching for continuous values
+
+# Collation strategy
+collation_strategy: ${collation_strategy}
+
+# CpG subset selection
+# Options:
+#   subset_k: 8000, fixed_subset: true  → Use ALL 8000 CpGs
+#   subset_k: 2048, fixed_subset: true  → Use FIXED 2048 CpGs (recommended for testing)
+#   subset_k: 2048, fixed_subset: false → Use RANDOM 2048 per sample (NOT recommended)
+subset_k: 8000  # Number of CpGs to use (all 8000 for best performance)
+fixed_subset: true  # IMPORTANT: Use SAME CpGs for all samples
+fixed_subset_seed: 42  # Seed for selecting fixed subset (for reproducibility)

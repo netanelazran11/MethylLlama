@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNA-Informed Methylation Pretraining</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #222; }
+
+  .slide {
+    width: 960px; margin: 40px auto; background: #fff;
+    border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 50px 60px 46px; page-break-after: always;
+    position: relative; overflow: hidden;
+  }
+  .slide::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 5px; background: linear-gradient(90deg, #0077b6, #00b4d8);
+  }
+  .slide-num { position: absolute; top: 18px; right: 28px; font-size: 13px; color: #bbb; font-weight: 500; }
+
+  h1 { font-size: 34px; color: #0077b6; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 23px; color: #0077b6; font-weight: 700; margin-bottom: 12px; }
+  h3 { font-size: 16px; color: #023e8a; font-weight: 700; margin-bottom: 5px; }
+
+  .subtitle { font-size: 15px; color: #666; font-style: italic; margin-bottom: 8px; }
+
+  hr.div { height: 3px; background: linear-gradient(90deg, #0077b6, #90e0ef); border: none; margin: 8px 0 22px; border-radius: 2px; width: 180px; }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 16px; }
+
+  .card { border-radius: 10px; padding: 18px 20px; border-left: 4px solid #0077b6; background: #f0f8ff; }
+  .card.green  { border-left-color: #06d6a0; background: #f0fff8; }
+  .card.orange { border-left-color: #ff9900; background: #fffaf0; }
+  .card.red    { border-left-color: #e63946; background: #fff5f5; }
+  .card.gray   { border-left-color: #aaa;    background: #fafafa; }
+  .card p  { font-size: 14px; color: #444; line-height: 1.65; margin-top: 6px; }
+  .card ul { padding-left: 18px; margin-top: 8px; }
+  .card ul li { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 5px; }
+
+  .badge { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 3px 3px 3px 0; }
+  .badge-blue   { background: #e0f0ff; color: #0077b6; }
+  .badge-green  { background: #d4f7ee; color: #087d5a; }
+  .badge-orange { background: #fff0d4; color: #b35a00; }
+
+  .pipeline { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 18px 0; }
+  .step { background: #f0f8ff; border: 2px solid #0077b6; border-radius: 8px; padding: 9px 13px; text-align: center; font-size: 13px; font-weight: 600; color: #023e8a; min-width: 90px; }
+  .step.green  { border-color: #06d6a0; color: #065f46; background: #f0fff8; }
+  .step.orange { border-color: #ff9900; color: #7c3600; background: #fffaf0; }
+  .step.gray   { border-color: #aaa;    color: #555;    background: #fafafa; }
+  .arr { font-size: 20px; color: #0077b6; padding: 0 5px; font-weight: bold; }
+
+  .metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+  .mbox { flex: 1; min-width: 120px; background: #f0f8ff; border-radius: 10px; padding: 14px; text-align: center; border-top: 4px solid #0077b6; }
+  .mbox .val { font-size: 26px; font-weight: 700; color: #0077b6; }
+  .mbox .lbl { font-size: 12px; color: #666; margin-top: 3px; }
+  .mbox.green  { border-top-color: #06d6a0; } .mbox.green .val  { color: #065f46; }
+  .mbox.orange { border-top-color: #ff9900; } .mbox.orange .val { color: #b35a00; }
+
+  .row-item { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: 8px; margin-bottom: 12px; }
+  .row-item .icon { font-size: 22px; min-width: 32px; text-align: center; }
+  .row-item .content h3 { margin-bottom: 3px; }
+  .row-item .content p  { font-size: 14px; color: #444; line-height: 1.6; }
+
+  .title-slide { text-align: center; padding: 70px 60px 56px; }
+  .title-slide h1 { font-size: 38px; margin-bottom: 14px; }
+  .title-slide .tagline { font-size: 18px; color: #555; max-width: 680px; margin: 0 auto 28px; line-height: 1.5; }
+  .title-slide .meta { font-size: 14px; color: #999; margin-top: 22px; }
+
+  .model-flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .flow-box { border-radius: 10px; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 600; width: 100%; border: 2px solid #0077b6; background: #f0f8ff; color: #023e8a; }
+  .flow-box.highlight { background: #0077b6; color: #fff; border-color: #0077b6; }
+  .flow-box.green     { background: #f0fff8; border-color: #06d6a0; color: #065f46; }
+  .flow-box.orange    { background: #fffaf0; border-color: #ff9900; color: #7c3600; }
+  .flow-box.dna       { background: #e8f8f2; border-color: #06d6a0; color: #065f46; border-width: 3px; font-size: 15px; }
+  .flow-down { font-size: 22px; color: #0077b6; line-height: 1; padding: 3px 0; }
+  .flow-sub  { font-size: 12px; font-weight: 400; color: inherit; display: block; margin-top: 2px; }
+
+  .vs-wrap { display: flex; align-items: stretch; gap: 0; margin-top: 18px; }
+  .vs-exp  { flex: 1; padding: 20px 22px; border-radius: 10px; }
+  .vs-mid  { display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #ff9900; padding: 0 16px; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+  th { background: #0077b6; color: #fff; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7faff; }
+  td.lbl   { font-weight: 600; color: #555; white-space: nowrap; }
+  td.green { color: #065f46; font-weight: 600; }
+  td.red   { color: #b30000; }
+
+  ul { padding-left: 20px; }
+  ul li { margin-bottom: 6px; font-size: 14px; line-height: 1.6; color: #333; }
+
+  @media print {
+    .slide { margin: 0; border-radius: 0; box-shadow: none; }
+    body   { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ SLIDE 1 — Title -->
+<div class="slide title-slide">
+  <span class="slide-num">1 / 12</span>
+  <h1>DNA-Informed Methylation Pretraining</h1>
+  <p class="tagline">
+    Using BMFM-DNA genomic context vectors to initialize MethylLlama's CpG embeddings —
+    giving the model biological knowledge before it sees a single methylation sample
+  </p>
+  <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
+    <span class="badge badge-blue">BMFM-DNA 113M</span>
+    <span class="badge badge-green">MethylLlama 73.7M</span>
+    <span class="badge badge-orange">WCED Pretraining</span>
+    <span class="badge badge-blue">AltumAge 21k Dataset</span>
+    <span class="badge badge-green">InfoNCE Contrastive</span>
+  </div>
+  <div style="background:#f0f8ff; border-radius:10px; padding:20px 32px; display:inline-block; max-width:720px; margin:0 auto;">
+    <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap; font-size:14px; color:#444;">
+      <div><strong style="color:#0077b6;">Step 1</strong><br>Map each CpG to its<br>genomic DNA window</div>
+      <div style="color:#bbb; font-size:22px; display:flex; align-items:center;">→</div>
+      <div><strong style="color:#0077b6;">Step 2</strong><br>Encode with BMFM-DNA<br>→ 768-dim vector</div>
+      <div style="color:#bbb; font-size:22px; display:flex; align-items:center;">→</div>
+      <div><strong style="color:#06d6a0;">Step 3</strong><br>Initialize MethylLlama<br>CpG embedding table</div>
+      <div style="color:#bbb; font-size:22px; display:flex; align-items:center;">→</div>
+      <div><strong style="color:#ff9900;">Step 4</strong><br>WCED pretraining<br>on methylation arrays</div>
+    </div>
+  </div>
+  <p class="meta">M.Sc. Thesis — Hebrew University of Jerusalem &nbsp;|&nbsp; 2026</p>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 2 — Problem -->
+<div class="slide">
+  <span class="slide-num">2 / 12</span>
+  <h2>The Problem: Learning from Methylation Arrays</h2>
+  <hr class="div">
+
+  <div class="two-col" style="align-items:start;">
+    <div>
+      <div class="card orange" style="margin-bottom:14px;">
+        <h3>What is DNA methylation?</h3>
+        <p>
+          A chemical modification at CpG sites across the genome that acts as a
+          <strong>stable, tissue-specific epigenetic switch</strong> — regulating gene expression
+          without changing the DNA sequence itself.
+          <br><br>
+          Biological age, cancer, cell type identity, and disease state are all
+          encoded in the methylation landscape.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>Illumina Methylation Arrays</h3>
+        <p>
+          Measure the methylation level (0 = unmethylated → 1 = fully methylated)
+          at hundreds of thousands of CpG sites across the genome.
+          Hundreds of thousands of public samples exist, but most have
+          <strong>no phenotype labels</strong> — making self-supervised pretraining essential.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom:14px;">
+        <h3>The Opportunity</h3>
+        <p>
+          Self-supervised pretraining on unlabeled arrays — like BERT for text —
+          can learn a general-purpose methylation encoder.
+          The CLS token becomes a compressed representation of the entire methylation profile,
+          useful for age prediction, cell-type deconvolution, and cancer classification.
+        </p>
+      </div>
+      <div class="card red">
+        <h3>The Challenge</h3>
+        <p>
+          In language models, word identity is already meaningful (semantics transfer).
+          In methylation models, <strong>CpG identity embeddings start from random noise</strong>.
+          The model must learn from scratch that nearby CpGs correlate, that promoter CpGs
+          behave differently from gene-body CpGs, and so on.
+          <br><br>
+          <strong>Our idea:</strong> use a DNA model to give each CpG a biologically
+          informed starting vector — before the model ever sees methylation data.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 3 — Why DNA -->
+<div class="slide">
+  <span class="slide-num">3 / 13</span>
+  <h2>Why a DNA Model?</h2>
+  <hr class="div">
+
+  <div class="two-col" style="align-items:start;">
+    <div>
+      <div class="card green" style="margin-bottom:14px;">
+        <h3>Methylation is a DNA phenomenon</h3>
+        <p>
+          DNA methylation occurs directly on the DNA strand at CpG dinucleotides.
+          The <strong>identity of a CpG site is fully determined by its DNA sequence context</strong>:
+          is it inside a CpG island? A promoter? A transcription factor binding site? A repeat element?
+          All of this information lives in the DNA — not in RNA or expression data.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>DNA is universal — computed once for all samples</h3>
+        <p>
+          Every human cell carries the same DNA sequence.
+          CpG embeddings are extracted <strong>once per probe</strong> and reused across all 10,988 training samples.
+          RNA expression is tissue- and condition-specific, so an RNA-based embedding
+          would not serve as a stable, sample-independent initialization.
+        </p>
+      </div>
+      <div class="card orange">
+        <h3>Why not RNA models?</h3>
+        <p>
+          RNA models (e.g., scBERT, Geneformer) encode <strong>gene expression</strong> —
+          the downstream effect of methylation, not its cause.
+          A promoter CpG controls whether a gene is transcribed;
+          a DNA model captures that regulatory role directly.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:14px; border-left-color:#06d6a0; background:#f0fff8;">
+        <h3 style="color:#065f46;">What BMFM-DNA learned</h3>
+        <p>
+          BMFM-DNA (IBM, 113M parameters) was pretrained on the entire human genome (GRCh38)
+          using a masked language modeling objective on DNA sequences.
+          Through this training it learned rich biological patterns embedded in DNA:
+        </p>
+        <ul style="margin-top:10px;">
+          <li><strong>CpG island structure</strong> — dense CpG regions that tend to stay unmethylated</li>
+          <li><strong>Promoter and enhancer signatures</strong> — sequence motifs near transcription start sites</li>
+          <li><strong>Transcription factor binding motifs</strong> — CTCF, SP1, and other regulators</li>
+          <li><strong>Repeat element context</strong> — LINE-1, Alu, SINE regions that are often heavily methylated</li>
+          <li><strong>Chromatin accessibility signals</strong> — open vs. closed chromatin is partly sequence-encoded</li>
+        </ul>
+        <p style="margin-top:10px;">
+          All of these patterns influence methylation — and BMFM-DNA encodes them
+          into a single 768-dim vector per genomic window, before seeing any methylation measurements.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 4 — Files needed -->
+<div class="slide">
+  <span class="slide-num">4 / 13</span>
+  <h2>Step 1a: Files Needed to Create CpG Embeddings</h2>
+  <hr class="div">
+  <p class="subtitle">Four resources are combined to map each CpG probe to a 768-dim DNA context vector</p>
+
+  <div class="two-col" style="align-items:start; margin-top:18px;">
+    <div>
+      <div class="card orange" style="margin-bottom:14px;">
+        <h3>hg38 Reference Genome (GRCh38)</h3>
+        <p>
+          The full human genome sequence — ~3.2 billion base pairs across all chromosomes.
+          Used to extract the exact DNA sequence surrounding each CpG site.
+          <br><br>
+          <strong>Why hg38?</strong> The most current and complete human assembly.
+          BMFM-DNA was trained on hg38, so the same reference must be used
+          to avoid coordinate mismatches.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>HM450 Probe Manifest</h3>
+        <p>
+          A lookup table that maps each Illumina probe ID
+          (e.g., <em>cg00000292</em>) to its exact chromosomal position in hg38 —
+          chromosome name and base-pair coordinate.
+          <br><br>
+          <strong>Source:</strong> Zhou et al. 2017 (NAR) — the standard hg38-native
+          annotation for the HM450 array. No coordinate conversion is needed.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom:14px;">
+        <h3>BMFM-DNA Pretrained Model</h3>
+        <p>
+          IBM's SCModernBert model (113M parameters) pretrained on the full human genome.
+          Reads a DNA sequence and outputs a 768-dim contextual embedding.
+          <br><br>
+          Used <strong>frozen</strong> — no fine-tuning, no weight updates.
+          This is pure feature extraction: we only need its forward pass once per CpG.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:14px; border-left-color:#aaa; background:#fafafa;">
+        <h3>AltumAge CpG List</h3>
+        <p>
+          The list of 21,368 CpG probe IDs present in our methylation dataset.
+          This defines exactly <strong>which probes</strong> we need embeddings for —
+          a subset of the full 450K array, filtered to the probes that appear
+          in the AltumAge 21k training data.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card green" style="margin-top:6px;">
+    <h3>How these four files connect</h3>
+    <p style="font-size:14px; color:#444; margin-top:6px;">
+      The CpG list defines <em>which probes</em> we need →
+      the HM450 manifest tells us <em>where each probe sits in the genome</em> →
+      hg38 gives us the <em>DNA sequence at that location</em> →
+      BMFM-DNA converts that sequence into a <em>768-dim biological context vector</em>.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 5 — Creating Embeddings flow -->
+<div class="slide">
+  <span class="slide-num">5 / 13</span>
+  <h2>Step 1b: Full Extraction Flow</h2>
+  <hr class="div">
+  <p class="subtitle">For each of the 21,368 CpG sites — repeated in batches until all embeddings are produced</p>
+
+  <!-- Vertical step-by-step flow -->
+  <div style="display:flex; flex-direction:column; gap:0; margin:22px 0 28px; max-width:760px; margin-left:auto; margin-right:auto;">
+
+    <div style="display:flex; gap:18px; align-items:stretch; margin-bottom:0;">
+      <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
+        <div style="background:#0077b6; color:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">1</div>
+        <div style="width:2px; background:#cde; flex:1; margin:4px 0;"></div>
+      </div>
+      <div class="card" style="flex:1; margin-bottom:10px;">
+        <h3>Look up the probe's genomic position</h3>
+        <p>For each CpG probe ID, query the HM450 manifest to retrieve its chromosome and exact base-pair position in hg38 (e.g., chr6 : 29,910,668).</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:stretch; margin-bottom:0;">
+      <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
+        <div style="background:#0077b6; color:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">2</div>
+        <div style="width:2px; background:#cde; flex:1; margin:4px 0;"></div>
+      </div>
+      <div class="card orange" style="flex:1; margin-bottom:10px;">
+        <h3>Extract the surrounding DNA window</h3>
+        <p>Open the hg38 genome FASTA and read the 4,096 nucleotides centered on the CpG site (±2,048 bp). This wide window captures nearby promoters, CpG islands, regulatory motifs, repeat elements, and long-range chromatin context.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:stretch; margin-bottom:0;">
+      <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
+        <div style="background:#0077b6; color:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">3</div>
+        <div style="width:2px; background:#cde; flex:1; margin:4px 0;"></div>
+      </div>
+      <div class="card" style="flex:1; margin-bottom:10px; border-left-color:#06d6a0; background:#f0fff8;">
+        <h3>Encode with BMFM-DNA (frozen)</h3>
+        <p>Feed the DNA sequence into the pretrained BMFM-DNA model. The model reads the nucleotide sequence and produces contextual representations for each position. We extract the <strong>hidden state at the CpG site token</strong> — the token whose span covers the CpG position — giving a 768-dim vector encoding the local genomic context at that exact site.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
+        <div style="background:#06d6a0; color:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">4</div>
+      </div>
+      <div class="card green" style="flex:1; margin-bottom:0;">
+        <h3>Save the embedding matrix</h3>
+        <p>After processing all 21,368 probes, the result is a matrix of shape <strong>21,368 × 768</strong> — one row per CpG site, one column per embedding dimension. This file is saved once and reused across all training runs.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="two-col" style="align-items:start;">
+    <div class="card" style="border-left-color:#aaa; background:#fafafa;">
+      <h3 style="color:#555;">What each 768-dim vector encodes</h3>
+      <ul>
+        <li>CpG island, shore, and shelf membership</li>
+        <li>Promoter and enhancer proximity</li>
+        <li>Transcription factor binding motifs (CTCF, SP1, etc.)</li>
+        <li>Repeat element context (LINE-1, Alu, etc.)</li>
+        <li>Local GC content and sequence complexity</li>
+      </ul>
+    </div>
+    <div class="card orange">
+      <h3>Key properties</h3>
+      <ul>
+        <li>Run <strong>once</strong> — no recomputation needed per training run</li>
+        <li>BMFM-DNA is fully <strong>frozen</strong> during extraction</li>
+        <li>All 21,368 probes have hg38 coordinates — <strong>100% coverage</strong></li>
+        <li>Special tokens (CLS, MASK, PAD) are <strong>never overwritten</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 5 — MethylLlama Architecture -->
+<div class="slide">
+  <span class="slide-num">6 / 13</span>
+  <h2>Step 2: MethylLlama — Model Architecture</h2>
+  <hr class="div">
+
+  <div class="two-col" style="align-items:start;">
+
+    <div>
+      <h3 style="color:#0077b6; margin-bottom:14px; text-align:center;">Information Flow</h3>
+      <div class="model-flow">
+        <div class="flow-box orange">
+          INPUT SEQUENCE
+          <span class="flow-sub">CLS token + randomly selected 50% of CpG sites</span>
+          <span class="flow-sub" style="color:#b35a00;">~10,684 CpGs per forward pass</span>
+        </div>
+        <div class="flow-down">↓</div>
+        <div class="flow-box dna">
+          EMBEDDING LAYER
+          <span class="flow-sub">CpG identity (768-dim) + methylation level [0,1]</span>
+          <span class="flow-sub" style="color:#087d5a; font-weight:700;">← BMFM-DNA vectors initialize the CpG identity part</span>
+        </div>
+        <div class="flow-down">↓</div>
+        <div class="flow-box">
+          TRANSFORMER LAYERS (8×)
+          <span class="flow-sub">Self-attention across all CpGs &nbsp;|&nbsp; RoPE position encoding</span>
+        </div>
+        <div class="flow-down">↓</div>
+        <div class="flow-box highlight">
+          CLS TOKEN — Global Methylation Profile
+          <span class="flow-sub">768-dim summary of the entire sample's methylation state</span>
+        </div>
+        <div class="flow-down">↓</div>
+        <div class="flow-box green">
+          DECODER — Predicts ALL 21,368 beta values
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="color:#0077b6; margin-bottom:14px;">Key Design Choices</h3>
+
+      <div class="row-item" style="background:#f0fff8; border-radius:8px; margin-bottom:10px; padding:12px 14px;">
+        <div style="min-width:90px; font-weight:700; color:#06d6a0; font-size:14px;">RoPE</div>
+        <div style="font-size:13px; color:#444;">Relative positional encoding within each attention layer — no fixed position table. Works correctly regardless of how many CpGs are in the sequence.</div>
+      </div>
+
+      <div class="row-item" style="background:#f0f8ff; border-radius:8px; margin-bottom:10px; padding:12px 14px;">
+        <div style="min-width:90px; font-weight:700; color:#0077b6; font-size:14px;">RMSNorm</div>
+        <div style="font-size:13px; color:#444;">Lightweight normalization applied before each sublayer (Pre-LN). More stable than standard BERT during early training.</div>
+      </div>
+
+      <div class="row-item" style="background:#fffaf0; border-radius:8px; margin-bottom:10px; padding:12px 14px;">
+        <div style="min-width:90px; font-weight:700; color:#ff9900; font-size:14px;">SwiGLU</div>
+        <div style="font-size:13px; color:#444;">Gated feed-forward activation (same as LLaMA, GPT-4). More expressive than standard GELU — better at learning complex co-methylation patterns.</div>
+      </div>
+
+      <div class="row-item" style="background:#f0fff8; border-radius:8px; padding:12px 14px;">
+        <div style="min-width:90px; font-weight:700; color:#06d6a0; font-size:14px;">ScaleAdapt</div>
+        <div style="font-size:13px; color:#444;">Trainable continuous encoder for methylation levels [0,1]. Encodes the beta value as a rich signal rather than a single number — important because 0.85 and 0.87 are biologically distinct.</div>
+      </div>
+
+      <div class="metrics">
+        <div class="mbox"><div class="val">8</div><div class="lbl">layers</div></div>
+        <div class="mbox green"><div class="val">768</div><div class="lbl">hidden dim</div></div>
+        <div class="mbox orange"><div class="val">12</div><div class="lbl">attn heads</div></div>
+        <div class="mbox"><div class="val">73.7M</div><div class="lbl">parameters</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 6 — Architecture Table -->
+<div class="slide">
+  <span class="slide-num">7 / 13</span>
+  <h2>Architecture: MethylLlama</h2>
+  <hr class="div">
+  <p class="subtitle">Every component was chosen to improve stability, efficiency, and the ability to capture fine-grained methylation signals</p>
+
+  <table style="margin-top:14px;">
+    <thead>
+      <tr>
+        <th style="width:150px;">Component</th>
+        <th>MethylLlama choice</th>
+        <th style="width:260px;">Why it matters</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="lbl">Normalization</td>
+        <td class="green">RMSNorm — ~40% faster, more numerically stable</td>
+        <td style="font-size:13px; color:#555;">Cleaner gradients, less compute per layer</td>
+      </tr>
+      <tr>
+        <td class="lbl">Layer order</td>
+        <td class="green">Pre-LN — normalize before each sublayer</td>
+        <td style="font-size:13px; color:#555;">Stable training from step one, no explosion risk</td>
+      </tr>
+      <tr>
+        <td class="lbl">Feed-forward</td>
+        <td class="green">SwiGLU — gated activation (same as LLaMA, GPT-4)</td>
+        <td style="font-size:13px; color:#555;">More expressive at the same parameter count</td>
+      </tr>
+      <tr>
+        <td class="lbl">Position encoding</td>
+        <td class="green">RoPE — relative, no fixed position table</td>
+        <td style="font-size:13px; color:#555;">Handles any number of CpGs, generalizes to unseen lengths</td>
+      </tr>
+      <tr>
+        <td class="lbl">Beta value encoder</td>
+        <td class="green">ScaleAdapt — trainable sinusoidal basis over [0,1]</td>
+        <td style="font-size:13px; color:#555;">Fine-grained resolution — 0.85 and 0.87 are biologically distinct</td>
+      </tr>
+      <tr>
+        <td class="lbl">Embedding scale</td>
+        <td class="green">Learned scale, initialized small (0.1)</td>
+        <td style="font-size:13px; color:#555;">CpG identity learned gradually — prevents shortcut learning early on</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card green" style="margin-top:18px;">
+    <h3>How each CpG is represented</h3>
+    <p style="margin-top:6px; font-size:14px; color:#444;">
+      Each input token combines two things:
+      a <strong>CpG identity vector</strong> (768-dim, initialized with BMFM-DNA — encodes the genomic context of that specific CpG site)
+      and a <strong>methylation level signal</strong> (the measured beta value [0,1], encoded by ScaleAdapt).
+      A small learned scale parameter controls the balance between these two components.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 7 — Injecting DNA Embeddings -->
+<div class="slide">
+  <span class="slide-num">8 / 13</span>
+  <h2>Step 3: Injecting BMFM-DNA Embeddings into MethylLlama</h2>
+  <hr class="div">
+
+  <div class="two-col" style="align-items:start;">
+    <div>
+      <h3 style="margin-bottom:14px;">The CpG Embedding Table</h3>
+
+      <div style="border-radius:10px; overflow:hidden; border:1px solid #e0e0e0; font-size:14px; margin-bottom:18px;">
+        <div style="background:#f0f0f0; padding:12px 16px; color:#888; font-weight:600;">
+          Special tokens &nbsp; (CLS, MASK, PAD …)
+        </div>
+        <div style="background:#f8f8f8; padding:7px 16px; font-size:12px; color:#bbb; border-bottom:1px solid #e8e8e8;">
+          ← never modified
+        </div>
+        <div style="background:#d4f7ee; padding:12px 16px; color:#065f46; font-weight:700;">
+          21,368 CpG site rows
+        </div>
+        <div style="background:#e8faf3; padding:7px 16px; font-size:12px; color:#06d6a0; font-weight:700;">
+          ← replaced with BMFM-DNA 768-dim vectors
+        </div>
+      </div>
+
+      <div class="card green">
+        <h3>Verified at the start of every run</h3>
+        <p>
+          The system checks automatically that embeddings were loaded correctly
+          by measuring their magnitude — DNA-initialized vectors have a
+          characteristic signature that differs clearly from random initialization.
+          A confirmation flag is recorded in the training log.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px;">What changes vs. random initialization</h3>
+
+      <div class="row-item" style="background:#f0f8ff; border-radius:8px; margin-bottom:10px;">
+        <div class="icon">🧭</div>
+        <div class="content">
+          <h3>Biological similarity from day one</h3>
+          <p>Two CpGs in the same CpG island start with similar vectors, before the model has seen any methylation data. Random init gives them completely unrelated vectors.</p>
+        </div>
+      </div>
+
+      <div class="row-item" style="background:#f0fff8; border-radius:8px; margin-bottom:10px;">
+        <div class="icon">⚡</div>
+        <div class="content">
+          <h3>Faster convergence expected</h3>
+          <p>The model starts from a biologically informed prior and can focus on learning methylation dynamics — not on re-discovering basic genomic relationships from scratch.</p>
+        </div>
+      </div>
+
+      <div class="row-item" style="background:#fffaf0; border-radius:8px; margin-bottom:10px;">
+        <div class="icon">🌍</div>
+        <div class="content">
+          <h3>Genome-scale context encoded</h3>
+          <p>Each embedding carries the context of ±2,048 bp around the CpG: CpG island status, regulatory elements, transcription factor binding sites — all transferred from a 113M parameter DNA model.</p>
+        </div>
+      </div>
+
+      <div class="row-item" style="background:#f8f8f8; border-radius:8px;">
+        <div class="icon">🔓</div>
+        <div class="content">
+          <h3>Embeddings remain trainable</h3>
+          <p>BMFM-DNA provides the starting point only. During pretraining the embeddings are updated and refined using the methylation data itself.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 9 — WCED + Why Pretraining -->
+<div class="slide">
+  <span class="slide-num">9 / 12</span>
+  <h2>Step 4: Pretraining with WCED</h2>
+  <hr class="div">
+  <p class="subtitle">Weighted CpG Expression Denoising — a Masked Autoencoder adapted for methylation data</p>
+
+  <div class="pipeline" style="margin:14px 0 18px;">
+    <div class="step orange">Random 50%<br>of CpGs<br>as input</div>
+    <span class="arr">→</span>
+    <div class="step">MethylLlama<br>Encoder<br>73.7M</div>
+    <span class="arr">→</span>
+    <div class="step">CLS<br>Representation<br>768-dim</div>
+    <span class="arr">→</span>
+    <div class="step">Linear<br>Decoder</div>
+    <span class="arr">→</span>
+    <div class="step green">Predicted beta<br>for all CpGs</div>
+    <span class="arr">→</span>
+    <div class="step orange">Loss on<br>held-out 50%<br>only</div>
+  </div>
+
+  <div class="two-col" style="align-items:start;">
+
+    <!-- Left: WCED design choices -->
+    <div>
+      <div class="card orange" style="margin-bottom:12px;">
+        <h3>Why randomize the input every batch?</h3>
+        <p>If the same CpGs were always the input, the model would memorize fixed mappings and stop generalizing. Random shuffling forces the model to learn <strong>global methylation patterns</strong> — it can never rely on any specific CpG always being available.</p>
+      </div>
+      <div class="card green" style="margin-bottom:12px;">
+        <h3>Why add contrastive loss?</h3>
+        <p>Without it, the CLS token collapses — all samples produce nearly identical representations.
+          Two random 50% views of the <em>same sample</em> → similar CLS.
+          Views from <em>different samples</em> → pushed apart.
+          <br><strong>Loss = Reconstruction MSE + 0.1 × InfoNCE</strong></p>
+      </div>
+      <div class="card gray">
+        <h3>Training setup</h3>
+        <ul>
+          <li>300 epochs max, early stopping (patience 60)</li>
+          <li>Effective batch size: 256 &nbsp;|&nbsp; 2 × H200 GPUs</li>
+          <li>7,416 train / 1,308 valid / 2,264 test samples</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right: Why pretraining is needed after DNA init -->
+    <div>
+      <p style="font-size:14px; font-weight:700; color:#0077b6; margin-bottom:12px;">Why DNA init alone is not enough — what WCED must learn:</p>
+      <div class="card red" style="margin-bottom:10px;">
+        <h3>Tissue- and age-specific methylation</h3>
+        <p>DNA sequence is the same in every cell. BMFM-DNA cannot learn that a CpG is methylated in blood but not in brain — this requires real methylation data across many samples.</p>
+      </div>
+      <div class="card red" style="margin-bottom:10px;">
+        <h3>Long-range co-methylation</h3>
+        <p>CpGs far apart may be tightly co-regulated in aging tissue. These correlations are invisible to any local DNA window — only methylation data across thousands of samples reveals them.</p>
+      </div>
+      <div class="card red">
+        <h3>How to use beta values</h3>
+        <p>BMFM-DNA reads only DNA letters — no concept of methylation levels [0,1]. WCED teaches the model to combine CpG identity with methylation level into a meaningful global representation.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 10 — Experiment Design -->
+<div class="slide">
+  <span class="slide-num">10 / 12</span>
+  <h2>Full Pipeline &amp; Experiment Design</h2>
+  <hr class="div">
+
+  <div class="pipeline" style="flex-wrap:wrap; gap:6px; margin-bottom:26px;">
+    <div class="step gray">hg38<br>Reference<br>Genome</div>
+    <span class="arr">→</span>
+    <div class="step gray">Extract<br>DNA context<br>per CpG</div>
+    <span class="arr">→</span>
+    <div class="step orange">BMFM-DNA<br>113M<br>(frozen)</div>
+    <span class="arr">→</span>
+    <div class="step green">21,368<br>context<br>vectors</div>
+    <span class="arr">→</span>
+    <div class="step">Initialize<br>embedding<br>table</div>
+    <span class="arr">→</span>
+    <div class="step orange">WCED<br>Pretraining<br>300 epochs</div>
+    <span class="arr">→</span>
+    <div class="step green">Best<br>checkpoint</div>
+    <span class="arr">→</span>
+    <div class="step">Fine-tune<br>(age / cell<br>type)</div>
+  </div>
+
+  <div class="vs-wrap">
+    <div class="vs-exp" style="background:#fff8ee; border:2px solid #ff9900; border-radius:10px;">
+      <h3 style="color:#b35a00; margin-bottom:12px;">Experiment A — Baseline</h3>
+      <p style="font-size:14px; color:#555; margin-bottom:12px;">Random initialization (Xavier)</p>
+      <ul>
+        <li>Standard MethylLlama with randomly initialized CpG embeddings</li>
+        <li>Identical architecture, training settings, and data</li>
+        <li>Purpose: establishes the performance floor</li>
+        <li>10,988 samples &nbsp;|&nbsp; 7,416 train / 1,308 valid / 2,264 test</li>
+      </ul>
+    </div>
+    <div class="vs-mid">VS</div>
+    <div class="vs-exp" style="background:#f0fff8; border:2px solid #06d6a0; border-radius:10px;">
+      <h3 style="color:#065f46; margin-bottom:12px;">Experiment B — BMFM-DNA Init</h3>
+      <p style="font-size:14px; color:#555; margin-bottom:12px;">Biologically-informed initialization</p>
+      <ul>
+        <li>Same MethylLlama, CpG embeddings replaced with BMFM-DNA vectors</li>
+        <li>Identical architecture, training settings, and data</li>
+        <li>Purpose: test whether genomic context improves representations</li>
+        <li>10,988 samples &nbsp;|&nbsp; 7,416 train / 1,308 valid / 2,264 test</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 11 — Fine-tuning -->
+<div class="slide">
+  <span class="slide-num">11 / 12</span>
+  <h2>Fine-tuning: From Pretrained Encoder to Downstream Tasks</h2>
+  <hr class="div">
+  <p class="subtitle">The pretrained CLS representation is the starting point for all downstream tasks</p>
+
+  <div class="two-col" style="align-items:start; margin-top:18px;">
+    <div>
+      <div class="card orange" style="margin-bottom:14px;">
+        <h3>Biological Age Prediction</h3>
+        <p>
+          All 21,368 CpGs are provided as input (no masking at inference time).
+          The CLS representation is passed to a lightweight prediction head
+          to estimate biological age in years.
+          <br><br>
+          This directly tests whether the learned representation captures
+          the aging methylation signal.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>Cell Type Deconvolution</h3>
+        <p>
+          Predicts the proportion of different cell types in a mixed sample
+          from its methylation profile.
+          This tests whether CLS captures tissue identity — the
+          key discriminative property we expect DNA init to improve.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom:14px;">
+        <h3>What changes at fine-tuning time</h3>
+        <ul>
+          <li>All CpGs are used as input — no random masking</li>
+          <li>The reconstruction decoder is discarded</li>
+          <li>A task-specific prediction head is added to CLS</li>
+          <li>The full encoder is fine-tuned end-to-end</li>
+          <li>A lower learning rate is used to preserve pretrained representations</li>
+        </ul>
+      </div>
+      <div class="card gray">
+        <h3>Why pretraining matters here</h3>
+        <p>
+          Fine-tuning datasets are typically small — often only hundreds of labeled samples.
+          A pretrained encoder that already understands methylation patterns
+          needs far fewer labeled examples to reach good performance,
+          exactly like BERT fine-tuned on NLP tasks.
+          <br><br>
+          <strong>The hypothesis:</strong> DNA-initialized pretraining produces
+          richer representations that transfer better to downstream tasks,
+          especially in low-data settings.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ SLIDE 12 — Expected Results -->
+<div class="slide">
+  <span class="slide-num">12 / 12</span>
+  <h2>What We Expect to See</h2>
+  <hr class="div">
+
+  <div class="two-col" style="align-items:start; margin-bottom:20px;">
+    <div>
+      <div class="row-item" style="background:#f0f8ff; border-radius:8px; margin-bottom:12px;">
+        <div class="icon">⚡</div>
+        <div class="content">
+          <h3>Faster Convergence</h3>
+          <p>DNA-init should reach low validation loss in fewer epochs — the model starts with biologically meaningful CpG similarities rather than learning them from scratch.</p>
+        </div>
+      </div>
+      <div class="row-item" style="background:#f0fff8; border-radius:8px; margin-bottom:12px;">
+        <div class="icon">📈</div>
+        <div class="content">
+          <h3>Better Reconstruction Quality</h3>
+          <p>Higher correlation between predicted and true beta values on held-out CpGs. We expect DNA-init to converge to a higher accuracy with fewer epochs.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="row-item" style="background:#fffaf0; border-radius:8px; margin-bottom:12px;">
+        <div class="icon">🎯</div>
+        <div class="content">
+          <h3>More Discriminative Representations</h3>
+          <p>Greater spread in the CLS embedding space — the encoder should separate cell types, tissues, and age groups more clearly than random init.</p>
+        </div>
+      </div>
+      <div class="row-item" style="background:#f0fff8; border-radius:8px; margin-bottom:12px;">
+        <div class="icon">🏆</div>
+        <div class="content">
+          <h3>Better Fine-tuning Performance</h3>
+          <p>The ultimate test: fine-tune both checkpoints on biological age prediction.
+          If DNA-init wins, the genomic context prior is genuinely useful for methylation modeling.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

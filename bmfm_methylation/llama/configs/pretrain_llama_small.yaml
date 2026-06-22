@@ -1,0 +1,96 @@
+# MethylLlama-Small pretraining configuration
+#
+# Smaller architecture for comparison with MethylGPT (64D, 6L, 4H, ~5-6M params).
+# This model uses the same modern components as MethylLlama (RoPE, RMSNorm, SwiGLU,
+# ScaleAdapt) but at a scale comparable to MethylGPT.
+#
+# Architecture: 256D, 4 layers, 4 heads → ~2-3M non-embedding params
+# Head dim = 256 / 4 = 64 (same as MethylGPT's entire hidden size)
+# SwiGLU intermediate: round(2/3 × 4 × 256 / 64) × 64 = 5 × 64 = 320
+
+pretraining_mode: wced
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+data_path: ???
+probe_ids_csv: null
+resume_checkpoint: null
+output_directory: ./outputs/llama_small_wced
+tokenizer_path: ./tokenizer_llama_domain21k
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Model architecture (MethylLlamaConfig — small variant)
+# ─────────────────────────────────────────────────────────────────────────────
+model:
+  hidden_size: 256
+  num_hidden_layers: 4
+  num_attention_heads: 4
+  # SwiGLU intermediate: round(2/3 × 4 × 256 / 64) × 64 = 5 × 64 = 320
+  intermediate_size: 320
+  # vocab_size set at runtime from h5ad + tokenizer
+  vocab_size: 21373            # 21368 CpGs + 5 special tokens (placeholder; overridden at runtime)
+  rope_theta: 10000.0
+  rms_norm_eps: 1e-6
+  hidden_dropout_prob: 0.1
+  n_sin_basis: 48
+  basis_scale: 2.0
+  scale_adapt_trainable: true
+  cpg_scale_init: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Data module
+# ─────────────────────────────────────────────────────────────────────────────
+data_module:
+  batch_size: 32               # Larger batch viable with smaller model
+  num_workers: 8
+  max_length: 10685            # CLS + 21368 × 0.5 input CpGs
+  subset_k: 21368
+  fixed_subset: false          # Random subset per epoch (same as domain run)
+  fixed_subset_seed: 42
+  mask_ratio: 0.3
+  change_ratio: 0.1
+  switch_ratio: 0.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WCED settings — identical to domain run for fair comparison
+# ─────────────────────────────────────────────────────────────────────────────
+wced_input_ratio: 0.5
+wced_contrastive: true
+wced_contrastive_weight: 0.1
+wced_contrastive_temp: 0.1
+wced_normalize_loss: true
+wced_age_weight: 0.5
+wced_decoder_dropout: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer
+# ─────────────────────────────────────────────────────────────────────────────
+trainer:
+  learning_rate: 5e-4
+  weight_decay: 0.01
+  warmup_steps: 500
+  lr_decay_steps: 0
+  betas: [0.9, 0.99]
+  epsilon: 1e-8
+
+pretrain_epochs: 300
+accumulate_grad_batches: 4    # Smaller model → smaller accum needed; eff batch = 32×2GPU×4 = 256
+gradient_clip_val: 1.0
+early_stop_patience: 60
+precision: "16-mixed"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Seed
+# ─────────────────────────────────────────────────────────────────────────────
+seed:
+  seed_value: 42
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WandB
+# ─────────────────────────────────────────────────────────────────────────────
+track_wandb:
+  enabled: true
+  project: "pretrain-llama-small"
+  entity: null
+  name: "llama_small_wced_pretrain"

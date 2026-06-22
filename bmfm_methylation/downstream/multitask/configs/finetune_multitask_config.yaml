@@ -1,0 +1,41 @@
+# Task B — Multi-Task Probing config (age + smoking + sex)
+
+defaults:
+  - _self_
+
+# ── Paths ──────────────────────────────────────────────────────────────────
+# data_path: h5ad with obs columns: age, smoking_status, sex, split
+# This can be your existing age h5ad if it also has smoking/sex columns.
+# If not, see data_prep/merge_multitask_data.py to merge datasets.
+data_path: ???
+checkpoint_path: ???
+output_directory: ./outputs/downstream/multitask
+
+# ── Data ───────────────────────────────────────────────────────────────────
+subset_k: 4000
+batch_size: 32
+num_workers: 4
+
+# ── Task weights ────────────────────────────────────────────────────────────
+# Scale so no single task dominates. Age MSE is ~1 (normalized), CE is ~1.1.
+age_weight: 1.0
+smoking_weight: 1.0
+sex_weight: 0.5
+
+# ── Training ───────────────────────────────────────────────────────────────
+finetune_epochs: 100
+accumulate_grad_batches: 1
+learning_rate: 1e-4
+weight_decay: 0.01
+warmup_steps: 200
+freeze_encoder: true
+unfreeze_encoder_epoch: 5
+early_stop_patience: 20
+
+# ── W&B ────────────────────────────────────────────────────────────────────
+use_wandb: true
+wandb_project: methyl-downstream-multitask
+wandb_entity: null
+wandb_run_name: multitask-wced
+
+seed: 42

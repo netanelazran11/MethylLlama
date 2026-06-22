@@ -1,0 +1,22 @@
+# Fine-tuning task configuration - Age Regression
+# This fine-tunes the pretrained model for age prediction
+
+- _target_: bmfm_targets.config.TrainingTaskConfig
+  default_root_dir: "${output_directory}/finetune_age"
+  max_epochs: ${finetune_epochs}
+  precision: "16-mixed"
+  val_check_interval: 0.25
+  accelerator: "gpu"
+  max_steps: -1
+  tf32_mode: medium
+  accumulate_grad_batches: ${accumulate_grad_batches}
+  freeze_layers: false
+  resume_training_from_ckpt: false
+
+- _target_: bmfm_targets.config.TestTaskConfig
+  default_root_dir: "${output_directory}/finetune_age"
+  precision: "16-mixed"
+  accelerator: "gpu"
+  tf32_mode: medium
+  checkpoint: best
+  num_bootstrap_runs: 0

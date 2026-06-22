@@ -1,0 +1,64 @@
+# Configuration for WCED (Whole Cell Expression Decoder) pretraining
+#
+# WCED differs from MLM:
+# - MLM: Mask some positions, predict only masked positions
+# - WCED: No masking, reconstruct ALL positions from [CLS] token
+#
+# WCED creates a global bottleneck that forces [CLS] to aggregate
+# information from the entire methylation profile into a single vector.
+#
+# Usage:
+#   python -m bmfm_methylation.pretrain \
+#       --config-name=pretrain_wced_config \
+#       data_path=/path/to/methylation.h5ad \
+#       output_directory=./outputs
+#
+# Or with the main config:
+#   python -m bmfm_methylation.pretrain \
+#       data_path=/path/to/methylation.h5ad \
+#       pretraining_mode=wced
+
+defaults:
+  - data_module: methylation
+  - fields: methylation
+  - trainer: methylation
+  - task: pretrain_mlm  # Reuse task config
+  - model: scbert_methylation
+  - _self_
+
+# Pretraining mode: "wced" for whole-cell decoder
+pretraining_mode: wced
+
+# Paths
+data_path: ???  # Required: path to h5ad file
+output_directory: ./outputs/methylation_wced
+tokenizer_path: ./tokenizer
+checkpoint_path: null
+
+# Training settings
+pretrain_epochs: 300
+accumulate_grad_batches: 4  # Effective batch = 32 x 4 = 128
+early_stop_patience: 60
+
+# Embedding combination style (for encoder)
+combine_style: add
+
+# WCED-specific settings
+wced_decoder_hidden_sizes: [2048, 4096]  # Decoder architecture: 512 -> 2048 -> 4096 -> num_cpg
+wced_decoder_dropout: 0.1
+wced_use_positional_decoder: false  # Set to true for attention-based decoder
+
+# MLM settings (disabled for WCED)
+mlm_enabled: false
+collation_strategy: "language_modeling"
+
+# Seed
+seed:
+  seed_value: 42
+
+# WandB logging
+track_wandb:
+  enabled: true
+  project: "methylation-pretrain-wced"
+  entity: null
+  name: "methylation_wced_pretrain"

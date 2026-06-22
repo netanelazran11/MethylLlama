@@ -1,0 +1,14 @@
+# Pretraining task configuration - Masked Language Modeling
+# This pretrains the model to learn methylation patterns
+
+- _target_: bmfm_targets.config.TrainingTaskConfig
+  default_root_dir: "${output_directory}/pretrain"
+  max_epochs: ${pretrain_epochs}
+  precision: "16-mixed"
+  val_check_interval: 0.25
+  accelerator: "gpu"
+  max_steps: -1
+  tf32_mode: medium
+  accumulate_grad_batches: ${accumulate_grad_batches}
+  freeze_layers: false
+  resume_training_from_ckpt: false

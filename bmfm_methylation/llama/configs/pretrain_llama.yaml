@@ -1,0 +1,105 @@
+# MethylLlama pretraining configuration
+#
+# Usage (WCED — recommended):
+#   python -m bmfm_methylation.llama_methyl.pretrain_llama \
+#       data_path=/path/to/methylation.h5ad \
+#       output_directory=./outputs/llama_wced
+#
+# Usage (with overrides):
+#   python -m bmfm_methylation.llama_methyl.pretrain_llama \
+#       data_path=/path/to/methylation.h5ad \
+#       pretraining_mode=wced \
+#       wced_age_weight=2.0 \
+#       model.hidden_size=768
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Pretraining mode
+# ─────────────────────────────────────────────────────────────────────────────
+pretraining_mode: wced   # "wced" (recommended) or "mlm"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+data_path: ???                              # Required: path to .h5ad file
+probe_ids_csv: null                        # Optional: CSV with CpG probe IDs (needed when var_names are integers)
+resume_checkpoint: null                    # Optional: path to .ckpt to resume training from
+output_directory: ./outputs/llama_wced
+tokenizer_path: ./tokenizer               # Shared with SCBert pretraining
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Model architecture (MethylLlamaConfig)
+# ─────────────────────────────────────────────────────────────────────────────
+model:
+  hidden_size: 768
+  num_hidden_layers: 8
+  num_attention_heads: 12
+  # SwiGLU intermediate: round(2/3 × 4 × 768 / 64) × 64 = 32 × 64 = 2048
+  intermediate_size: 2048
+  # vocab_size = n_cpg_sites + 5 special tokens (UNK, SEP, PAD, CLS, MASK)
+  # For 49156 CpGs: 49156 + 5 = 49161 (set at runtime from h5ad, not here)
+  vocab_size: 49161
+  rope_theta: 10000.0
+  rms_norm_eps: 1e-6
+  hidden_dropout_prob: 0.1
+  # ScaleAdapt: basis_scale=2.0 (methylation [0,1]) vs upstream 1.5 (scRNA [0,10+])
+  n_sin_basis: 48
+  basis_scale: 2.0
+  scale_adapt_trainable: true
+  cpg_scale_init: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Data module
+# ─────────────────────────────────────────────────────────────────────────────
+data_module:
+  batch_size: 8
+  num_workers: 8
+  max_length: 24580          # CLS + 49156×0.5 input CpGs
+  subset_k: 49156            # Use ALL 49k CpGs
+  fixed_subset: true         # Use the same CpG subset across epochs
+  fixed_subset_seed: 42
+  mask_ratio: 0.3            # Only used for MLM mode
+  change_ratio: 0.1          # Only used for MLM mode
+  switch_ratio: 0.0          # Only used for MLM mode
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WCED settings
+# ─────────────────────────────────────────────────────────────────────────────
+wced_input_ratio: 0.5              # 50%→50% proven WCED split
+wced_contrastive: false            # Disabled: pure reconstruction for first run
+wced_contrastive_weight: 0.0
+wced_contrastive_temp: 0.1         # InfoNCE temperature
+wced_normalize_loss: false         # Per-sample normalize (removes "predict averages" shortcut)
+wced_age_weight: 1.0               # λ for age MSE (forces CLS to encode age)
+wced_decoder_dropout: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer
+# ─────────────────────────────────────────────────────────────────────────────
+trainer:
+  learning_rate: 3e-4
+  weight_decay: 0.01
+  warmup_steps: 1000         # Larger model benefits from longer warmup
+  lr_decay_steps: 0          # 0 = auto-compute from trainer.estimated_stepping_batches
+  betas: [0.9, 0.99]         # β₂=0.99 (upstream BMFM convention; faster adaptation)
+  epsilon: 1e-8
+
+pretrain_epochs: 300
+accumulate_grad_batches: 8   # Effective batch = 16 × 8 = 128
+gradient_clip_val: 1.0
+early_stop_patience: 60
+precision: "16-mixed"        # BFloat16 or FP16 mixed precision
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Seed
+# ─────────────────────────────────────────────────────────────────────────────
+seed:
+  seed_value: 42
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WandB logging
+# ─────────────────────────────────────────────────────────────────────────────
+track_wandb:
+  enabled: true
+  project: "methylation-llama-pretrain"
+  entity: null      # Set to your WandB entity
+  name: "llama_wced_pretrain"

@@ -1,0 +1,73 @@
+# Main configuration for methylation pretraining (MLM/WCED)
+#
+# Usage:
+#   # MLM pretraining (default):
+#   python -m bmfm_methylation.pretrain \
+#       data_path=/path/to/methylation.h5ad \
+#       output_directory=./outputs
+#
+#   # WCED pretraining:
+#   python -m bmfm_methylation.pretrain \
+#       data_path=/path/to/methylation.h5ad \
+#       pretraining_mode=wced
+
+defaults:
+  - data_module: methylation
+  - fields: methylation
+  - trainer: methylation
+  - task: pretrain_mlm
+  - model: scbert_methylation
+  - _self_
+
+# Pretraining mode: "mlm" or "wced"
+# - mlm: Mask 30% of beta values, predict masked positions only
+# - wced: No masking, reconstruct ALL positions from [CLS] token
+pretraining_mode: mlm
+
+# Paths
+data_path: ???  # Required: path to h5ad file
+output_directory: ./outputs/methylation
+tokenizer_path: ./tokenizer  # Will be created if doesn't exist
+checkpoint_path: null  # No checkpoint for pretraining from scratch
+
+# Training settings
+pretrain_epochs: 300  # May need longer for good representations
+accumulate_grad_batches: 8  # Effective batch = 16 × 8 = 128 (reduced for 8k seq length)
+early_stop_patience: 60  # Stop after 60 epochs without improvement
+
+# Embedding combination style
+# "add" (default): h = CpG_embed + β_embed (standard BMFM)
+# "multiply": h = CpG_embed * β_value (scGPT style)
+combine_style: add
+
+# Beta encoder: ScaleAdaptEncoder (sinusoidal basis) vs default MLP
+# ScaleAdapt encodes beta values [0,1] via trainable sinusoidal frequencies,
+# providing higher resolution than a 2-layer MLP (better captures 0.85 vs 0.87)
+# Applies to both MLM and WCED pretraining modes
+use_scale_adapt: false          # set true to enable
+scale_adapt_n_sin_basis: 48     # number of sin/cos basis pairs → 96 total features
+scale_adapt_basis_scale: 1.5    # frequency init scale: freqs ~ N(0, 2π * basis_scale)
+
+# MLM settings (used when pretraining_mode=mlm)
+mlm_enabled: true
+collation_strategy: "language_modeling"
+
+# WCED settings (used when pretraining_mode=wced)
+wced_input_ratio: 0.5  # Fraction of CpGs per view (0.5 for non-overlapping contrastive views)
+wced_contrastive: false  # Enable contrastive learning (two views per sample)
+wced_contrastive_weight: 0.0  # λ for contrastive loss (Loss = Recon + λ * Contrastive)
+wced_contrastive_temp: 0.1  # Temperature for InfoNCE loss
+wced_normalize_loss: false  # Per-sample normalize before loss (removes "predict averages" shortcut)
+wced_age_weight: 1.0  # λ for age prediction loss (Loss = Recon + λ * Age_MSE) - forces CLS to encode age
+wced_decoder_dropout: 0.1
+
+# Seed
+seed:
+  seed_value: 42
+
+# WandB logging
+track_wandb:
+  enabled: true
+  project: "methylation-pretrain"
+  entity: null  # Set to your WandB entity
+  name: "methylation_mlm_pretrain"

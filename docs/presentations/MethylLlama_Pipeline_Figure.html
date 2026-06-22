@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MethylLlama — Pipeline Figure</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:#fff;padding:36px 28px}
+.figure{width:1340px;margin:0 auto}
+
+/* ── Title ──────────────────────────────────────────────── */
+.fig-title{
+  text-align:center;font-size:16px;font-weight:800;color:#111827;
+  margin-bottom:6px;letter-spacing:.3px
+}
+.fig-subtitle{
+  text-align:center;font-size:11.5px;color:#6b7280;margin-bottom:26px
+}
+
+/* ── Pipeline row ────────────────────────────────────────── */
+.pipeline{display:flex;align-items:stretch;gap:0;margin-bottom:28px}
+.panel{
+  flex:1;border-radius:10px;padding:13px 11px 13px;position:relative;
+  display:flex;flex-direction:column
+}
+.arrow-wrap{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;flex-shrink:0;padding-top:18px
+}
+
+/* ── Panel colour themes ─────────────────────────────────── */
+.p1{background:#eff6ff;border:2px solid #3b82f6}
+.p2{background:#ecfdf5;border:2px solid #10b981}
+.p3{background:#fffbeb;border:2px solid #f59e0b}
+.p4{background:#f5f3ff;border:2px solid #7c3aed}
+.p5{background:#fff7ed;border:2px solid #f97316}
+.p6{background:#f0fdf4;border:2px solid #16a34a}
+
+/* ── Panel header ────────────────────────────────────────── */
+.p-header{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.p-num{
+  width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800;
+  color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0
+}
+.p1 .p-num{background:#3b82f6}
+.p2 .p-num{background:#10b981}
+.p3 .p-num{background:#f59e0b}
+.p4 .p-num{background:#7c3aed}
+.p5 .p-num{background:#f97316}
+.p6 .p-num{background:#16a34a}
+
+.p-title{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.p1 .p-title{color:#1d4ed8}
+.p2 .p-title{color:#065f46}
+.p3 .p-title{color:#92400e}
+.p4 .p-title{color:#4c1d95}
+.p5 .p-title{color:#9a3412}
+.p6 .p-title{color:#14532d}
+
+/* ── Panel icon area ─────────────────────────────────────── */
+.p-icon{margin:4px auto 8px;display:block}
+
+/* ── Panel bullet list ───────────────────────────────────── */
+.p-list{list-style:none;padding:0;flex:1}
+.p-list li{
+  font-size:10px;color:#374151;padding:1.5px 0 1.5px 11px;
+  position:relative;line-height:1.45
+}
+.p-list li::before{content:'·';position:absolute;left:2px;font-size:12px;color:#9ca3af;top:-1px}
+.p-list .hi{font-weight:700;color:#111827}
+.p-list .mono{font-family:monospace;font-size:9.5px;background:rgba(0,0,0,.06);
+              padding:0 3px;border-radius:3px}
+
+/* ── Bottom label ─────────────────────────────────────────── */
+.p-label{
+  margin-top:8px;text-align:center;font-size:9px;font-weight:700;
+  letter-spacing:.4px;text-transform:uppercase;opacity:.65
+}
+
+/* ── Architecture zoom ───────────────────────────────────── */
+.arch-section{
+  border:2px solid #7c3aed;border-radius:12px;background:#faf9ff;
+  padding:22px 28px 24px;position:relative
+}
+.arch-badge{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:#7c3aed;color:#fff;font-size:11px;font-weight:700;
+  padding:3px 18px;border-radius:20px;letter-spacing:.3px
+}
+.arch-inner{display:flex;gap:20px;align-items:flex-start}
+
+/* columns inside arch section */
+.arch-col{flex:1}
+.arch-col-wide{flex:1.4}
+.arch-col-narrow{flex:.8}
+.arch-section-title{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  color:#4c1d95;margin-bottom:10px;border-bottom:1px solid #ddd6fe;padding-bottom:5px
+}
+
+/* embedding block */
+.emb-box{
+  background:#ede9fe;border:1.5px solid #a78bfa;border-radius:8px;
+  padding:9px 10px;margin-bottom:10px
+}
+.emb-title{font-size:10px;font-weight:700;color:#4c1d95;margin-bottom:6px}
+.emb-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.emb-field{
+  flex:1;background:#fff;border:1px solid #c4b5fd;border-radius:5px;
+  padding:4px 6px;font-size:9.5px;color:#374151;text-align:center;line-height:1.4
+}
+.emb-field .ef-type{font-weight:700;color:#5b21b6;font-size:9px;text-transform:uppercase;letter-spacing:.3px}
+.emb-plus{font-size:13px;font-weight:700;color:#7c3aed}
+.emb-fuse{
+  background:#fff;border:1px dashed #a78bfa;border-radius:5px;
+  padding:4px 8px;font-size:9.5px;color:#4c1d95;text-align:center;
+  font-style:italic
+}
+.emb-scale{font-size:9px;color:#6b7280;margin-top:4px;text-align:center}
+
+/* transformer layer box */
+.layer-box{
+  background:#f0ebff;border:1.5px solid #8b5cf6;border-radius:8px;
+  padding:7px 9px;margin-bottom:6px
+}
+.layer-tag{
+  font-size:9px;font-weight:800;color:#5b21b6;text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:5px
+}
+.sub-block{
+  background:#fff;border:1px solid #c4b5fd;border-radius:4px;
+  padding:4px 7px;margin-bottom:4px;font-size:9.5px;color:#374151;
+  display:flex;align-items:center;gap:6px
+}
+.sub-block .sub-label{font-weight:700;color:#5b21b6;min-width:70px;font-size:9px}
+.sub-block .sub-desc{color:#6b7280;font-size:9px}
+.layer-repeat{font-size:9px;color:#7c3aed;font-weight:700;text-align:right;margin-top:2px}
+
+/* CLS pooler */
+.cls-box{
+  background:#ddd6fe;border:1.5px solid #7c3aed;border-radius:8px;
+  padding:7px 10px;margin-top:6px;text-align:center
+}
+.cls-title{font-size:10px;font-weight:800;color:#4c1d95}
+.cls-sub{font-size:9px;color:#5b21b6;margin-top:2px}
+
+/* WCED heads */
+.head-box{
+  border-radius:7px;padding:7px 9px;margin-bottom:8px
+}
+.head-recon{background:#fef3c7;border:1.5px solid #f59e0b}
+.head-age  {background:#fee2e2;border:1.5px solid #ef4444}
+.head-cont {background:#dcfce7;border:1.5px solid #22c55e}
+.head-title{font-size:10px;font-weight:700;margin-bottom:4px}
+.head-recon .head-title{color:#92400e}
+.head-age   .head-title{color:#991b1b}
+.head-cont  .head-title{color:#14532d}
+.head-body{font-size:9px;color:#374151;line-height:1.5}
+.head-body .mono{font-family:monospace;font-size:8.5px;background:rgba(0,0,0,.07);
+                 padding:0 2px;border-radius:2px}
+.head-weight{font-size:9px;font-weight:700;opacity:.8}
+
+/* fine-tune block */
+.ft-box{
+  background:#fff7ed;border:1.5px solid #f97316;border-radius:8px;padding:9px 10px
+}
+.ft-title{font-size:10px;font-weight:700;color:#9a3412;margin-bottom:6px}
+.ft-row{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.ft-stage{
+  background:#fff;border:1px solid #fed7aa;border-radius:4px;
+  padding:4px 7px;font-size:9px;color:#374151;flex:1;text-align:center;line-height:1.4
+}
+.ft-stage .ft-s-title{font-weight:700;color:#ea580c;font-size:9px}
+.ft-arrow{font-size:11px;color:#f97316}
+.ft-result{
+  background:#fef9c3;border:1px solid #fde047;border-radius:5px;
+  padding:4px 8px;font-size:9.5px;text-align:center;margin-top:6px;color:#713f12
+}
+.ft-result .res-val{font-weight:800;font-size:11px;color:#16a34a}
+
+/* param count badge */
+.param-badge{
+  display:inline-flex;gap:10px;background:#f3f4f6;border:1px solid #d1d5db;
+  border-radius:20px;padding:5px 14px;font-size:9.5px;color:#374151;
+  margin:10px auto 0;display:flex;justify-content:center;align-items:center
+}
+.param-badge span{font-weight:700;color:#111827}
+
+/* caption */
+.fig-caption{
+  margin-top:20px;font-size:10px;color:#6b7280;text-align:center;
+  line-height:1.6;max-width:1100px;margin-left:auto;margin-right:auto
+}
+.fig-caption b{color:#374151}
+
+/* divider line */
+.arch-divider{
+  width:1px;background:#ddd6fe;margin:0 4px;align-self:stretch
+}
+</style>
+</head>
+<body>
+<div class="figure">
+
+<!-- ══ Title ══════════════════════════════════════════════════════════════ -->
+<div class="fig-title">MethylLlama: LLaMA-Style Transformer for DNA Methylation Pretraining and Age Prediction</div>
+<div class="fig-subtitle">WCED self-supervised pretraining → CLS representation → fine-tuned age clock &nbsp;|&nbsp; Architecture: 256D × 4L × 4H &nbsp;·&nbsp; ~7.7M parameters</div>
+
+<!-- ══ Pipeline Row ════════════════════════════════════════════════════════ -->
+<div class="pipeline">
+
+  <!-- Panel 1: Input Data -->
+  <div class="panel p1">
+    <div class="p-header">
+      <div class="p-num">1</div>
+      <div class="p-title">Input Data</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- sample × CpG grid schematic -->
+      <rect x="2" y="2" width="96" height="52" rx="4" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+      <text x="6" y="13" font-size="7" fill="#1d4ed8" font-weight="700">Samples</text>
+      <text x="30" y="50" font-size="7" fill="#1d4ed8" font-weight="700">CpG Sites</text>
+      <!-- grid cells -->
+      <rect x="6"  y="16" width="9" height="7" rx="1" fill="#3b82f6" opacity=".9"/>
+      <rect x="17" y="16" width="9" height="7" rx="1" fill="#93c5fd" opacity=".7"/>
+      <rect x="28" y="16" width="9" height="7" rx="1" fill="#bfdbfe" opacity=".5"/>
+      <rect x="39" y="16" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".5"/>
+      <rect x="50" y="16" width="9" height="7" rx="1" fill="#3b82f6" opacity=".8"/>
+      <rect x="61" y="16" width="9" height="7" rx="1" fill="#93c5fd" opacity=".6"/>
+      <rect x="72" y="16" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".4"/>
+      <rect x="83" y="16" width="9" height="7" rx="1" fill="#3b82f6" opacity=".7"/>
+      <rect x="6"  y="25" width="9" height="7" rx="1" fill="#bfdbfe" opacity=".6"/>
+      <rect x="17" y="25" width="9" height="7" rx="1" fill="#3b82f6" opacity=".85"/>
+      <rect x="28" y="25" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".4"/>
+      <rect x="39" y="25" width="9" height="7" rx="1" fill="#93c5fd" opacity=".7"/>
+      <rect x="50" y="25" width="9" height="7" rx="1" fill="#bfdbfe" opacity=".5"/>
+      <rect x="61" y="25" width="9" height="7" rx="1" fill="#3b82f6" opacity=".9"/>
+      <rect x="72" y="25" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".3"/>
+      <rect x="83" y="25" width="9" height="7" rx="1" fill="#93c5fd" opacity=".6"/>
+      <rect x="6"  y="34" width="9" height="7" rx="1" fill="#3b82f6" opacity=".75"/>
+      <rect x="17" y="34" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".4"/>
+      <rect x="28" y="34" width="9" height="7" rx="1" fill="#93c5fd" opacity=".8"/>
+      <rect x="39" y="34" width="9" height="7" rx="1" fill="#bfdbfe" opacity=".5"/>
+      <rect x="50" y="34" width="9" height="7" rx="1" fill="#e0e0e0" opacity=".3"/>
+      <rect x="61" y="34" width="9" height="7" rx="1" fill="#3b82f6" opacity=".9"/>
+      <rect x="72" y="34" width="9" height="7" rx="1" fill="#bfdbfe" opacity=".6"/>
+      <rect x="83" y="34" width="9" height="7" rx="1" fill="#3b82f6" opacity=".8"/>
+      <!-- NaN indicators -->
+      <text x="40" y="22" font-size="5.5" fill="#ef4444" font-weight="700">✕</text>
+      <text x="29" y="31" font-size="5.5" fill="#ef4444" font-weight="700">✕</text>
+      <text x="73" y="22" font-size="5.5" fill="#ef4444" font-weight="700">✕</text>
+      <text x="51" y="40" font-size="5.5" fill="#ef4444" font-weight="700">✕</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">Illumina EPIC/450K</span> array</li>
+      <li>β ∈ [0, 1] &nbsp;— methylation level</li>
+      <li><span class="hi">~850K</span> CpG sites (human genome)</li>
+      <li>Mixed tissues &amp; cell types</li>
+      <li>Chronological <span class="hi">age labels</span></li>
+      <li><span class="hi">~30–50%</span> missing values / sample</li>
+    </ul>
+    <div class="p-label">raw methylation</div>
+  </div>
+
+  <div class="arrow-wrap"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 9h18M11 2l9 7-9 7" stroke="#9ca3af" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- Panel 2: Tokenization -->
+  <div class="panel p2">
+    <div class="p-header">
+      <div class="p-num">2</div>
+      <div class="p-title">CpG Tokenization</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- dual-field token schematic -->
+      <rect x="2" y="4" width="96" height="48" rx="5" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1"/>
+      <text x="50" y="14" font-size="7" fill="#065f46" font-weight="700" text-anchor="middle">[CLS]  CpG₁  CpG₂  ···  CpG_k</text>
+      <!-- token block -->
+      <rect x="8"  y="18" width="38" height="28" rx="4" fill="#fff" stroke="#10b981" stroke-width="1.2"/>
+      <text x="27" y="27" font-size="6.5" fill="#374151" font-weight="700" text-anchor="middle">CpG Token</text>
+      <rect x="10" y="29" width="34" height="8" rx="2" fill="#bbf7d0" stroke="#86efac" stroke-width=".8"/>
+      <text x="27" y="35" font-size="5.5" fill="#065f46" text-anchor="middle">ID: cg00001234  →  idx 3847</text>
+      <rect x="10" y="38" width="34" height="7" rx="2" fill="#fef3c7" stroke="#fde68a" stroke-width=".8"/>
+      <text x="27" y="43.5" font-size="5.5" fill="#92400e" text-anchor="middle">β = 0.72  →  ScaleAdapt</text>
+      <!-- special tokens -->
+      <rect x="54" y="18" width="40" height="13" rx="3" fill="#fff" stroke="#34d399" stroke-width="1"/>
+      <text x="74" y="27" font-size="6" fill="#065f46" text-anchor="middle" font-weight="700">[CLS] [MASK] [PAD]</text>
+      <rect x="54" y="33" width="40" height="13" rx="3" fill="#fff" stroke="#34d399" stroke-width="1"/>
+      <text x="74" y="39" font-size="5.5" fill="#374151" text-anchor="middle">NaN → excluded</text>
+      <text x="74" y="44" font-size="5.5" fill="#374151" text-anchor="middle">from input</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">49,156</span> CpG vocabulary (pretrain)</li>
+      <li><span class="hi">Dual-field</span>: (CpG_ID, β_value)</li>
+      <li>CpG_ID → <span class="mono">nn.Embedding</span> lookup</li>
+      <li>β → sinusoidal <span class="hi">ScaleAdapt</span> (48 basis)</li>
+      <li>Special: <span class="mono">[CLS]</span> <span class="mono">[MASK]</span> <span class="mono">[PAD]</span></li>
+      <li>Missing CpGs excluded from input</li>
+    </ul>
+    <div class="p-label">dual-field tokens</div>
+  </div>
+
+  <div class="arrow-wrap"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 9h18M11 2l9 7-9 7" stroke="#9ca3af" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- Panel 3: WCED Pretraining -->
+  <div class="panel p3">
+    <div class="p-header">
+      <div class="p-num">3</div>
+      <div class="p-title">WCED Pretraining</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- WCED schematic: input subset → encoder → decoder → target -->
+      <!-- input side -->
+      <rect x="2" y="4" width="22" height="48" rx="3" fill="#fef3c7" stroke="#fde68a" stroke-width="1"/>
+      <text x="13" y="13" font-size="5.5" fill="#92400e" text-anchor="middle" font-weight="700">Input</text>
+      <text x="13" y="20" font-size="5" fill="#92400e" text-anchor="middle">50%</text>
+      <rect x="4"  y="22" width="18" height="4" rx="1" fill="#f59e0b" opacity=".8"/>
+      <rect x="4"  y="27" width="18" height="4" rx="1" fill="#f59e0b" opacity=".7"/>
+      <rect x="4"  y="32" width="18" height="4" rx="1" fill="#f59e0b" opacity=".6"/>
+      <rect x="4"  y="37" width="18" height="4" rx="1" fill="#e5e7eb" opacity=".5"/>
+      <rect x="4"  y="42" width="18" height="4" rx="1" fill="#e5e7eb" opacity=".4"/>
+      <text x="13" y="52" font-size="4.5" fill="#92400e" text-anchor="middle">observed</text>
+      <!-- arrow to encoder -->
+      <path d="M26 28 l8 0" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#ah)"/>
+      <!-- encoder box -->
+      <defs><marker id="ah" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+        <path d="M0 0 L5 2.5 L0 5 z" fill="#9ca3af"/></marker></defs>
+      <rect x="35" y="16" width="30" height="24" rx="4" fill="#d8b4fe" stroke="#a78bfa" stroke-width="1.2"/>
+      <text x="50" y="27" font-size="6" fill="#4c1d95" text-anchor="middle" font-weight="700">Encoder</text>
+      <text x="50" y="35" font-size="5.5" fill="#4c1d95" text-anchor="middle">CLS → [256D]</text>
+      <!-- arrow to decoder -->
+      <path d="M66 28 l8 0" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#ah)"/>
+      <!-- target side -->
+      <rect x="75" y="4" width="23" height="48" rx="3" fill="#d1fae5" stroke="#86efac" stroke-width="1"/>
+      <text x="86" y="13" font-size="5.5" fill="#14532d" text-anchor="middle" font-weight="700">Target</text>
+      <text x="86" y="20" font-size="5" fill="#14532d" text-anchor="middle">50%</text>
+      <rect x="77" y="22" width="19" height="4" rx="1" fill="#e5e7eb" opacity=".4"/>
+      <rect x="77" y="27" width="19" height="4" rx="1" fill="#e5e7eb" opacity=".3"/>
+      <rect x="77" y="32" width="19" height="4" rx="1" fill="#22c55e" opacity=".7"/>
+      <rect x="77" y="37" width="19" height="4" rx="1" fill="#22c55e" opacity=".8"/>
+      <rect x="77" y="42" width="19" height="4" rx="1" fill="#22c55e" opacity=".6"/>
+      <text x="86" y="52" font-size="4.5" fill="#14532d" text-anchor="middle">held-out</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">8,000</span> CpG subset per sample</li>
+      <li><span class="hi">50% input</span> (4,000 observed CpGs)</li>
+      <li><span class="hi">50% target</span> (4,000 held-out CpGs)</li>
+      <li>Loss 1: <span class="hi">Recon MSE</span> on held-out only</li>
+      <li>Loss 2: <span class="hi">Age MSE</span> (auxiliary, λ=0.5)</li>
+      <li>Loss 3: <span class="hi">InfoNCE</span> two views (λ=0.1)</li>
+    </ul>
+    <div class="p-label">self-supervised</div>
+  </div>
+
+  <div class="arrow-wrap"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 9h18M11 2l9 7-9 7" stroke="#9ca3af" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- Panel 4: Architecture -->
+  <div class="panel p4">
+    <div class="p-header">
+      <div class="p-num">4</div>
+      <div class="p-title">MethylLlama</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- stacked transformer layers -->
+      <rect x="2" y="2" width="96" height="52" rx="5" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1"/>
+      <!-- embedding row -->
+      <rect x="6"  y="6" width="88" height="10" rx="3" fill="#ddd6fe" stroke="#a78bfa" stroke-width="1"/>
+      <text x="50" y="13.5" font-size="6.5" fill="#4c1d95" text-anchor="middle" font-weight="700">Embedding: cpg_scale × ID_emb + ScaleAdapt(β)</text>
+      <!-- 4 layers -->
+      <rect x="6"  y="18" width="88" height="8" rx="2" fill="#c4b5fd" stroke="#8b5cf6" stroke-width=".8"/>
+      <text x="50" y="24" font-size="6" fill="#4c1d95" text-anchor="middle">Layer 1: RMSNorm · MHSA(RoPE,4H) · RMSNorm · SwiGLU</text>
+      <rect x="6"  y="27" width="88" height="8" rx="2" fill="#c4b5fd" stroke="#8b5cf6" stroke-width=".8"/>
+      <text x="50" y="33" font-size="6" fill="#4c1d95" text-anchor="middle">Layer 2</text>
+      <rect x="6"  y="36" width="88" height="8" rx="2" fill="#c4b5fd" stroke="#8b5cf6" stroke-width=".8"/>
+      <text x="50" y="42" font-size="6" fill="#4c1d95" text-anchor="middle">Layer 3</text>
+      <rect x="6"  y="45" width="88" height="8" rx="2" fill="#c4b5fd" stroke="#8b5cf6" stroke-width=".8"/>
+      <text x="50" y="51" font-size="6" fill="#4c1d95" text-anchor="middle">Layer 4 → CLS Pooler → [256D]</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">256D</span> hidden · <span class="hi">4 layers</span> · <span class="hi">4 heads</span></li>
+      <li>Head dim = 64 · FFN = 320 (SwiGLU)</li>
+      <li><span class="hi">Pre-LN</span> (RMSNorm before each sublayer)</li>
+      <li><span class="hi">RoPE</span> θ=10K (no position table)</li>
+      <li><span class="hi">ScaleAdapt</span>: 48 sin/cos basis → 256D</li>
+      <li>~7.7M total · ~2.1M non-embed params</li>
+    </ul>
+    <div class="p-label">↓ details below</div>
+  </div>
+
+  <div class="arrow-wrap"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 9h18M11 2l9 7-9 7" stroke="#9ca3af" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- Panel 5: Fine-tuning -->
+  <div class="panel p5">
+    <div class="p-header">
+      <div class="p-num">5</div>
+      <div class="p-title">Fine-tuning</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- fine-tune flow schematic -->
+      <rect x="2" y="14" width="28" height="28" rx="4" fill="#fed7aa" stroke="#fb923c" stroke-width="1.2"/>
+      <text x="16" y="26" font-size="6" fill="#9a3412" text-anchor="middle" font-weight="700">Pretrained</text>
+      <text x="16" y="33" font-size="6" fill="#9a3412" text-anchor="middle">Encoder</text>
+      <text x="16" y="39" font-size="5" fill="#9a3412" text-anchor="middle">(frozen ep1-10)</text>
+      <!-- arrow -->
+      <path d="M31 28 l8 0" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#ah2)"/>
+      <defs><marker id="ah2" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+        <path d="M0 0 L5 2.5 L0 5 z" fill="#9ca3af"/></marker></defs>
+      <!-- CLS bubble -->
+      <circle cx="46" cy="28" r="7" fill="#fde68a" stroke="#f59e0b" stroke-width="1.2"/>
+      <text x="46" y="30.5" font-size="6" fill="#92400e" text-anchor="middle" font-weight="700">CLS</text>
+      <!-- arrow to head -->
+      <path d="M54 28 l8 0" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#ah2)"/>
+      <!-- MLP head -->
+      <rect x="63" y="8" width="34" height="40" rx="4" fill="#ffedd5" stroke="#f97316" stroke-width="1.2"/>
+      <text x="80" y="18" font-size="6" fill="#9a3412" text-anchor="middle" font-weight="700">MLP Head</text>
+      <rect x="65" y="20" width="30" height="5" rx="1.5" fill="#fed7aa"/>
+      <text x="80" y="24" font-size="5" fill="#9a3412" text-anchor="middle">256</text>
+      <rect x="65" y="26" width="30" height="5" rx="1.5" fill="#fdba74"/>
+      <text x="80" y="30" font-size="5" fill="#9a3412" text-anchor="middle">256</text>
+      <rect x="65" y="32" width="30" height="5" rx="1.5" fill="#fb923c"/>
+      <text x="80" y="36" font-size="5" fill="#9a3412" text-anchor="middle">128</text>
+      <rect x="72" y="38" width="16" height="5" rx="1.5" fill="#f97316"/>
+      <text x="80" y="42.5" font-size="5.5" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">19,608</span> CpGs input (no masking)</li>
+      <li>Freeze encoder → warm-up head (ep 1–10)</li>
+      <li><span class="hi">CLS pooler_output</span> [256D]</li>
+      <li>Head: <span class="mono">256→256→128→1</span></li>
+      <li>Loss: <span class="hi">MSE</span> on z-score ages</li>
+      <li>Unfreeze encoder at epoch 10</li>
+    </ul>
+    <div class="p-label">age prediction</div>
+  </div>
+
+  <div class="arrow-wrap"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 9h18M11 2l9 7-9 7" stroke="#9ca3af" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- Panel 6: Downstream Tasks -->
+  <div class="panel p6">
+    <div class="p-header">
+      <div class="p-num">6</div>
+      <div class="p-title">Downstream Tasks</div>
+    </div>
+    <svg class="p-icon" width="100" height="56" viewBox="0 0 100 56">
+      <!-- branching output tasks -->
+      <circle cx="18" cy="28" r="9" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.2"/>
+      <text x="18" y="26.5" font-size="5" fill="#14532d" text-anchor="middle" font-weight="700">CLS</text>
+      <text x="18" y="32" font-size="5" fill="#14532d" text-anchor="middle">[256D]</text>
+      <!-- branches -->
+      <line x1="28" y1="20" x2="40" y2="10" stroke="#22c55e" stroke-width="1.2"/>
+      <line x1="28" y1="24" x2="40" y2="22" stroke="#22c55e" stroke-width="1.2"/>
+      <line x1="28" y1="28" x2="40" y2="34" stroke="#22c55e" stroke-width="1.2"/>
+      <line x1="28" y1="32" x2="40" y2="46" stroke="#22c55e" stroke-width="1.2"/>
+      <!-- task boxes -->
+      <rect x="40" y="4"  width="54" height="11" rx="3" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+      <text x="67" y="11.5" font-size="6" fill="#14532d" text-anchor="middle" font-weight="700">★ Biological Age Clock</text>
+      <rect x="40" y="17" width="54" height="11" rx="3" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+      <text x="67" y="24.5" font-size="6" fill="#14532d" text-anchor="middle">Cell Type Profiling</text>
+      <rect x="40" y="30" width="54" height="11" rx="3" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+      <text x="67" y="37.5" font-size="6" fill="#14532d" text-anchor="middle">CpG Imputation</text>
+      <rect x="40" y="43" width="54" height="11" rx="3" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+      <text x="67" y="50.5" font-size="6" fill="#14532d" text-anchor="middle">Repr. Analysis / UMAP</text>
+    </svg>
+    <ul class="p-list">
+      <li><span class="hi">★ Age Clock</span>: MedAE=3.65yr, R²=0.905</li>
+      <li>Cell type classification</li>
+      <li>Disease / clinical phenotype</li>
+      <li>CpG methylation imputation</li>
+      <li>CLS representation analysis</li>
+      <li>Multi-omics integration</li>
+    </ul>
+    <div class="p-label">applications</div>
+  </div>
+
+</div><!-- end pipeline -->
+
+<!-- ══ Architecture Zoom ═══════════════════════════════════════════════════ -->
+<div class="arch-section">
+  <div class="arch-badge">Architecture Detail — MethylLlama (256D × 4L × 4H)</div>
+
+  <div class="arch-inner">
+
+    <!-- Column A: Embedding Fusion -->
+    <div class="arch-col" style="max-width:320px">
+      <div class="arch-section-title">① Dual-Field Embedding Fusion</div>
+
+      <div class="emb-box">
+        <div class="emb-title">Input: [CLS | CpG₁ | CpG₂ | ··· | CpG_k]</div>
+        <div class="emb-row">
+          <div class="emb-field">
+            <div class="ef-type">Field 0</div>
+            CpG_ID (int)<br>
+            <span style="font-size:9px;color:#7c3aed">nn.Embedding(49156, 256)</span>
+          </div>
+          <div class="emb-plus">+</div>
+          <div class="emb-field">
+            <div class="ef-type">Field 1</div>
+            β value [0,1]<br>
+            <span style="font-size:9px;color:#7c3aed">ScaleAdapt(48 basis→256)</span>
+          </div>
+        </div>
+        <div class="emb-fuse">h = <b>α</b> · ID_embed + ScaleAdapt(β)</div>
+        <div class="emb-scale">α = <em>cpg_scale</em> (learned scalar, init=0.1)</div>
+        <div style="margin-top:6px;font-size:9px;color:#6b7280;text-align:center">
+          Special tokens (β &lt; 0): own learned embeddings<br>
+          β ≥ 0: sin/cos basis × 48 → Linear(96→256)
+        </div>
+      </div>
+
+      <!-- param count -->
+      <div class="param-badge">
+        <span>~7.7M</span> total &nbsp;|&nbsp; <span>~2.1M</span> non-embed &nbsp;|&nbsp; vocab <span>49,161</span>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="arch-section-title">⑤ CLS Pooler → Global Repr.</div>
+        <div class="cls-box">
+          <div class="cls-title">pooler_output = Tanh(Linear(cls_token))</div>
+          <div class="cls-sub">Last-hidden[:, 0, :] → Linear(256→256) → Tanh → [B, 256]</div>
+          <div style="font-size:9px;color:#5b21b6;margin-top:4px">
+            WCED training forces CLS to encode the full methylome globally
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-divider"></div>
+
+    <!-- Column B: Transformer Blocks -->
+    <div class="arch-col-wide">
+      <div class="arch-section-title">② – ④ Transformer Encoder Block × 4 (Pre-LN)</div>
+
+      <!-- Single layer expanded -->
+      <div class="layer-box">
+        <div class="layer-tag">Layer ℓ = 1, 2, 3, 4</div>
+        <div class="sub-block">
+          <span class="sub-label">RMSNorm</span>
+          <span class="sub-desc">Pre-normalization: x̂ = x / RMS(x) · γ &nbsp;&nbsp;(no mean subtraction, ~40% faster than LayerNorm)</span>
+        </div>
+        <div class="sub-block">
+          <span class="sub-label">MHSA + RoPE</span>
+          <span class="sub-desc">4 heads, head_dim=64 · Q/K/V/O: Linear(256,256) no bias · RoPE θ=10,000 applied to Q&K · Flash SDPA</span>
+        </div>
+        <div class="sub-block">
+          <span class="sub-label">Residual</span>
+          <span class="sub-desc">x = x + Dropout(Attention(RMSNorm(x)))</span>
+        </div>
+        <div class="sub-block">
+          <span class="sub-label">RMSNorm</span>
+          <span class="sub-desc">Second pre-norm before FFN</span>
+        </div>
+        <div class="sub-block">
+          <span class="sub-label">SwiGLU FFN</span>
+          <span class="sub-desc">FFN(x) = W_down(SiLU(W_gate(x)) ⊙ W_up(x)) &nbsp; dim: 256→320→256 &nbsp;(3 matrices, gated activation)</span>
+        </div>
+        <div class="sub-block">
+          <span class="sub-label">Residual</span>
+          <span class="sub-desc">x = x + Dropout(FFN(RMSNorm(x)))</span>
+        </div>
+        <div class="layer-repeat">× 4 identical layers</div>
+      </div>
+
+      <!-- Sequence shape annotations -->
+      <div style="display:flex;gap:8px;margin-top:8px;font-size:9px;color:#6b7280">
+        <div style="flex:1;background:#f3f4f6;border-radius:5px;padding:5px 8px">
+          <b style="color:#374151">Pretrain input shape</b><br>
+          [B, L, 256] where L = 4,001 (CLS + 4,000 input CpGs)
+        </div>
+        <div style="flex:1;background:#f3f4f6;border-radius:5px;padding:5px 8px">
+          <b style="color:#374151">Fine-tune input shape</b><br>
+          [B, L, 256] where L = 19,609 (CLS + 19,608 CpGs)
+        </div>
+        <div style="flex:1;background:#f3f4f6;border-radius:5px;padding:5px 8px">
+          <b style="color:#374151">RoPE</b><br>
+          No position table — sin/cos applied to Q&K in attention. Generalises to any seq. length.
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-divider"></div>
+
+    <!-- Column C: WCED Heads + Fine-tune -->
+    <div class="arch-col-narrow">
+      <div class="arch-section-title">⑥ Pretraining Heads (WCED)</div>
+
+      <div class="head-box head-recon">
+        <div class="head-title">Reconstruction Decoder</div>
+        <div class="head-body">
+          CLS [256] → Linear → LayerNorm → GELU → Dropout(0.1) → Linear → Sigmoid → <span class="mono">β̂</span> [vocab_size]<br>
+          <b>Loss:</b> MSE on held-out 50% CpGs only
+        </div>
+        <div class="head-weight" style="color:#92400e">weight = 1.0</div>
+      </div>
+
+      <div class="head-box head-age">
+        <div class="head-title">Age Prediction Head</div>
+        <div class="head-body">
+          CLS [256] → Linear(256→128) → ReLU → Dropout(0.1) → Linear(128→1) → <span class="mono">age</span><br>
+          <b>Loss:</b> MSE (chronological age, z-score)<br>
+          Prevents CLS from collapsing
+        </div>
+        <div class="head-weight" style="color:#991b1b">weight = 0.5</div>
+      </div>
+
+      <div class="head-box head-cont">
+        <div class="head-title">Contrastive Head (InfoNCE)</div>
+        <div class="head-body">
+          CLS → MLP(256→128→128) → L2-norm → <span class="mono">z</span><br>
+          Two random 50% views → InfoNCE loss<br>
+          Temperature τ = 0.1
+        </div>
+        <div class="head-weight" style="color:#14532d">weight = 0.1</div>
+      </div>
+
+      <!-- Fine-tune result box -->
+      <div style="margin-top:10px">
+        <div class="arch-section-title">⑦ Fine-tuning Result (V5)</div>
+        <div class="ft-box">
+          <div class="ft-title">Age Clock — V5 (CLS Pooling)</div>
+          <div class="ft-row">
+            <div class="ft-stage">
+              <div class="ft-s-title">Frozen (ep 1–10)</div>
+              Head warmup only
+            </div>
+            <div class="ft-arrow">→</div>
+            <div class="ft-stage">
+              <div class="ft-s-title">Unfrozen (ep 10+)</div>
+              End-to-end fine-tune
+            </div>
+          </div>
+          <div style="font-size:9px;color:#6b7280;margin-bottom:4px;text-align:center">
+            Head: Linear 256→256→128→1 · Loss: MSE
+          </div>
+          <div class="ft-result">
+            Test MedAE <span class="res-val">3.65 yr</span> &nbsp;·&nbsp; R² <span class="res-val">0.905</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arch-inner -->
+</div><!-- end arch-section -->
+
+<!-- ══ Caption ═════════════════════════════════════════════════════════════ -->
+<div class="fig-caption">
+  <b>Figure.</b> Overview of the MethylLlama pretraining and fine-tuning pipeline.
+  <b>(1)</b> Raw DNA methylation profiles from Illumina arrays (β ∈ [0,1], ~850K CpG sites, mixed tissues).
+  <b>(2)</b> Dual-field tokenization: each CpG is represented as a (ID, β-value) pair; missing values are excluded.
+  <b>(3)</b> WCED (Weighted CpG Encoder Decoder) self-supervised pretraining: a random 50% subset of 8,000 CpGs is used as input; the model reconstructs held-out CpGs via the CLS embedding, supervised additionally by an age auxiliary loss and an InfoNCE contrastive loss on two random views.
+  <b>(4)</b> MethylLlama architecture: LLaMA-style encoder with 256D hidden size, 4 layers, 4 attention heads, RMSNorm Pre-LN, RoPE, and SwiGLU FFN (~7.7M parameters).
+  <b>(5)</b> Fine-tuning for biological age prediction: the pretrained encoder (frozen for 10 epochs) feeds the CLS pooler output into a 3-layer MLP head.
+  <b>(6)</b> Downstream results: V5 achieves test MedAE = 3.65 yr, R² = 0.905 on the AltumAge benchmark using only 19,608 CpGs.
+</div>
+
+</div><!-- end figure -->
+</body>
+</html>

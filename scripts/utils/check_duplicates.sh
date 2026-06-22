@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#SBATCH --job-name=check-duplicates
+#SBATCH --partition=glacier
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=16G
+#SBATCH --time=0:10:00
+#SBATCH --output=/sci/labs/benjamin.yakir/netanel.azran/repos/BMFM-RNA/methyl/logs_llama-smoke/check_duplicates_%j.out
+#SBATCH --error=/sci/labs/benjamin.yakir/netanel.azran/repos/BMFM-RNA/methyl/logs_llama-smoke/check_duplicates_%j.err
+
+set -euo pipefail
+
+REPO="/sci/labs/benjamin.yakir/netanel.azran/repos/BMFM-RNA/methyl"
+cd "${REPO}"
+source bmfm_methyl_env/bin/activate
+
+python3 scripts/utils/check_duplicates.py

@@ -1,0 +1,37 @@
+# Task A — Smoking Status Classification config
+# Inherits field/model/trainer defaults from the WCED pretrain config structure.
+
+defaults:
+  - _self_
+
+# ── Paths ──────────────────────────────────────────────────────────────────
+data_path: ???          # Path to smoking h5ad (produced by data_prep/prepare_geo_smoking.py)
+checkpoint_path: ???    # WCED pretrained checkpoint (epoch=190)
+output_directory: ./outputs/downstream/smoking
+
+# ── Data ───────────────────────────────────────────────────────────────────
+label_col: smoking_status   # obs column: "current" / "former" / "never"
+binary: false               # if true: ever(current+former)=1 vs never=0
+split_col: split
+subset_k: 4000
+batch_size: 32
+num_workers: 4
+
+# ── Training ───────────────────────────────────────────────────────────────
+finetune_epochs: 100
+accumulate_grad_batches: 1
+learning_rate: 1e-4
+weight_decay: 0.01
+warmup_steps: 200
+head_dropout: 0.1
+freeze_encoder: true
+unfreeze_encoder_epoch: 999
+early_stop_patience: 20
+
+# ── W&B ────────────────────────────────────────────────────────────────────
+use_wandb: true
+wandb_project: methyl-downstream-smoking
+wandb_entity: null         # set to your entity
+wandb_run_name: smoking-cls-wced
+
+seed: 42

@@ -1,0 +1,109 @@
+# MethylLlama WCED fine-tuning configuration
+#
+# Usage:
+#   python -m bmfm_methylation.llama_methyl.finetune_wced_llama \
+#       data_path=/path/to/methylation.h5ad \
+#       checkpoint_path=/path/to/wced_llama_epoch=N.ckpt \
+#       output_directory=./outputs/llama_finetune
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+data_path: ???                              # Required
+checkpoint_path: null                       # Required for init_mode=pretrained; omit for random
+output_directory: ./outputs/llama_finetune
+tokenizer_path: ./tokenizer
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Encoder initialization
+# ─────────────────────────────────────────────────────────────────────────────
+init_mode: pretrained    # "pretrained": load WCED checkpoint | "random": train from scratch
+
+# Architecture params — only used when init_mode=random (pretrained infers from ckpt)
+model_arch:
+  vocab_size: 49161
+  hidden_size: 256
+  num_hidden_layers: 4
+  intermediate_size: 320
+  num_attention_heads: 4
+  n_sin_basis: 48
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Data module
+# ─────────────────────────────────────────────────────────────────────────────
+data_module:
+  batch_size: 32
+  num_workers: 4
+  max_length: 8002
+  subset_k: 8000
+  fixed_subset_seed: 42
+  filter_age_outliers: false      # Remove age<0 and age>120 samples entirely
+  duplicate_pairs_csv: null       # Path to duplicate_pairs.csv for deduplication
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WCED collator settings
+# ─────────────────────────────────────────────────────────────────────────────
+wced_input_ratio: 0.5    # Match pretraining distribution (4000 input CpGs)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Age normalization
+# Compute from training set: age_mean = mean(train_ages), age_std = std(train_ages)
+# Model predicts normalized age, loss is MSE in normalized space
+# ─────────────────────────────────────────────────────────────────────────────
+age_mean: 0.0    # Set to actual training mean
+age_std: 1.0     # Set to actual training std
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Fine-tuning settings
+# ─────────────────────────────────────────────────────────────────────────────
+finetune:
+  head_hidden_size: 256
+  head_dropout: 0.1
+  learning_rate: 1e-4         # MLP head
+  encoder_lr: 5e-5            # Encoder lr after unfreeze (5x lower than head)
+  weight_decay: 0.01
+  warmup_steps: 500
+  # max_steps: auto-computed in code as steps_per_epoch × finetune_epochs
+  # Encoder: keep frozen (M1 strategy — WCED CLS already encodes age from pretraining)
+  # Set to false for M2 strategy (fine-tune encoder too, but risks corrupting WCED repr)
+  freeze_encoder: true
+  unfreeze_encoder_epoch: 9999  # Set to e.g. 5 for M2-style gradual unfreeze
+  # Decoder regularizer weight (keeps reconstruction objective alive during fine-tuning)
+  recon_weight: 0.0              # 0.0 when input_ratio=1.0 (no held-out CpGs to reconstruct)
+  pooling: mean               # mean pooling over all tokens (better than CLS-only)
+  loss_type: mse              # mse or huber (huber delta must be in normalized space)
+  beta_noise: 0.0             # Gaussian noise σ on real CpG beta values during training only
+
+finetune_epochs: 100
+accumulate_grad_batches: 4
+gradient_clip_val: 1.0
+early_stop_patience: 30
+precision: "16-mixed"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Fields (same as pretrain)
+# ─────────────────────────────────────────────────────────────────────────────
+fields:
+  - _target_: bmfm_targets.config.FieldInfo
+    name: cpg_ids
+    padding_token: 0
+    is_primary: true
+  - _target_: bmfm_targets.config.FieldInfo
+    name: beta_values
+    padding_token: -4.0
+    is_primary: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Seed
+# ─────────────────────────────────────────────────────────────────────────────
+seed:
+  seed_value: 42
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WandB
+# ─────────────────────────────────────────────────────────────────────────────
+track_wandb:
+  enabled: true
+  project: "methylation-llama-finetune"
+  entity: null
+  name: "llama_wced_finetune"

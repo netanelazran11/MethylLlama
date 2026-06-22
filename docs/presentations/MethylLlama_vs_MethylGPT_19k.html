@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MethylLlama vs MethylGPT Medium — 19k Benchmark</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef0f4;
+    color: #1e2535;
+    font-size: 15px;
+  }
+
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 40px auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 48px 56px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    position: relative;
+    border: 1px solid #dde1ea;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 28px;
+    color: #1a2340;
+    border-bottom: 2px solid #dde3f0;
+    padding-bottom: 14px;
+  }
+
+  .slide-label {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 11px;
+    color: #a0aabb;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8090a8;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-top: 18px;
+  }
+
+  .divider { height: 1px; background: #dde3f0; margin: 22px 0; }
+
+  /* ── big metric cards ─────────────────────────────────── */
+  .metric-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .metric-card {
+    flex: 1;
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: center;
+  }
+  .mc-label { font-size: 10px; color: #6a7890; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .mc-val   { font-size: 30px; font-weight: 800; line-height: 1.1; }
+  .mc-unit  { font-size: 12px; color: #6a7890; margin-top: 3px; }
+  .mc-sub   { font-size: 11px; margin-top: 5px; font-style: italic; }
+
+  .card-llama  { background: #e8f0ff; border: 2px solid #3a6acc; }
+  .card-llama .mc-val { color: #1a4ab0; }
+  .card-llama .mc-sub { color: #5070a0; }
+
+  .card-gpt    { background: #fff4ee; border: 2px solid #c07030; }
+  .card-gpt .mc-val { color: #8a3800; }
+  .card-gpt .mc-sub { color: #a05020; }
+
+  .card-win    { background: #edfff4; border: 2px solid #2a9a4a; }
+  .card-win .mc-val { color: #1a6030; }
+  .card-win .mc-sub { color: #2a7a38; }
+
+  /* ── main comparison tables ───────────────────────────── */
+  table.cmp {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(80,100,160,0.10);
+    margin-bottom: 18px;
+  }
+  table.cmp thead tr { background: #2a3a6a; color: #fff; }
+  table.cmp th {
+    padding: 10px 16px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-size: 12px;
+    text-align: center;
+  }
+  table.cmp th.left { text-align: left; }
+  table.cmp td {
+    padding: 9px 16px;
+    border-bottom: 1px solid #e4e8f4;
+    text-align: center;
+    color: #3a4a68;
+  }
+  table.cmp td.feat { text-align: left; font-weight: 600; color: #4a5a78; }
+  table.cmp tr:nth-child(odd)  td { background: #f8faff; }
+  table.cmp tr:nth-child(even) td { background: #ffffff; }
+  table.cmp tr:last-child td { border-bottom: none; }
+  table.cmp td.llama { color: #1a4ab0; font-weight: 700; }
+  table.cmp td.gpt   { color: #8a3800; font-weight: 600; }
+  table.cmp td.win   { color: #1a6030; font-weight: 700; background: #edfff4 !important; }
+  table.cmp td.big   { font-size: 16px; font-weight: 800; }
+
+  /* ── section band ─────────────────────────────────────── */
+  .band {
+    border-left: 4px solid #4a70cc;
+    background: #f0f4ff;
+    border-radius: 0 8px 8px 0;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2a3a70;
+    margin: 18px 0 10px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .band.green  { background: #edfff4; border-color: #2a9a4a; color: #1a4a28; }
+  .band.orange { background: #fff8ee; border-color: #c07020; color: #6a3a10; }
+  .band.purple { background: #f4eeff; border-color: #7040c0; color: #3a1a70; }
+
+  /* ── note box ─────────────────────────────────────────── */
+  .note-box {
+    background: #f0f4ff;
+    border-left: 3px solid #1a4ab0;
+    border-radius: 0 8px 8px 0;
+    padding: 11px 16px;
+    font-size: 12px;
+    color: #3a4a70;
+    line-height: 1.7;
+    margin-top: 16px;
+  }
+  .note-box.green { background: #edfff4; border-color: #2a9a4a; color: #1a4a28; }
+  .note-box.orange { background: #fff8ee; border-color: #c07020; color: #6a3818; }
+
+  /* ── arch feature box ─────────────────────────────────── */
+  .arch-box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .arch-llama { background: #e8f0ff; border: 2px solid #3a6acc; }
+  .arch-gpt   { background: #fff4ee; border: 2px solid #c07030; }
+  .arch-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; }
+  .arch-llama .arch-title { color: #1a3a80; }
+  .arch-gpt   .arch-title { color: #7a2800; }
+  .arch-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.07); }
+  .arch-row:last-child { border-bottom: none; }
+  .arch-key { color: #5a6a8a; }
+  .arch-val { font-weight: 700; font-family: monospace; }
+  .arch-llama .arch-val { color: #1a4ab0; }
+  .arch-gpt   .arch-val { color: #8a3800; }
+
+  /* ── efficiency bar ───────────────────────────────────── */
+  .eff-bar-wrap { margin: 18px 0 8px; }
+  .eff-bar { height: 36px; border-radius: 8px; display: flex; overflow: hidden; border: 1px solid #c8d0e4; }
+  .eff-llama { background: #3a6acc; display: flex; align-items: center; padding-left: 14px; color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .eff-gpt   { background: #e0e8f8; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; color: #3a4a70; font-size: 11px; font-weight: 600; flex: 1; }
+  .eff-label { font-size: 11px; color: #5a6880; margin-top: 4px; text-align: center; }
+
+  /* ── two-col layout ───────────────────────────────────── */
+  .two-col { display: flex; gap: 24px; }
+  .col { flex: 1; }
+
+  /* ── dataset badge ────────────────────────────────────── */
+  .badge {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .badge-verified { background: #edfff4; border: 1px solid #2a9a4a; color: #1a5a28; }
+  .badge-note     { background: #fff8ee; border: 1px solid #c07020; color: #6a3818; }
+
+  /* ── print ────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; }
+    .slide { margin: 0; border-radius: 0; box-shadow: none; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 1 — Cover
+     ═══════════════════════════════════════════════════════ -->
+<div class="slide" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:500px;">
+  <div class="slide-label">1 / 4</div>
+
+  <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#8090a8;margin-bottom:18px;">Technical Report · June 2026</div>
+
+  <div style="font-size:38px;font-weight:800;color:#1a2340;line-height:1.2;margin-bottom:16px;">
+    MethylLlama vs MethylGPT Medium
+  </div>
+  <div style="font-size:20px;font-weight:400;color:#4a5a80;margin-bottom:32px;">
+    Same Dataset · Same Splits · Fair Comparison
+  </div>
+
+  <div style="display:flex;gap:32px;margin-bottom:40px;">
+    <div style="background:#e8f0ff;border:2px solid #3a6acc;border-radius:14px;padding:20px 36px;text-align:center;">
+      <div style="font-size:11px;color:#5070a0;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">MethylLlama</div>
+      <div style="font-size:42px;font-weight:800;color:#1a4ab0;line-height:1;">3.65 <span style="font-size:18px;font-weight:500;">yr</span></div>
+      <div style="font-size:12px;color:#5a7090;margin-top:5px;">Test MedAE</div>
+    </div>
+    <div style="display:flex;align-items:center;font-size:28px;color:#2a9a4a;font-weight:700;">vs</div>
+    <div style="background:#fff4ee;border:2px solid #c07030;border-radius:14px;padding:20px 36px;text-align:center;">
+      <div style="font-size:11px;color:#a05020;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">MethylGPT Medium</div>
+      <div style="font-size:42px;font-weight:800;color:#8a3800;line-height:1;">4.10 <span style="font-size:18px;font-weight:500;">yr</span></div>
+      <div style="font-size:12px;color:#5a7090;margin-top:5px;">Test MedAE</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:40px;font-size:13px;color:#5a6a88;">
+    <div><span style="font-weight:700;color:#1a4ab0;">19,608</span> CpG sites</div>
+    <div>·</div>
+    <div><span style="font-weight:700;color:#2a9a4a;">Same</span> train/val/test splits</div>
+    <div>·</div>
+    <div><span style="font-weight:700;color:#1a4ab0;">43×</span> fewer gradient steps</div>
+    <div>·</div>
+    <div>Hebrew University of Jerusalem · 2026</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 2 — Architecture Comparison
+     ═══════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">2 / 4</div>
+  <div class="slide-title">Architecture Comparison — MethylLlama vs MethylGPT Medium</div>
+
+  <div class="two-col" style="margin-bottom:22px;">
+    <!-- MethylLlama -->
+    <div class="arch-box arch-llama">
+      <div class="arch-title">MethylLlama &nbsp;<span style="font-size:11px;font-weight:400;color:#5070a0;">(This work)</span></div>
+      <div class="arch-row"><span class="arch-key">Base architecture</span><span class="arch-val">Llama Transformer</span></div>
+      <div class="arch-row"><span class="arch-key">Layers</span><span class="arch-val">4</span></div>
+      <div class="arch-row"><span class="arch-key">Attention heads</span><span class="arch-val">4</span></div>
+      <div class="arch-row"><span class="arch-key">Hidden dim</span><span class="arch-val">256</span></div>
+      <div class="arch-row"><span class="arch-key">FFN type</span><span class="arch-val">SwiGLU</span></div>
+      <div class="arch-row"><span class="arch-key">Normalization</span><span class="arch-val">RMSNorm (Pre-LN)</span></div>
+      <div class="arch-row"><span class="arch-key">Position encoding</span><span class="arch-val">RoPE (relative)</span></div>
+      <div class="arch-row"><span class="arch-key">Total parameters</span><span class="arch-val">~7.7M</span></div>
+      <div class="arch-row"><span class="arch-key">Non-embedding params</span><span class="arch-val">~2.1M</span></div>
+    </div>
+    <!-- MethylGPT Medium -->
+    <div class="arch-box arch-gpt">
+      <div class="arch-title">MethylGPT Medium &nbsp;<span style="font-size:11px;font-weight:400;color:#a05020;">Ying et al., 2024</span></div>
+      <div class="arch-row"><span class="arch-key">Base architecture</span><span class="arch-val">scGPT Transformer</span></div>
+      <div class="arch-row"><span class="arch-key">Layers</span><span class="arch-val">6</span></div>
+      <div class="arch-row"><span class="arch-key">Attention heads</span><span class="arch-val">4</span></div>
+      <div class="arch-row"><span class="arch-key">Hidden dim</span><span class="arch-val">256</span></div>
+      <div class="arch-row"><span class="arch-key">FFN type</span><span class="arch-val">ReLU</span></div>
+      <div class="arch-row"><span class="arch-key">Normalization</span><span class="arch-val">LayerNorm (Post-LN)</span></div>
+      <div class="arch-row"><span class="arch-key">Position encoding</span><span class="arch-val">Absolute learned</span></div>
+      <div class="arch-row"><span class="arch-key">Total parameters</span><span class="arch-val">~15M</span></div>
+      <div class="arch-row"><span class="arch-key">Non-embedding params</span><span class="arch-val">~9.5M</span></div>
+    </div>
+  </div>
+
+  <div class="band purple">② Training &amp; Fine-tuning Protocol</div>
+
+  <table class="cmp">
+    <thead>
+      <tr>
+        <th class="left" style="width:22%;color:#d8e4ff;">Feature</th>
+        <th style="color:#a8c8ff;">MethylLlama</th>
+        <th style="color:#ffcc99;">MethylGPT Medium</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="feat">Pretraining objective</td><td class="llama">WCED (recon + age + InfoNCE)</td><td class="gpt">MLM + reconstruction</td></tr>
+      <tr><td class="feat">Age supervision in pretrain</td><td class="llama">Yes (multi-task)</td><td class="gpt">No</td></tr>
+      <tr><td class="feat">Pretrain samples</td><td class="llama">154,063</td><td class="gpt">154,063</td></tr>
+      <tr><td class="feat">CpG sites (fine-tune)</td><td class="llama">19,608</td><td class="gpt">19,608</td></tr>
+      <tr><td class="feat">Pooling strategy</td><td class="llama">CLS token (matches WCED readout)</td><td class="gpt">Full seq → ResNet1D</td></tr>
+      <tr><td class="feat">Age prediction head</td><td class="llama">MLP: 256→256→128→1</td><td class="gpt">ResNet1D (6 blocks) → Linear(32→1)</td></tr>
+      <tr><td class="feat">Encoder freeze warmup</td><td class="llama">Yes (10 epochs)</td><td class="gpt">No</td></tr>
+      <tr><td class="feat">Encoder LR</td><td class="llama">5e-5</td><td class="gpt">1e-4</td></tr>
+      <tr><td class="feat">Batch size</td><td class="llama">64</td><td class="gpt">1</td></tr>
+      <tr><td class="feat">Fine-tune loss</td><td class="llama">Huber</td><td class="gpt">MSE</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 3 — Results Comparison (19k same dataset)
+     ═══════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">3 / 4</div>
+  <div class="slide-title">Results — Same Dataset, Same Splits &nbsp;<span class="badge badge-verified">Verified ✓</span></div>
+
+  <div style="font-size:12px;color:#5a6a8a;margin-bottom:16px;line-height:1.7;">
+    Both models evaluated on identical <b>19k CpG</b> dataset with pre-defined splits.
+    Split identity verified: sizes train=7,286 / val=1,145 / test=1,927 match exactly;
+    sorted age distributions are identical (allclose, atol=0.01).
+  </div>
+
+  <!-- Big metric cards — test set -->
+  <div class="band">Test Set — Final Epoch</div>
+
+  <div class="metric-row">
+    <div class="metric-card" style="flex:0.6;background:#f4f6fc;border:1.5px solid #c8d0e8;">
+      <div class="mc-label">Metric</div>
+      <div style="font-size:13px;color:#4a5a78;font-weight:700;margin-top:8px;">MedAE (yr) ↓</div>
+      <div style="font-size:11px;color:#8090a8;margin-top:4px;">Median Absolute Error</div>
+      <div style="font-size:13px;color:#4a5a78;font-weight:700;margin-top:14px;">MAE (yr) ↓</div>
+      <div style="font-size:11px;color:#8090a8;margin-top:4px;">Mean Absolute Error</div>
+      <div style="font-size:13px;color:#4a5a78;font-weight:700;margin-top:14px;">R² ↑</div>
+      <div style="font-size:11px;color:#8090a8;margin-top:4px;">Coefficient of determination</div>
+    </div>
+    <div class="metric-card card-llama">
+      <div class="mc-label">MethylLlama</div>
+      <div class="mc-val">3.650</div>
+      <div class="mc-unit">years</div>
+      <div class="mc-val" style="font-size:24px;margin-top:12px;">5.462</div>
+      <div class="mc-unit">years</div>
+      <div class="mc-val" style="font-size:24px;margin-top:12px;">0.905</div>
+      <div class="mc-sub">ep 300 · 17,100 steps</div>
+    </div>
+    <div class="metric-card card-gpt">
+      <div class="mc-label">MethylGPT Medium</div>
+      <div class="mc-val">4.104</div>
+      <div class="mc-unit">years</div>
+      <div class="mc-val" style="font-size:24px;margin-top:12px;">5.475</div>
+      <div class="mc-unit">years</div>
+      <div class="mc-val" style="font-size:24px;margin-top:12px;">0.912</div>
+      <div class="mc-sub">ep 99 · 728,599 steps</div>
+    </div>
+    <div class="metric-card card-win">
+      <div class="mc-label">Gap (MethylLlama wins)</div>
+      <div class="mc-val">▼ 0.45 yr</div>
+      <div class="mc-unit">11% lower MedAE</div>
+      <div class="mc-val" style="font-size:24px;margin-top:12px;">▼ 0.01 yr</div>
+      <div class="mc-unit">0.2% lower MAE</div>
+      <div class="mc-val" style="font-size:20px;margin-top:12px;color:#c07020;">+0.007 R²</div>
+      <div class="mc-sub" style="color:#a05020;">MethylGPT R² slightly better</div>
+    </div>
+  </div>
+
+  <!-- Full table — val and test side by side -->
+  <div class="band">Full Metric Table — Validation & Test</div>
+
+  <table class="cmp">
+    <thead>
+      <tr>
+        <th class="left" style="width:18%;color:#d8e4ff;">Metric</th>
+        <th style="color:#a8c8ff;">MethylLlama Val</th>
+        <th style="color:#ffcc99;">MethylGPT Val</th>
+        <th style="color:#a8c8ff;">MethylLlama Test</th>
+        <th style="color:#ffcc99;">MethylGPT Test</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feat">MedAE (yr) ↓</td>
+        <td>3.938</td>
+        <td>3.711</td>
+        <td class="win big">3.650</td>
+        <td class="gpt big">4.104</td>
+      </tr>
+      <tr>
+        <td class="feat">MAE (yr) ↓</td>
+        <td>5.439</td>
+        <td>5.402</td>
+        <td class="win">5.462</td>
+        <td class="gpt">5.475</td>
+      </tr>
+      <tr>
+        <td class="feat">R² ↑</td>
+        <td>0.911</td>
+        <td class="llama">0.913</td>
+        <td>0.905</td>
+        <td class="llama">0.912</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Best checkpoint row -->
+  <div class="band green">Best Val Checkpoint</div>
+
+  <table class="cmp">
+    <thead>
+      <tr>
+        <th class="left" style="width:25%;color:#d8e4ff;">Metric</th>
+        <th style="color:#a8c8ff;">MethylLlama</th>
+        <th style="color:#ffcc99;">MethylGPT Medium</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feat">Best val MedAE (yr)</td>
+        <td>3.5625 &nbsp;<span style="font-size:11px;color:#6a7890;">(ep 127)</span></td>
+        <td class="win">3.3008 &nbsp;<span style="font-size:11px;color:#1a5a28;">(ep 75)</span></td>
+      </tr>
+      <tr>
+        <td class="feat">Best val R²</td>
+        <td>0.9114 &nbsp;<span style="font-size:11px;color:#6a7890;">(ep 227)</span></td>
+        <td class="win">0.9183 &nbsp;<span style="font-size:11px;color:#1a5a28;">(ep 78)</span></td>
+      </tr>
+      <tr>
+        <td class="feat">Best ckpt test MedAE</td>
+        <td>3.650 &nbsp;<span style="font-size:11px;color:#6a7890;">(ep 300 final)</span></td>
+        <td class="win">3.555 &nbsp;<span style="font-size:11px;color:#1a5a28;">(ep 75, from ckpt file)</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note-box orange">
+    <b>Interpretation:</b> MethylLlama wins on <b>final-epoch test MedAE</b> (3.65 vs 4.10 yr, −11%).
+    MethylGPT wins on <b>best-checkpoint val MedAE</b> (3.30 vs 3.56 yr) and best-checkpoint test MedAE (3.55 vs 3.65 yr).
+    R² and correlation metrics favour MethylGPT throughout. The result is mixed: neither model dominates across all metrics.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 4 — Training Efficiency + Next Steps
+     ═══════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">4 / 4</div>
+  <div class="slide-title">Training Efficiency</div>
+
+  <!-- Efficiency metrics -->
+  <div class="band">Compute Comparison</div>
+
+  <table class="cmp" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th class="left" style="width:26%;color:#d8e4ff;">Metric</th>
+        <th style="color:#a8c8ff;">MethylLlama</th>
+        <th style="color:#ffcc99;">MethylGPT Medium</th>
+        <th style="color:#90ee90;">Ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feat">Gradient steps</td>
+        <td class="llama big">17,100</td>
+        <td class="gpt big">728,599</td>
+        <td class="win">43× fewer</td>
+      </tr>
+      <tr>
+        <td class="feat">Epochs</td>
+        <td>300</td>
+        <td>99</td>
+        <td style="color:#5a6a8a;">—</td>
+      </tr>
+      <tr>
+        <td class="feat">Steps per epoch</td>
+        <td class="llama">57</td>
+        <td class="gpt">7,359</td>
+        <td class="win">129× fewer</td>
+      </tr>
+      <tr>
+        <td class="feat">Step efficiency (steps/yr MedAE)</td>
+        <td class="win">1,084 steps/yr</td>
+        <td class="gpt">168,265 steps/yr</td>
+        <td class="win">155× more efficient</td>
+      </tr>
+      <tr>
+        <td class="feat">Batch size</td>
+        <td class="win">64</td>
+        <td class="gpt">1</td>
+        <td class="win">64× larger batches</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Visual step bar -->
+  <div class="eff-bar-wrap">
+    <div style="font-size:11px;color:#6a7890;margin-bottom:6px;letter-spacing:0.5px;">GRADIENT STEPS (proportional scale)</div>
+    <div class="eff-bar">
+      <div class="eff-llama" style="flex: 17100">MethylLlama — 17,100 steps</div>
+      <div class="eff-gpt" style="flex: calc(728599 - 17100)">MethylGPT — 728,599 steps total →</div>
+    </div>
+    <div class="eff-label">MethylLlama's entire fine-tuning fits inside the first 2.3% of MethylGPT's training</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Why MethylGPT uses more steps -->
+  <div class="band purple">Why the 43× step gap?</div>
+  <div style="font-size:13px;color:#3a4a68;line-height:1.8;">
+    MethylGPT uses <b>batch_size = 1</b> — each gradient step updates weights on a single sample.
+    MethylLlama uses <b>batch_size = 64</b>, so each step aggregates gradients over 64 samples.
+    This explains the large step gap even though MethylLlama trained for more epochs (300 vs 99).
+    WCED pretraining additionally gives MethylLlama a strong initialisation — the model converges
+    to R² ≥ 0.90 within ~5,000 steps, whereas MethylGPT requires ~430,000 steps for the same quality.
+  </div>
+
+</div>
+
+</body>
+</html>

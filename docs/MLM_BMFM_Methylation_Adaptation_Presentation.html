@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adapting BMFM-RNA for DNA Methylation Age Prediction</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --secondary: #0d9488;
+            --secondary-bg: #f0fdfa;
+            --accent: #8b5cf6;
+            --accent-bg: #f5f3ff;
+            --orange: #f59e0b;
+            --orange-bg: #fffbeb;
+            --rose: #e11d48;
+            --rose-bg: #fff1f2;
+            --text: #1f2937;
+            --text-light: #4b5563;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-light: #f9fafb;
+            --bg-alt: #f3f4f6;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        /* Slide sections */
+        .slide {
+            min-height: 100vh;
+            padding: 80px 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .slide:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .slide:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Title slide */
+        .title-slide {
+            text-align: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+        }
+
+        .title-slide h1 {
+            color: #1f2937;
+        }
+
+        .title-slide .subtitle {
+            color: #374151;
+        }
+
+        .title-slide .description {
+            color: #4b5563;
+        }
+
+        .title-slide h1 {
+            font-size: 3.2rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 60px;
+        }
+
+        .title-slide .description {
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.9;
+        }
+
+        /* Section headers */
+        .slide h2 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--primary);
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        #motivation h2 { color: #1e40af; border-color: #3b82f6; }
+        #files h2 { color: #047857; border-color: #10b981; }
+        #tokenization h2 { color: #6d28d9; border-color: #8b5cf6; }
+        #architecture h2 { color: #b45309; border-color: #f59e0b; }
+        #pipeline h2 { color: #1e40af; border-color: #3b82f6; }
+        #results h2 { color: #059669; border-color: #10b981; }
+        #summary h2 { color: #be123c; border-color: #f43f5e; }
+
+        .slide h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 35px 0 20px;
+        }
+
+        .slide p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin: 30px 0;
+        }
+
+        .column {
+            padding: 30px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .column:nth-child(2) {
+            border-top-color: var(--secondary);
+        }
+
+        .column h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .column:nth-child(2) h4 {
+            color: var(--secondary);
+        }
+
+        .column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .column li {
+            padding: 10px 0;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--bg-alt);
+        }
+
+        .column li:last-child {
+            border-bottom: none;
+        }
+
+        /* File changes table */
+        .file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .file-table th {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .file-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .file-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .file-table tr:hover {
+            background: #f1f5f9;
+        }
+
+        .file-name {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .file-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .file-why {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Diagram container */
+        .diagram-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #64748b;
+            border-radius: 8px;
+            padding: 40px;
+            margin: 30px 0;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .diagram-box .hl { color: var(--primary); font-weight: 600; }
+        .diagram-box .hl2 { color: var(--secondary); font-weight: 600; }
+        .diagram-box .dim { color: var(--text-muted); }
+
+        /* Key concept boxes */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .concept {
+            padding: 25px 30px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #3b82f6;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .concept:nth-child(2) {
+            border-left-color: #10b981;
+        }
+
+        .concept:nth-child(3) {
+            border-left-color: #8b5cf6;
+        }
+
+        .concept:nth-child(4) {
+            border-left-color: #f59e0b;
+        }
+
+        .concept h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .concept p {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* Architecture table */
+        .arch-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .arch-table th {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .arch-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .arch-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .arch-table .highlight-row {
+            background: #e0f2fe;
+            font-weight: 600;
+        }
+
+        .arch-table .highlight-row td {
+            color: #0369a1;
+        }
+
+        /* Pipeline section */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin: 30px 0;
+        }
+
+        .pipeline-stage {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 35px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .pipeline-stage:nth-child(2) {
+            border-top-color: var(--secondary);
+        }
+
+        .pipeline-stage h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pipeline-stage:nth-child(2) h4 {
+            color: var(--secondary);
+        }
+
+        .pipeline-step {
+            display: flex;
+            margin: 15px 0;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .pipeline-stage:nth-child(2) .step-num {
+            background: var(--secondary);
+        }
+
+        .step-content h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .step-detail {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            padding-left: 10px;
+            border-left: 2px solid var(--border);
+        }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .summary-card {
+            padding: 30px 25px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid #3b82f6;
+        }
+
+        .summary-card:nth-child(2) {
+            border-top-color: #10b981;
+        }
+        .summary-card:nth-child(3) {
+            border-top-color: #8b5cf6;
+        }
+        .summary-card:nth-child(4) {
+            border-top-color: #f59e0b;
+        }
+
+        .summary-card .number {
+            font-size: 0.9rem;
+            color: #3b82f6;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .summary-card:nth-child(2) .number { color: #10b981; }
+        .summary-card:nth-child(3) .number { color: #8b5cf6; }
+        .summary-card:nth-child(4) .number { color: #f59e0b; }
+
+        .summary-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Comparison table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        .comparison-table th {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .comparison-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .comparison-table tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* Navigation */
+        .nav-sidebar {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot:hover,
+        .nav-dot.active {
+            background: #3b82f6;
+            transform: scale(1.3);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #0c4a6e;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .slide {
+                padding: 50px 40px;
+            }
+
+            .two-column,
+            .pipeline-grid,
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-sidebar {
+                display: none;
+            }
+        }
+
+        /* Print */
+        @media print {
+            .slide {
+                min-height: auto;
+                page-break-after: always;
+                padding: 40px;
+            }
+
+            .nav-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-sidebar">
+    <a href="#title" class="nav-dot active"></a>
+    <a href="#motivation" class="nav-dot"></a>
+    <a href="#files" class="nav-dot"></a>
+    <a href="#tokenization" class="nav-dot"></a>
+    <a href="#architecture" class="nav-dot"></a>
+    <a href="#pipeline" class="nav-dot"></a>
+    <a href="#results" class="nav-dot"></a>
+    <a href="#summary" class="nav-dot"></a>
+</nav>
+
+<!-- Slide 1: Title -->
+<section id="title" class="slide title-slide">
+    <h1>Adapting BMFM-RNA for DNA Methylation</h1>
+    <p class="subtitle">Multi-Field Tokenization for Biological Age Prediction</p>
+    <p class="description">
+        This presentation describes how we adapted a transformer foundation model
+        originally designed for single-cell RNA sequencing to predict chronological age
+        from DNA methylation patterns. The key insight is that both data types share
+        a common structure: discrete identifiers paired with continuous measurements.
+    </p>
+</section>
+
+<!-- Slide 2: Motivation -->
+<section id="motivation" class="slide">
+    <h2>Why BMFM-RNA for Methylation?</h2>
+
+    <p>
+        DNA methylation and gene expression data share a fundamental structure that makes
+        BMFM-RNA's multi-field architecture directly applicable to methylation analysis.
+    </p>
+
+    <div class="two-column">
+        <div class="column">
+            <h4>Single-Cell RNA (Original)</h4>
+            <ul>
+                <li><strong>Identifiers:</strong> Gene symbols (BRCA1, TP53, EGFR...)</li>
+                <li><strong>Values:</strong> Expression counts (integers, 0 to 10,000+)</li>
+                <li><strong>Features:</strong> ~20,000 genes per cell</li>
+                <li><strong>Task:</strong> Cell type classification</li>
+            </ul>
+        </div>
+
+        <div class="column">
+            <h4>DNA Methylation (Adapted)</h4>
+            <ul>
+                <li><strong>Identifiers:</strong> CpG probe IDs (cg00000029, cg00000108...)</li>
+                <li><strong>Values:</strong> Beta-values (continuous, 0.0 to 1.0)</li>
+                <li><strong>Features:</strong> 8,000 CpG sites (Altumage selection)</li>
+                <li><strong>Task:</strong> Age regression</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="concept-grid">
+        <div class="concept">
+            <h4>Shared Data Structure</h4>
+            <p>Both modalities pair discrete tokens (gene/CpG IDs) with continuous measurements
+            (expression/methylation levels). BMFM handles this natively with its two-field design.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Transfer Learning Opportunity</h4>
+            <p>The architectural patterns learned for gene expression relationships can transfer
+            to methylation patterns, especially the attention mechanisms that capture feature interactions.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 3: Files Changed -->
+<section id="files" class="slide">
+    <h2>Files Created and Modified</h2>
+
+    <p>
+        We created a new module <code>bmfm_methylation/</code> containing all methylation-specific
+        adaptations while reusing the core BMFM transformer components unchanged.
+    </p>
+
+    <table class="file-table">
+        <thead>
+            <tr>
+                <th style="width: 22%">File</th>
+                <th style="width: 40%">What It Does</th>
+                <th style="width: 38%">Why It's Needed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="file-name">tokenizer.py</span></td>
+                <td class="file-desc">Creates vocabulary file mapping CpG probe IDs to token indices.
+                    Generates vocab.txt with special tokens ([CLS], [PAD], [MASK], etc.) followed by 8,000 CpG identifiers.</td>
+                <td class="file-why">BMFM uses BertTokenizer which requires a vocabulary file.
+                    CpG IDs (cg00000029) need their own embedding table separate from gene symbols.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">data_module.py</span></td>
+                <td class="file-desc">PyTorch Lightning DataModule that loads h5ad files,
+                    handles train/valid/test splits, and implements MethylationCollator for batch creation
+                    using all 8,000 CpG sites.</td>
+                <td class="file-why">Methylation data uses AnnData format (.h5ad). Need custom collator
+                    to process all CpG features consistently across samples.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">model.py</span></td>
+                <td class="file-desc">MethylationEncoder wrapper around SCBertModel that converts
+                    methylation inputs (cpg_ids, beta_values) into BMFM's expected input format.
+                    MethylationAgeModel adds regression head on [CLS] output.</td>
+                <td class="file-why">BMFM expects input_ids tensor with shape [batch, num_fields, seq_len].
+                    Need adapter to pack CpG IDs and beta-values into this format.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">pretrain.py</span></td>
+                <td class="file-desc">MLM pretraining script using masked language modeling objective.
+                    Masks 30% of beta-values (not CpG IDs) and trains model to reconstruct them.</td>
+                <td class="file-why">Pretraining teaches the model methylation patterns and CpG
+                    co-methylation relationships before fine-tuning on age.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">finetune.py</span></td>
+                <td class="file-desc">Age regression training with frozen encoder. Extracts [CLS]
+                    pooled output and passes through trainable MLP head (512→256→128→1) to predict age.</td>
+                <td class="file-why">Freezing encoder prevents overfitting on limited data (11,500 samples).
+                    Regression head learns age mapping from pretrained representations.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">configs/fields/methylation.yaml</span></td>
+                <td class="file-desc">Defines two fields: cpg_sites (discrete, not masked) and
+                    beta_values (continuous, masked during MLM). Specifies ContinuousValueEncoder for beta-values.</td>
+                <td class="file-why">BMFM's multi-field system requires explicit field definitions.
+                    Critical: only beta-values are masked, CpG IDs remain visible.</td>
+            </tr>
+            <tr>
+                <td><span class="file-name">configs/model/scbert_methylation.yaml</span></td>
+                <td class="file-desc">Model architecture: 6 layers, 8 heads, 512 hidden dim,
+                    2,048 FFN intermediate size, vocabulary 8,005 (8,000 CpGs + 5 special tokens).</td>
+                <td class="file-why">Smaller model prevents overfitting. Methylation patterns are
+                    more homogeneous than single-cell RNA, requiring less capacity.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- Slide 4: Tokenization -->
+<section id="tokenization" class="slide">
+    <h2>Two-Field Tokenization</h2>
+
+    <p>
+        The key adaptation is how we handle the two types of information in methylation data:
+        the CpG site identifiers (which site are we measuring) and the beta-values (what is the methylation level).
+    </p>
+
+    <div class="diagram-box">
+<span class="dim">Input Sample (one person's methylation profile):</span>
+{"cg00000029": <span class="hl2">0.85</span>, "cg00000108": <span class="hl2">0.12</span>, "cg00000165": <span class="hl2">0.67</span>, ...}  <span class="dim">(8,000 CpG sites)</span>
+
+                              │
+          ┌───────────────────┴───────────────────┐
+          ▼                                       ▼
+
+┌─────────────────────────┐         ┌─────────────────────────┐
+│  <span class="hl">FIELD 1: CpG IDs</span>       │         │  <span class="hl2">FIELD 2: Beta Values</span>   │
+│  (Discrete Tokens)      │         │  (Continuous Values)    │
+│                         │         │                         │
+│  Encoding Method:       │         │  Encoding Method:       │
+│  Standard nn.Embedding  │         │  ContinuousValueEncoder │
+│  (vocabulary lookup)    │         │  (MLP: 1 → 128 → 512)   │
+│                         │         │                         │
+│  cg00000029 → ID <span class="hl">5</span>     │         │  0.85 → <span class="hl2">[e₁, e₂...e₅₁₂]</span> │
+│  cg00000108 → ID <span class="hl">6</span>     │         │  0.12 → <span class="hl2">[e₁, e₂...e₅₁₂]</span> │
+│  cg00000165 → ID <span class="hl">7</span>     │         │  0.67 → <span class="hl2">[e₁, e₂...e₅₁₂]</span> │
+│                         │         │                         │
+│  Output: (batch, 8000,  │         │  Output: (batch, 8000,  │
+│          512)           │         │          512)           │
+└─────────────────────────┘         └─────────────────────────┘
+          │                                       │
+          └───────────────────┬───────────────────┘
+                              ▼
+                    ┌─────────────────────┐
+                    │  <span class="hl">ELEMENT-WISE ADD</span>   │
+                    │                     │
+                    │  combined = cpg_emb │
+                    │            + beta_emb│
+                    └─────────────────────┘
+                              │
+                              ▼
+                    Combined Embeddings
+                    (batch, 8000, 512)
+                              │
+                              ▼
+                    Transformer Encoder
+                    (6 layers, 8 heads)
+    </div>
+
+    <h3>Critical Design Decisions</h3>
+
+    <div class="concept-grid">
+        <div class="concept">
+            <h4>CpG IDs Are Never Masked</h4>
+            <p>During MLM pretraining, we always know which CpG site we are measuring.
+            The site identity is structural information, not something to predict.
+            Only beta-values are masked and reconstructed.</p>
+        </div>
+
+        <div class="concept">
+            <h4>All 8,000 CpG Sites Used</h4>
+            <p>We use all 8,000 CpG sites from the Altumage dataset for every sample.
+            This ensures the model learns comprehensive methylation patterns across
+            the full feature set.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Continuous Value Encoder</h4>
+            <p>Beta-values (0.0-1.0) cannot use standard vocabulary lookup. Instead,
+            a small MLP (1→128→512) projects each scalar value into the embedding space,
+            producing a 512-dim vector per CpG site.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Embedding Fusion by Addition</h4>
+            <p>The CpG ID embedding and beta-value embedding are combined by element-wise
+            addition. This allows the model to jointly reason about which site and
+            what value, creating position-aware value representations.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 5: Architecture -->
+<section id="architecture" class="slide">
+    <h2>Model Architecture</h2>
+
+    <p>
+        We use a smaller version of the BMFM architecture, reducing capacity to prevent
+        overfitting on the limited methylation dataset while maintaining the core transformer structure.
+    </p>
+
+    <table class="arch-table">
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>BMFM-RNA (Original)</th>
+                <th>BMFM-Methylation (Ours)</th>
+                <th>Rationale</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Transformer Layers</td>
+                <td>12</td>
+                <td>6</td>
+                <td>Methylation patterns are more regular, need less depth</td>
+            </tr>
+            <tr>
+                <td>Attention Heads</td>
+                <td>12</td>
+                <td>8</td>
+                <td>Balanced for 512 hidden dim (64 per head)</td>
+            </tr>
+            <tr>
+                <td>Hidden Dimension</td>
+                <td>768</td>
+                <td>512</td>
+                <td>Sufficient representation capacity for methylation</td>
+            </tr>
+            <tr>
+                <td>FFN Intermediate Size</td>
+                <td>3,072</td>
+                <td>2,048</td>
+                <td>Standard 4x expansion of hidden dimension (512 × 4)</td>
+            </tr>
+            <tr>
+                <td>Vocabulary Size</td>
+                <td>~60,000 genes</td>
+                <td>8,005</td>
+                <td>8,000 CpG sites + 5 special tokens</td>
+            </tr>
+            <tr>
+                <td>Input Sequence Length</td>
+                <td>Variable</td>
+                <td>8,000</td>
+                <td>All CpG sites from Altumage dataset</td>
+            </tr>
+            <tr class="highlight-row">
+                <td>Total Parameters</td>
+                <td>~110M</td>
+                <td>~25M</td>
+                <td>4× smaller to prevent memorization</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="highlight-box">
+        <p><strong>FFN Intermediate Size (2,048):</strong> This is the width of the feed-forward network
+        inside each transformer layer. Each transformer block has: Attention → FFN. The FFN expands the
+        512-dim hidden representation to 2,048-dim (4× expansion), applies GELU activation, then projects back to 512-dim.
+        This is the standard transformer design used in BERT.</p>
+    </div>
+</section>
+
+<!-- Slide 6: Training Pipeline -->
+<section id="pipeline" class="slide">
+    <h2>Training Pipeline</h2>
+
+    <p>
+        Training consists of two stages: self-supervised pretraining to learn methylation patterns,
+        followed by supervised fine-tuning for age prediction.
+    </p>
+
+    <div class="pipeline-grid">
+        <div class="pipeline-stage">
+            <h4>Stage 1: Pretraining (Masked Language Modeling)</h4>
+
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h5>Input Preparation</h5>
+                    <p>Load methylation profiles from h5ad file. Each sample contains beta-values for all 8,000 CpG sites.</p>
+                    <div class="step-detail">Data: 11,500 samples total (train: 5,483, valid: 1,371, test: 4,646)</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h5>Full Feature Input</h5>
+                    <p>Use all 8,000 CpG sites for every sample to capture complete methylation profiles.</p>
+                    <div class="step-detail">Consistent feature set enables learning global methylation patterns</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h5>Masking (30% of beta-values)</h5>
+                    <p>Randomly replace 30% of beta-values with mask token (-1.0). CpG IDs remain visible.</p>
+                    <div class="step-detail">Higher mask rate than BERT (15%) encourages learning richer representations</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h5>Reconstruction Objective</h5>
+                    <p>Model predicts original beta-values at masked positions. Loss: MSE on masked positions only.</p>
+                    <div class="step-detail">Teaches model to understand methylation co-regulation patterns</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                    <h5>Training Configuration</h5>
+                    <p>AdamW optimizer, cosine LR schedule with warmup, early stopping on validation loss.</p>
+                    <div class="step-detail">Epochs: up to 300, Batch: 32 × 4 accumulation = 128 effective</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pipeline-stage">
+            <h4>Stage 2: Fine-tuning (Age Regression)</h4>
+
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h5>Load Pretrained Encoder</h5>
+                    <p>Initialize from best pretraining checkpoint. Freeze all encoder parameters.</p>
+                    <div class="step-detail">Freezing prevents catastrophic forgetting and overfitting</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h5>Add Regression Head</h5>
+                    <p>Attach trainable MLP (512→256→128→1) on [CLS] pooler output.</p>
+                    <div class="step-detail">Only ~200K trainable parameters in the head</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h5>Age Normalization</h5>
+                    <p>Normalize target ages: z = (age - μ) / σ where μ=42.0, σ=26.53 years.</p>
+                    <div class="step-detail">Improves training stability for regression</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h5>MSE Loss on Normalized Ages</h5>
+                    <p>Minimize mean squared error between predicted and true normalized ages.</p>
+                    <div class="step-detail">Denormalize predictions for final MAE/R² evaluation</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                    <h5>Training Configuration</h5>
+                    <p>LR: 5e-4, weight decay: 0.01, warmup: 100 steps, early stopping patience: 100.</p>
+                    <div class="step-detail">Best checkpoint selected by validation MAE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 7: Results -->
+<section id="results" class="slide">
+    <h2>Experimental Results</h2>
+
+    <p>
+        We evaluate our adapted BMFM-RNA model on the Altumage methylation dataset with 11,500 samples.
+        Results show strong performance on both pretraining reconstruction and age prediction tasks.
+    </p>
+
+    <h3>Pretraining Results (MLM)</h3>
+    <p>
+        The encoder learns to accurately reconstruct masked beta-values from context, achieving
+        near-perfect correlation (PCC = 0.997) on the test set.
+    </p>
+
+    <table class="arch-table">
+        <thead>
+            <tr>
+                <th>Split</th>
+                <th>Loss (MSE)</th>
+                <th>MAE</th>
+                <th>PCC</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Train</td>
+                <td>0.00132</td>
+                <td>0.0221</td>
+                <td>0.994</td>
+            </tr>
+            <tr>
+                <td>Validation</td>
+                <td>0.00147</td>
+                <td>0.0234</td>
+                <td>0.994</td>
+            </tr>
+            <tr class="highlight-row">
+                <td>Test</td>
+                <td>0.00087</td>
+                <td>0.0195</td>
+                <td><strong>0.997</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Fine-tuning Results (Age Prediction)</h3>
+    <p>
+        Multi-seed evaluation (seeds 40, 41, 42, 43, 44) demonstrates consistent performance across runs
+        for both BMFM-RNA and MethylGPT models.
+    </p>
+
+    <h3>Comparison: BMFM-RNA vs MethylGPT (5 seeds each)</h3>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Test MAE (years)</th>
+                <th>Test R²</th>
+                <th>Parameters</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Mean Prediction (baseline)</td>
+                <td>22.82</td>
+                <td>0.00</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Ridge Regression</td>
+                <td>4.49</td>
+                <td>0.94</td>
+                <td>8K</td>
+            </tr>
+            <tr>
+                <td><strong>MethylGPT (Mean, n=5)</strong></td>
+                <td><strong>4.39 ± 0.17</strong></td>
+                <td><strong>0.941 ± 0.003</strong></td>
+                <td>~2M</td>
+            </tr>
+            <tr>
+                <td>MethylGPT (Best, Seed 42)</td>
+                <td>4.13</td>
+                <td>0.947</td>
+                <td>~2M</td>
+            </tr>
+            <tr>
+                <td><strong>BMFM-RNA (Mean, n=5)</strong></td>
+                <td><strong>4.79 ± 0.14</strong></td>
+                <td><strong>0.927 ± 0.004</strong></td>
+                <td>~25M</td>
+            </tr>
+            <tr class="highlight-row">
+                <td><strong>BMFM-RNA (Best, Seed 44)</strong></td>
+                <td><strong>4.64</strong></td>
+                <td><strong>0.932</strong></td>
+                <td>~25M</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>BMFM-RNA Multi-Seed Results (5 seeds)</h3>
+    <table class="arch-table">
+        <thead>
+            <tr>
+                <th>Seed</th>
+                <th>Test MAE (years)</th>
+                <th>Test R²</th>
+                <th>Val MAE Best</th>
+                <th>Best Epoch</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>40</td>
+                <td>4.88</td>
+                <td>0.926</td>
+                <td>4.96</td>
+                <td>116</td>
+            </tr>
+            <tr>
+                <td>41</td>
+                <td>4.97</td>
+                <td>0.921</td>
+                <td>4.99</td>
+                <td>85</td>
+            </tr>
+            <tr>
+                <td>42</td>
+                <td>4.76</td>
+                <td>0.928</td>
+                <td>4.97</td>
+                <td>214</td>
+            </tr>
+            <tr>
+                <td>43</td>
+                <td>4.67</td>
+                <td>0.931</td>
+                <td>4.98</td>
+                <td>118</td>
+            </tr>
+            <tr class="highlight-row">
+                <td>44 (Best)</td>
+                <td><strong>4.64</strong></td>
+                <td><strong>0.932</strong></td>
+                <td>4.85</td>
+                <td>125</td>
+            </tr>
+            <tr style="background: #f0f9ff; font-weight: 600;">
+                <td>Mean ± Std</td>
+                <td>4.79 ± 0.14</td>
+                <td>0.927 ± 0.004</td>
+                <td>4.95 ± 0.06</td>
+                <td>132 ± 49</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>MethylGPT Multi-Seed Results (5 seeds)</h3>
+    <table class="arch-table">
+        <thead>
+            <tr>
+                <th>Seed</th>
+                <th>Test MAE (years)</th>
+                <th>Test R²</th>
+                <th>Test MedAE</th>
+                <th>Test RMSE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>40</td>
+                <td>4.62</td>
+                <td>0.939</td>
+                <td>3.34</td>
+                <td>6.60</td>
+            </tr>
+            <tr>
+                <td>41</td>
+                <td>4.38</td>
+                <td>0.938</td>
+                <td>2.91</td>
+                <td>6.66</td>
+            </tr>
+            <tr class="highlight-row">
+                <td>42 (Best)</td>
+                <td><strong>4.13</strong></td>
+                <td><strong>0.947</strong></td>
+                <td><strong>2.85</strong></td>
+                <td><strong>6.16</strong></td>
+            </tr>
+            <tr>
+                <td>43</td>
+                <td>4.40</td>
+                <td>0.941</td>
+                <td>3.12</td>
+                <td>6.50</td>
+            </tr>
+            <tr>
+                <td>44</td>
+                <td>4.40</td>
+                <td>0.940</td>
+                <td>3.05</td>
+                <td>6.52</td>
+            </tr>
+            <tr style="background: #f0f9ff; font-weight: 600;">
+                <td>Mean ± Std</td>
+                <td>4.39 ± 0.17</td>
+                <td>0.941 ± 0.003</td>
+                <td>3.05 ± 0.19</td>
+                <td>6.49 ± 0.19</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Head-to-Head Comparison</h3>
+    <div class="concept-grid">
+        <div class="concept">
+            <h4>Mean Performance (n=5)</h4>
+            <p><strong>MethylGPT:</strong> MAE 4.39 ± 0.17, R² 0.941<br>
+            <strong>BMFM-RNA:</strong> MAE 4.79 ± 0.14, R² 0.927<br>
+            <strong>Difference:</strong> MethylGPT is 9% better in MAE</p>
+        </div>
+        <div class="concept">
+            <h4>Best Single Run</h4>
+            <p><strong>MethylGPT (Seed 42):</strong> MAE 4.13, R² 0.947<br>
+            <strong>BMFM-RNA (Seed 44):</strong> MAE 4.64, R² 0.932<br>
+            <strong>Difference:</strong> MethylGPT is 11% better in MAE</p>
+        </div>
+        <div class="concept">
+            <h4>Consistency</h4>
+            <p><strong>MethylGPT:</strong> std = 0.17 years<br>
+            <strong>BMFM-RNA:</strong> std = 0.14 years<br>
+            Both models show excellent reproducibility across seeds.</p>
+        </div>
+        <div class="concept">
+            <h4>Efficiency</h4>
+            <p><strong>MethylGPT:</strong> ~2M parameters<br>
+            <strong>BMFM-RNA:</strong> ~25M parameters<br>
+            MethylGPT achieves better results with 12× fewer parameters.</p>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <p><strong>Key Findings:</strong> MethylGPT outperforms BMFM-RNA by <strong>9% in MAE</strong> (4.39 vs 4.79 years)
+        and <strong>1.5% in R²</strong> (0.941 vs 0.927) on average across 5 seeds. MethylGPT's best model (Seed 42)
+        achieves <strong>MAE = 4.13 years</strong>, explaining <strong>94.7% of age variance</strong>.
+        BMFM-RNA uses 12× more parameters (~25M vs ~2M) but achieves lower performance,
+        suggesting the simpler MethylGPT architecture is more efficient for methylation age prediction.</p>
+    </div>
+</section>
+
+<!-- Slide 8: Summary of Adaptations -->
+<section id="summary" class="slide">
+    <h2>Summary of Adaptations</h2>
+
+    <p>
+        The following table summarizes all key changes made to adapt BMFM-RNA for methylation data:
+    </p>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Aspect</th>
+                <th>Original BMFM-RNA</th>
+                <th>Our Methylation Adaptation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Token Vocabulary</td>
+                <td>Gene symbols (~60K)</td>
+                <td>CpG probe IDs (8,000 + 5 special)</td>
+            </tr>
+            <tr>
+                <td>Continuous Values</td>
+                <td>Expression counts (0-10K+)</td>
+                <td>Beta-values (0.0-1.0)</td>
+            </tr>
+            <tr>
+                <td>Value Encoder</td>
+                <td>ContinuousValueEncoder</td>
+                <td>Same (MLP 1→128→512)</td>
+            </tr>
+            <tr>
+                <td>Masking Strategy</td>
+                <td>Mask expression values</td>
+                <td>Mask beta-values (30%)</td>
+            </tr>
+            <tr>
+                <td>Feature Selection</td>
+                <td>Top expressed genes</td>
+                <td>All 8,000 CpG sites</td>
+            </tr>
+            <tr>
+                <td>Model Size</td>
+                <td>12 layers, 768 hidden (~110M)</td>
+                <td>6 layers, 512 hidden (~25M)</td>
+            </tr>
+            <tr>
+                <td>FFN Intermediate</td>
+                <td>3,072</td>
+                <td>2,048</td>
+            </tr>
+            <tr>
+                <td>Downstream Task</td>
+                <td>Cell type classification</td>
+                <td>Age regression</td>
+            </tr>
+            <tr>
+                <td>Output Head</td>
+                <td>Classification (softmax)</td>
+                <td>Regression MLP (512→256→128→1)</td>
+            </tr>
+            <tr>
+                <td>Fine-tuning Strategy</td>
+                <td>Full model or frozen</td>
+                <td>Frozen encoder only</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="number">01</div>
+            <h4>Two-Field Design</h4>
+            <p>Discrete CpG IDs + continuous beta-values with separate encoders</p>
+        </div>
+
+        <div class="summary-card">
+            <div class="number">02</div>
+            <h4>Mask Only Values</h4>
+            <p>CpG IDs stay visible; beta-values are the prediction target</p>
+        </div>
+
+        <div class="summary-card">
+            <div class="number">03</div>
+            <h4>Full 8K Features</h4>
+            <p>All 8,000 CpG sites used for comprehensive coverage</p>
+        </div>
+
+        <div class="summary-card">
+            <div class="number">04</div>
+            <h4>Frozen Encoder</h4>
+            <p>Only train regression head to prevent overfitting</p>
+        </div>
+    </div>
+
+    <h3>Key Observations</h3>
+
+    <div class="concept-grid">
+        <div class="concept">
+            <h4>MethylGPT Outperforms BMFM</h4>
+            <p>MethylGPT achieves 9% better MAE (4.39 vs 4.79 years) with 12× fewer parameters (~2M vs ~25M).
+            This suggests simpler architectures may be more efficient for methylation age prediction.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Feature Subset Impact</h4>
+            <p>BMFM-RNA used only 2,048 of 8,000 CpG sites. Using all 8K CpGs may improve performance
+            by training all CpG embeddings properly instead of a fixed subset.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Pretraining Success</h4>
+            <p>MLM pretraining achieved excellent reconstruction (PCC=0.997), indicating the encoder
+            learns meaningful methylation patterns. The gap may be in the fine-tuning stage.</p>
+        </div>
+
+        <div class="concept">
+            <h4>Both Models Consistent</h4>
+            <p>Both models show excellent reproducibility: MethylGPT ±0.17 MAE, BMFM-RNA ±0.14 MAE.
+            Results are reliable across different random seeds.</p>
+        </div>
+    </div>
+
+    <h3>Next Steps</h3>
+
+    <div class="concept-grid">
+        <div class="concept">
+            <h4>1. Train with Full 8K CpGs</h4>
+            <p>Run BMFM pretraining and fine-tuning using all 8,000 CpG sites instead of 2,048 subset.
+            This ensures all CpG embeddings are properly trained.</p>
+        </div>
+
+        <div class="concept">
+            <h4>2. Multi-Seed Evaluation</h4>
+            <p>Run BMFM with multiple seeds (40-44) to enable fair comparison with MethylGPT's
+            5-seed evaluation and assess variance.</p>
+        </div>
+
+        <div class="concept">
+            <h4>3. Architecture Optimization</h4>
+            <p>Explore smaller BMFM configurations or different pooling strategies to improve
+            efficiency while maintaining performance.</p>
+        </div>
+
+        <div class="concept">
+            <h4>4. Analyze Attention Patterns</h4>
+            <p>Visualize which CpG sites the model attends to for age prediction, comparing
+            with known age-associated CpGs from the literature.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Navigation dot highlighting
+    const sections = document.querySelectorAll('.slide');
+    const navDots = document.querySelectorAll('.nav-dot');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navDots.forEach(dot => {
+            dot.classList.remove('active');
+            if (dot.getAttribute('href') === '#' + current) {
+                dot.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

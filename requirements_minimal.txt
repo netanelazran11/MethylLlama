@@ -1,0 +1,40 @@
+# Minimal Requirements for BMFM Methylation Age Prediction
+# Use this if you already have bmfm_targets dependencies installed
+#
+# Setup:
+#   conda create -n bmfm_methyl python=3.10 -y
+#   conda activate bmfm_methyl
+#   pip install -r requirements_minimal.txt
+#   pip install -e /path/to/BiomedSciAI_ACL_Project  # Install bmfm_targets
+
+# ==============================================================================
+# Core (required)
+# ==============================================================================
+torch>=2.0.0
+pytorch-lightning>=2.0.0
+transformers>=4.44.0
+torchmetrics==1.1.0
+
+# ==============================================================================
+# Data (required)
+# ==============================================================================
+numpy<2
+pandas>=2,<3
+scipy<1.15.0
+anndata>=0.10.9
+scanpy
+
+# ==============================================================================
+# Config & Logging (required)
+# ==============================================================================
+hydra-core
+omegaconf
+wandb
+rich
+
+# ==============================================================================
+# bmfm_targets specific (required)
+# ==============================================================================
+einops
+peft
+focal-loss-torch @ git+https://github.com/mathiaszinnen/focal_loss_torch.git

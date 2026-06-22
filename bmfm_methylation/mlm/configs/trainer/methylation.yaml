@@ -1,0 +1,29 @@
+# Trainer configuration for methylation pretraining
+
+_target_: bmfm_targets.config.TrainerConfig
+
+# Optimizer settings
+learning_rate: 1.0e-4  # Reduced from 5e-4 - 8k sequences need lower LR for stability
+weight_decay: 0.01
+warmup_steps: 500  # Increased from 100 - more warmup needed for 8k-length sequences
+lr_decay_steps: -1  # Use -1 to decay based on total training steps
+
+# Adam parameters
+betas:
+  - 0.9
+  - 0.999
+epsilon: 1.0e-8
+
+# Losses for pretraining (MSE on masked methylation values)
+losses:
+  - name: mse
+    field_name: beta_values  # Predict masked methylation values
+
+# Batch prediction tracking
+batch_prediction_behavior: track
+
+# Metrics for regression (available: mae, mse, pcc)
+metrics:
+  - name: mae
+  - name: mse
+  - name: pcc

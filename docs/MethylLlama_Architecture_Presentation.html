@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MethylLlama: LLaMA-Style Encoder for DNA Methylation Age Prediction</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root {
+      --bg: #f8f9fc;
+      --surface: #ffffff;
+      --surface2: #f1f4f9;
+      --border: #dde1ec;
+      --accent: #4f6ef7;
+      --accent2: #7c3aed;
+      --green: #16a34a;
+      --orange: #ea580c;
+      --red: #dc2626;
+      --yellow: #d97706;
+      --text: #1e293b;
+      --muted: #64748b;
+      --code-bg: #f4f6fb;
+      --table-head: #eef1f8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #eef1fb 0%, #f8f9fc 60%, #f0eeff 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 40px 40px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    header h1 { -webkit-text-fill-color: transparent; }
+
+    /* ── Nav ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    nav a:hover { color: var(--accent); border-color: var(--accent); background: #eef1fb; }
+
+    /* ── Layout ── */
+    main { max-width: 1050px; margin: 0 auto; padding: 40px 32px 80px; }
+
+    /* ── Sections ── */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+    }
+    .section-number {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #c7d2fe;
+      margin-bottom: 20px;
+    }
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin: 24px 0 10px;
+    }
+    h3:first-child { margin-top: 0; }
+    p { color: var(--text); margin-bottom: 12px; }
+    strong { color: #0f172a; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead tr { background: var(--table-head); }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      color: var(--accent);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td {
+      padding: 9px 14px;
+      color: var(--text);
+      vertical-align: top;
+    }
+    tbody td:first-child { color: var(--muted); font-weight: 500; }
+    .val { color: var(--green); font-weight: 600; font-family: monospace; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin: 14px 0;
+      color: #374151;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+    code {
+      background: #1e2236;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.85em;
+      color: #a5b4fc;
+    }
+    pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+    /* ── Architecture diagram ── */
+    .arch-diagram {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: #374151;
+    }
+    .arch-diagram .layer-box {
+      border: 1px solid #c7d2e8;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin: 6px 0;
+      background: #eef2fb;
+    }
+    .arch-diagram .layer-title { color: var(--accent); font-weight: 700; }
+    .arch-diagram .layer-detail { color: #64748b; font-size: 0.78rem; }
+    .arch-diagram .arrow { text-align: center; color: #94a3b8; margin: 4px 0; }
+    .arch-diagram .tensor { color: var(--orange); }
+    .arch-diagram .label { color: var(--green); }
+
+    /* ── Info boxes ── */
+    .callout {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      border-left: 3px solid;
+      font-size: 0.9rem;
+    }
+    .callout.info  { background: #eff3ff; border-color: var(--accent); }
+    .callout.warn  { background: #fff7ed; border-color: var(--orange); }
+    .callout.good  { background: #f0fdf4; border-color: var(--green); }
+    .callout.bad   { background: #fef2f2; border-color: var(--red); }
+    .callout-title { font-weight: 700; margin-bottom: 4px; }
+    .callout.info  .callout-title { color: var(--accent); }
+    .callout.warn  .callout-title { color: var(--orange); }
+    .callout.good  .callout-title { color: var(--green); }
+    .callout.bad   .callout-title { color: var(--red); }
+
+    /* ── Comparison grid ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 14px 0;
+    }
+    .compare-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .compare-card .card-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    .compare-card.old .card-title { color: var(--red); }
+    .compare-card.new .card-title { color: var(--green); }
+    .compare-card ul { list-style: none; padding: 0; }
+    .compare-card li {
+      padding: 3px 0;
+      font-size: 0.87rem;
+      color: var(--muted);
+    }
+    .compare-card li::before { content: "▸ "; color: #475569; }
+
+    /* ── Numbered list ── */
+    ol.styled {
+      padding-left: 0;
+      list-style: none;
+      counter-reset: item;
+      margin: 10px 0;
+    }
+    ol.styled li {
+      counter-increment: item;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+    }
+    ol.styled li::before {
+      content: counter(item);
+      background: var(--accent);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── Formula display ── */
+    .formula-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 24px;
+      text-align: center;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    /* ── Tag badges ── */
+    .badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 2px;
+    }
+    .badge.blue   { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .badge.green  { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge.purple { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
+    .badge.red    { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* ── Summary cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .summary-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .summary-card .sc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 4px;
+    }
+    .summary-card .sc-tech {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: monospace;
+      margin-bottom: 6px;
+    }
+    .summary-card .sc-benefit {
+      font-size: 0.82rem;
+      color: var(--green);
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 28px 20px; }
+      header h1 { font-size: 1.5rem; }
+      main { padding: 20px 16px 60px; }
+      .section { padding: 22px 18px; }
+      .compare-grid { grid-template-columns: 1fr; }
+      nav { padding: 10px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MethylLlama</h1>
+  <div class="subtitle">LLaMA-Style Encoder for DNA Methylation Age Prediction &nbsp;·&nbsp; Architecture Presentation</div>
+</header>
+
+<nav>
+  <a href="#data">1. Data</a>
+  <a href="#arch">2. Architecture</a>
+  <a href="#config">3. Config</a>
+  <a href="#rmsnorm">4.1 RMSNorm</a>
+  <a href="#preln">4.2 Pre-LN</a>
+  <a href="#swiglu">4.3 SwiGLU</a>
+  <a href="#rope">4.4 RoPE</a>
+  <a href="#scaleadapt">4.5 ScaleAdapt</a>
+  <a href="#cpgscale">4.6 cpg_scale</a>
+  <a href="#wced">5. WCED</a>
+  <a href="#why">6. Why Better</a>
+  <a href="#summary">7. Summary</a>
+</nav>
+
+<main>
+
+<!-- ── Section 1 ── -->
+<div class="section" id="data">
+  <span class="section-number">Section 1</span>
+  <h2>Data Overview</h2>
+
+  <h3>Pretraining Dataset</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Samples</td><td class="val">~169,000</td></tr>
+        <tr><td>CpG sites per sample</td><td class="val">49,156</td></tr>
+        <tr><td>Total tokens</td><td class="val">~8.3 billion</td></tr>
+        <tr><td>Source</td><td>Public methylation arrays (GSE datasets)</td></tr>
+        <tr><td>Input format</td><td>Dual-field: (CpG ID, beta value) per position</td></tr>
+        <tr><td>Sequence length</td><td class="val">24,580 <span style="color:var(--muted)">(CLS + 50% of 49,156 CpGs)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout good">
+    <div class="callout-title">No Data Leakage in Pretraining</div>
+    The pretraining set contains completely different samples from the downstream fine-tuning set. The model never sees AltumAge samples during pretraining.
+  </div>
+
+  <h3>Fine-tuning Dataset (AltumAge)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Samples</td><td class="val">~11,500</td></tr>
+        <tr><td>CpG sites measured</td><td class="val">21,368</td></tr>
+        <tr><td>CpG sites in pretrain vocab</td><td class="val">19,608</td></tr>
+        <tr><td>CpG sites NOT in pretrain</td><td style="color:var(--red)">1,760 (excluded)</td></tr>
+        <tr><td>Final CpGs used for fine-tuning</td><td><strong style="color:var(--green)">19,608</strong></td></tr>
+        <tr><td>Target</td><td>Chronological age (years)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-title">Why 19,608 CpGs?</div>
+    The pretrain tokenizer was built on 49,156 CpG sites. AltumAge measures 21,368 of these, but 1,760 are NOT in the pretrain vocabulary. We use all 19,608 that are in both — <strong>no feature selection needed, no data leakage</strong>.
+  </div>
+
+  <div class="callout bad">
+    <div class="callout-title">Why Not the Original 8,000 CpG Subset?</div>
+    The 8k CpGs were selected by age correlation across the <em>entire</em> AltumAge dataset including the test set → <strong>data leakage</strong>. Using all 19,608 in-vocab CpGs eliminates this bias entirely.
+  </div>
+</div>
+
+<!-- ── Section 2 ── -->
+<div class="section" id="arch">
+  <span class="section-number">Section 2</span>
+  <h2>Architecture Overview</h2>
+
+  <div class="arch-diagram">
+    <div style="color:var(--muted); font-size:0.78rem; margin-bottom:10px;">Forward pass — from raw methylation data to WCED loss</div>
+
+    <div style="color:#64748b; margin-bottom:6px;">Input: <span class="tensor">[B, 2, L]</span>  &nbsp;←&nbsp; <span class="label">(CpG_IDs field, Beta_values field)</span></div>
+    <div class="arrow">↓</div>
+
+    <div class="layer-box">
+      <div class="layer-title">MethylLlamaEmbeddings</div>
+      <div class="layer-detail">h = cpg_scale × CpgEmbed(cpg_ids) + ScaleAdaptEncoder(beta_values)</div>
+      <div class="layer-detail">→ RMSNorm → Dropout</div>
+    </div>
+    <div class="arrow">↓ <span class="tensor">[B, L, 768]</span></div>
+
+    <div class="layer-box">
+      <div class="layer-title">MethylLlamaLayer × 8 &nbsp;<span style="color:#6b7280; font-weight:400; font-size:0.76rem">(Pre-LN)</span></div>
+      <div class="layer-detail">h = h + Attn(RMSNorm(h)) &nbsp; ← multi-head self-attention with RoPE</div>
+      <div class="layer-detail">h = h + MLP(RMSNorm(h)) &nbsp;&nbsp; ← SwiGLU feed-forward</div>
+    </div>
+    <div class="arrow">↓ <span class="tensor">[B, L, 768]</span></div>
+
+    <div class="layer-box">
+      <div class="layer-title">RMSNorm (final) &nbsp;+&nbsp; Pooler</div>
+      <div class="layer-detail">CLS token → Linear(768→768) → Tanh</div>
+    </div>
+    <div class="arrow">↓ <span class="tensor">[B, 768]</span> &nbsp;<span class="label">← CLS embedding (global methylation summary)</span></div>
+
+    <div class="layer-box" style="border-color:#3d2d5e;">
+      <div class="layer-title" style="color:var(--accent2)">WCED Heads <span style="color:#6b7280; font-weight:400">(pretraining only)</span></div>
+      <div class="layer-detail">WCEDDecoder &nbsp;&nbsp;&nbsp;&nbsp; → <span class="tensor">[B, 49,156]</span> predicted beta values</div>
+      <div class="layer-detail">ProjectionHead &nbsp; → <span class="tensor">[B, 128]</span> &nbsp;&nbsp; L2-normalized (InfoNCE)</div>
+      <div class="layer-detail">AgeHead &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → <span class="tensor">[B, 1]</span> &nbsp;&nbsp;&nbsp;&nbsp; auxiliary age prediction</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 3 ── -->
+<div class="section" id="config">
+  <span class="section-number">Section 3</span>
+  <h2>Model Configuration (Actual Run)</h2>
+
+  <pre><code># pretrain_llama.yaml — actual running config
+hidden_size:          768      # Embedding dimension D
+num_hidden_layers:    8        # Transformer depth
+num_attention_heads:  12       # Attention heads H
+head_dim:             64       # D / H = 768 / 12
+
+intermediate_size:    2048     # SwiGLU hidden dim
+# Formula: round(2/3 × 4 × 768 / 64) × 64 = 32 × 64 = 2048
+
+vocab_size:           49,161   # 49,156 CpG sites + 5 special tokens
+max_seq_len:          24,580   # CLS + 50% of 49,156 CpGs
+
+n_sin_basis:          48       # ScaleAdapt basis pairs (96 features total)
+basis_scale:          2.0      # Freq init N(0, 2π × 2.0) for [0,1] range
+cpg_scale_init:       0.1      # Small init: beta encoder dominates first
+
+rope_theta:           10,000   # RoPE base frequency
+rms_norm_eps:         1e-6
+hidden_dropout_prob:  0.1
+
+# Training
+batch_size:           8        # per GPU
+accumulate_grad_batches: 8
+# Effective batch: 8 × 8 × 2 GPUs = 128 samples
+learning_rate:        3e-4
+warmup_steps:         1,000
+betas:                [0.9, 0.99]
+precision:            16-mixed
+pretrain_epochs:      300</code></pre>
+
+  <h3>Parameter Count Estimate</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>Approx Params</th></tr></thead>
+      <tbody>
+        <tr><td>CpG ID embeddings (49,161 × 768)</td><td class="val">~37.8M</td></tr>
+        <tr><td>ScaleAdaptEncoder (48 basis → Linear 96→768)</td><td class="val">~0.075M</td></tr>
+        <tr><td>8 × Transformer layers</td><td class="val">~56.6M</td></tr>
+        <tr><td>Pooler</td><td class="val">~0.6M</td></tr>
+        <tr><td><strong>Total encoder</strong></td><td><strong style="color:var(--green); font-size:1rem">~95M</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 4 ── -->
+<div class="section">
+  <span class="section-number">Section 4</span>
+  <h2>Architecture Components</h2>
+
+  <!-- 4.1 RMSNorm -->
+  <h3 id="rmsnorm">4.1 RMSNorm</h3>
+  <div class="compare-grid">
+    <div class="compare-card old">
+      <div class="card-title">BERT — LayerNorm</div>
+      <div class="formula-block" style="text-align:left; padding:10px 16px; font-size:0.88rem;">
+        \(\displaystyle \text{LN}(x) = \frac{x - \mu}{\sigma} \cdot \gamma + \beta\)
+      </div>
+      <ul>
+        <li>Computes mean AND variance</li>
+        <li>Two passes over the vector</li>
+        <li>Heavier compute overhead</li>
+      </ul>
+    </div>
+    <div class="compare-card new">
+      <div class="card-title">MethylLlama — RMSNorm</div>
+      <div class="formula-block" style="text-align:left; padding:10px 16px; font-size:0.88rem;">
+        \(\displaystyle \text{RMSNorm}(x) = \frac{x}{\text{RMS}(x)} \cdot \gamma\)
+        <br><br>
+        \(\displaystyle \text{RMS}(x) = \sqrt{\frac{1}{d}\sum_i x_i^2}\)
+      </div>
+      <ul>
+        <li>No mean subtraction</li>
+        <li>~40% faster in practice</li>
+        <li>Used in LLaMA, Mistral, Gemma</li>
+        <li>float32 → cast back to fp16</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- 4.2 Pre-LN -->
+  <h3 id="preln">4.2 Pre-LN vs Post-LN</h3>
+  <div class="compare-grid">
+    <div class="compare-card old">
+      <div class="card-title">BERT — Post-LN (normalize AFTER residual)</div>
+      <pre><code>h = LayerNorm(h + Attn(h))
+h = LayerNorm(h + MLP(h))</code></pre>
+    </div>
+    <div class="compare-card new">
+      <div class="card-title">MethylLlama — Pre-LN (normalize BEFORE sublayer)</div>
+      <pre><code>h = h + Attn(RMSNorm(h))
+h = h + MLP(RMSNorm(h))</code></pre>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Post-LN (BERT)</th><th>Pre-LN (LLaMA)</th></tr></thead>
+      <tbody>
+        <tr><td>Gradient flow at step 0</td><td style="color:var(--red)">Can explode / vanish</td><td style="color:var(--green)">Stable from the start</td></tr>
+        <tr><td>LR warmup requirement</td><td style="color:var(--red)">Mandatory, sensitive</td><td style="color:var(--green)">Less critical</td></tr>
+        <tr><td>Training stability</td><td style="color:var(--orange)">Needs careful tuning</td><td style="color:var(--green)">Stable default</td></tr>
+        <tr><td>Convergence speed</td><td style="color:var(--orange)">Slower (needs warmup)</td><td style="color:var(--green)">Faster</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout info">
+    For a model training on 24k-token sequences with 49k-site reconstruction, training instability is a real risk. Pre-LN eliminates this from step 1.
+  </div>
+
+  <hr />
+
+  <!-- 4.3 SwiGLU -->
+  <h3 id="swiglu">4.3 SwiGLU Feed-Forward Network</h3>
+  <div class="compare-grid">
+    <div class="compare-card old">
+      <div class="card-title">BERT FFN — GELU (2 matrices)</div>
+      <div class="formula-block" style="text-align:left; padding:10px 16px;">
+        \(\text{FFN}(x) = W_2 \cdot \text{GELU}(W_1 x)\)
+      </div>
+      <p style="font-size:0.83rem; color:var(--muted)">Params per layer: 2 × D × 4D = 8D²</p>
+    </div>
+    <div class="compare-card new">
+      <div class="card-title">MethylLlama — SwiGLU (3 matrices)</div>
+      <div class="formula-block" style="text-align:left; padding:10px 16px;">
+        \(\text{FFN}(x) = W_{\text{down}} \big( \text{SiLU}(W_{\text{gate}} x) \odot W_{\text{up}} x \big)\)
+      </div>
+      <p style="font-size:0.83rem; color:var(--muted)">Params per layer: 3 × D × (2/3 × 4D) = 8D² &nbsp;<em>(same budget!)</em></p>
+    </div>
+  </div>
+  <p>Why SwiGLU:</p>
+  <ul style="padding-left: 20px; color:var(--muted); font-size:0.9rem; line-height:1.8;">
+    <li><strong>Gated mechanism:</strong> each dimension has a learned gate controlling information flow</li>
+    <li><strong>SiLU</strong> = x × sigmoid(x) — smooth, avoids dying-ReLU</li>
+    <li>Consistently outperforms GELU-FFN (PaLM, LLaMA, Gemma)</li>
+    <li>intermediate_size = round(2/3 × 4 × 768 / 64) × 64 = <code>2048</code></li>
+  </ul>
+
+  <hr />
+
+  <!-- 4.4 RoPE -->
+  <h3 id="rope">4.4 Rotary Position Embedding (RoPE)</h3>
+  <div class="compare-grid">
+    <div class="compare-card old">
+      <div class="card-title">BERT — Absolute Position Table</div>
+      <pre><code>embedding_table = nn.Embedding(
+    max_seq_len, hidden_size)
+# 8002 × 768 ≈ 6.1M parameters
+# Fails on unseen lengths</code></pre>
+    </div>
+    <div class="compare-card new">
+      <div class="card-title">MethylLlama — RoPE</div>
+      <pre><code># Zero learned parameters
+inv_freq[k] = 1 / (θ ^ (2k / head_dim))
+# Rotate Q and K by position
+q_rot = q*cos + rotate_half(q)*sin</code></pre>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Absolute (BERT)</th><th>RoPE</th></tr></thead>
+      <tbody>
+        <tr><td>Learned parameters</td><td style="color:var(--orange)">~6.1M for L=24,580</td><td style="color:var(--green)">0</td></tr>
+        <tr><td>Unseen sequence lengths</td><td style="color:var(--red)">Fails (untrained positions)</td><td style="color:var(--green)">Generalizes</td></tr>
+        <tr><td>Position signal type</td><td>Additive, global</td><td>Relative, per-head</td></tr>
+        <tr><td>Memory</td><td>Extra embedding table</td><td>Cached cos/sin only</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout good">
+    Each attention head independently learns how position-sensitive to be — some heads may attend locally (nearby CpGs in a gene), others globally (distant co-methylation patterns).
+  </div>
+
+  <hr />
+
+  <!-- 4.5 ScaleAdaptEncoder -->
+  <h3 id="scaleadapt">4.5 ScaleAdaptEncoder (Beta Value Encoding)</h3>
+
+  <div class="callout warn">
+    <div class="callout-title">Problem with 2-layer MLP</div>
+    Beta values are continuous in [0, 1]. A 2-layer MLP may not resolve fine differences like 0.85 vs 0.87, which are biologically meaningful for age prediction.
+  </div>
+
+  <p><strong>Solution — Sinusoidal basis encoding:</strong></p>
+  <pre><code># For each beta value β:
+features_k = [sin(β × f_k), cos(β × f_k)]   for k = 1..48
+output = Linear(96 → 768)(concat(all features))
+
+# Frequencies f_k ~ N(0, 2π × basis_scale) are TRAINABLE
+# The model learns which resolutions of beta variation matter biologically</code></pre>
+
+  <p><strong>Special token routing:</strong></p>
+  <pre><code>β &lt; 0   →  learned nn.Embedding   (MASK→0, CLS→1, SEP→2, PAD→3)
+β ≥ 0   →  sinusoidal basis       (β=0 is real: fully unmethylated CpG)</code></pre>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>2-layer MLP (SCBert)</th><th>ScaleAdaptEncoder</th></tr></thead>
+      <tbody>
+        <tr><td>Resolution of [0,1]</td><td style="color:var(--orange)">Smooth global mapping only</td><td style="color:var(--green)">Multiple frequency bands</td></tr>
+        <tr><td>Frequency adaptation</td><td style="color:var(--red)">Fixed architecture</td><td style="color:var(--green)">Trainable frequencies</td></tr>
+        <tr><td>Special token handling</td><td>Separate logic</td><td>Native routing (β &lt; 0)</td></tr>
+        <tr><td>Integration</td><td style="color:var(--orange)">Monkey-patched post-init</td><td style="color:var(--green)">Built into __init__</td></tr>
+        <tr><td>basis_scale</td><td>1.5 (scRNA, range 0–10+)</td><td>2.0 (methylation [0,1])</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr />
+
+  <!-- 4.6 cpg_scale -->
+  <h3 id="cpgscale">4.6 cpg_scale Initialization</h3>
+  <pre><code># Embedding fusion formula
+h = cpg_scale × CpgEmbed(cpg_ids) + ScaleAdaptEncoder(beta_values)
+
+# cpg_scale = nn.Parameter(torch.tensor(0.1))  ← single learned scalar</code></pre>
+
+  <div class="callout info">
+    <div class="callout-title">Why initialize at 0.1?</div>
+    At step 0, the beta encoder dominates → the model focuses on methylation levels first.
+    CpG identity (which site) is slowly learned as the model discovers which sites matter most.
+    A healthy training run shows <code>cpg_scale</code> growing from 0.1 toward ~0.3–0.5.
+  </div>
+
+  <div class="callout bad">
+    <div class="callout-title">Failure Mode if cpg_scale is Large at Init</div>
+    If initialized at 1.0, the model collapses to predicting per-site averages (mean beta per CpG across the training set) — ignoring individual sample variation entirely. This gives low MSE but zero biological information.
+  </div>
+</div>
+
+<!-- ── Section 5 ── -->
+<div class="section" id="wced">
+  <span class="section-number">Section 5</span>
+  <h2>WCED Pretraining Objective</h2>
+
+  <h3>What is WCED?</h3>
+  <p><strong>Whole-Context Encoder Distillation</strong> — the model sees 50% of CpGs and must reconstruct ALL CpGs from the CLS token alone.</p>
+
+  <div class="arch-diagram">
+    <div style="color:#64748b">Full methylation profile: <span class="tensor">[c₁, c₂, c₃, ..., c₄₉₁₅₆]</span></div>
+    <div class="arrow">↓ &nbsp; random 50% split</div>
+    <div>View (input to encoder): <span class="tensor">[CLS, c₃, c₇, c₁₂, ...]</span> <span class="label">← 24,579 tokens seen</span></div>
+    <div class="arrow">↓ &nbsp; MethylLlamaModel</div>
+    <div>CLS embedding: <span class="tensor">[B, 768]</span> <span class="label">← must encode entire methylation profile</span></div>
+    <div class="arrow">↓ &nbsp; WCEDDecoder</div>
+    <div>Predictions: <span class="tensor">[ĉ₁, ĉ₂, ..., ĉ₄₉₁₅₆]</span> <span class="label">← all 49,156 sites</span></div>
+    <div class="arrow">↓ &nbsp; loss</div>
+    <div style="color:var(--yellow)">MSE only on <strong>NON-input sites</strong> <span class="label">← must generalize beyond input</span></div>
+  </div>
+
+  <h3>Loss Function</h3>
+  <div class="formula-block">
+    \(\mathcal{L} = \mathcal{L}_{\text{recon}} + \lambda_{\text{age}} \cdot \mathcal{L}_{\text{age}}\)
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Term</th><th>Formula</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Reconstruction</td><td>MSE(predicted, true) on non-input, non-NaN CpGs</td><td>Compress full profile into CLS</td></tr>
+        <tr><td>Age MSE</td><td>MSE(age_head(CLS), chronological_age)</td><td>Prevent CLS collapse; encode age</td></tr>
+        <tr><td>InfoNCE</td><td>Symmetric cross-entropy on similarity matrix</td><td style="color:var(--muted)">Disabled in first run (λ=0)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-title">Why Age Auxiliary Loss?</div>
+    Without it, the CLS token can collapse to encoding mean methylation level (easy shortcut — MSE drops fast but no biological signal is learned).
+    The age prediction head forces CLS to capture chronological age signal even during unsupervised pretraining.
+  </div>
+
+  <h3>Metrics Logged</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>train/pcc</code></td><td>Pearson correlation on hidden (non-input) CpGs — primary quality signal</td></tr>
+        <tr><td><code>validation/pcc</code></td><td>Same on validation set</td></tr>
+        <tr><td><code>train/cpg_scale</code></td><td>Learned embedding balance (should grow from 0.1)</td></tr>
+        <tr><td><code>validation/cls_variance</code></td><td>CLS diversity — collapse = near 0</td></tr>
+        <tr><td><code>validation/cls_similarity</code></td><td>Mean cosine sim between CLS tokens — collapse = near 1</td></tr>
+        <tr><td><code>validation/pred_var_ratio</code></td><td>pred_var / target_var — collapse = near 0</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 6 ── -->
+<div class="section" id="why">
+  <span class="section-number">Section 6</span>
+  <h2>Why MethylLlama Should Outperform SCBert + WCED</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>SCBert + WCED</th><th>MethylLlama + WCED</th></tr></thead>
+      <tbody>
+        <tr><td>Normalization</td><td style="color:var(--orange)">LayerNorm (mean+variance)</td><td style="color:var(--green)">RMSNorm (~40% faster)</td></tr>
+        <tr><td>Layer order</td><td style="color:var(--orange)">Post-LN (BERT)</td><td style="color:var(--green)">Pre-LN (stable from step 0)</td></tr>
+        <tr><td>FFN</td><td style="color:var(--orange)">GELU, 2 matrices</td><td style="color:var(--green)">SwiGLU, 3 matrices (gated)</td></tr>
+        <tr><td>Position encoding</td><td style="color:var(--orange)">Absolute table (~6M params)</td><td style="color:var(--green)">RoPE (0 params, generalizes)</td></tr>
+        <tr><td>Beta encoder</td><td style="color:var(--orange)">2-layer MLP (monkey-patched)</td><td style="color:var(--green)">ScaleAdaptEncoder (built-in)</td></tr>
+        <tr><td>Embedding patch</td><td style="color:var(--red)">add_forward monkey-patch</td><td style="color:var(--green)">Native in __init__</td></tr>
+        <tr><td>cpg_scale</td><td style="color:var(--orange)">Learned, patched post-init</td><td style="color:var(--green)">Built-in scalar Parameter</td></tr>
+        <tr><td>Code complexity</td><td style="color:var(--red)">High (patches + hacks)</td><td style="color:var(--green)">Clean, no patching needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Why Larger Pretraining Corpus Matters</h3>
+  <p style="color:var(--muted); margin-bottom:14px;">169,000 × 49,156 CpGs vs typical clock models that train on 500–5,000 samples:</p>
+
+  <ol class="styled">
+    <li><strong>Biological variation coverage:</strong> 169k samples span diverse tissues, ages, conditions — the model learns which CpG patterns are universal vs tissue-specific</li>
+    <li><strong>CpG co-methylation patterns:</strong> With 49k CpGs per sample, the encoder learns long-range correlations between distant sites (e.g., methylation at one gene promoter predicts another)</li>
+    <li><strong>CLS quality:</strong> A CLS trained to reconstruct all 49k CpGs from 24.5k inputs must compress far more information than a model trained on 8k CpGs → richer representations for downstream tasks</li>
+    <li><strong>Transfer to 19,608 CpGs:</strong> All 19,608 fine-tune CpGs were seen during pretraining — the encoder already knows these sites' methylation dynamics from 169k samples</li>
+    <li><strong>Age signal without labels:</strong> The age auxiliary head during pretraining means CLS already encodes chronological age before any labeled age data is shown in fine-tuning</li>
+  </ol>
+</div>
+
+<!-- ── Section 7 ── -->
+<div class="section" id="summary">
+  <span class="section-number">Section 7</span>
+  <h2>Summary: Key Contributions of MethylLlama</h2>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="sc-title">RMSNorm</div>
+      <div class="sc-tech">No mean subtraction · RMS scale only</div>
+      <div class="sc-benefit">40% faster norm, numerically cleaner</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">Pre-LN</div>
+      <div class="sc-tech">Normalize before each sublayer</div>
+      <div class="sc-benefit">Stable gradients from step 1, no warmup explosion</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">SwiGLU</div>
+      <div class="sc-tech">Gated FFN · 3 matrices · same param budget</div>
+      <div class="sc-benefit">More expressive than GELU-FFN at same cost</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">RoPE</div>
+      <div class="sc-tech">Rotary position encoding · 0 learned params</div>
+      <div class="sc-benefit">Saves ~6M params, generalizes to unseen lengths</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">ScaleAdaptEncoder</div>
+      <div class="sc-tech">Trainable sinusoidal basis · basis_scale=2.0</div>
+      <div class="sc-benefit">Fine-grained [0,1] methylation resolution</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">cpg_scale_init = 0.1</div>
+      <div class="sc-tech">Small CpG identity weight at initialization</div>
+      <div class="sc-benefit">Prevents per-site average prediction collapse</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">WCED Objective</div>
+      <div class="sc-tech">See 50% · reconstruct 100% from CLS</div>
+      <div class="sc-benefit">Compresses full methylation profile into CLS</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">Age Auxiliary Loss</div>
+      <div class="sc-tech">MSE(CLS→age) during pretraining</div>
+      <div class="sc-benefit">CLS encodes biological age before fine-tuning</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">No Data Leakage</div>
+      <div class="sc-tech">19,608 vocab-intersection CpGs · no feature selection</div>
+      <div class="sc-benefit">Clean test-set evaluation, unbiased benchmarks</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-title">Large Pretrain Corpus</div>
+      <div class="sc-tech">169k samples × 49k CpGs</div>
+      <div class="sc-benefit">Rich co-methylation patterns, diverse biological conditions</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</body>
+</html>

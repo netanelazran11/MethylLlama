@@ -1,0 +1,74 @@
+# Requirements for MethylLlama
+# ==============================================================================
+# Setup with venv:
+#   python3.10 -m venv bmfm_methyl_env
+#   source bmfm_methyl_env/bin/activate  # Linux/Mac
+#   pip install --upgrade pip
+#   pip install -r requirements.txt
+#   pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
+# ==============================================================================
+
+# ==============================================================================
+# Core Deep Learning
+# ==============================================================================
+torch>=2.0.0
+pytorch-lightning>=2.0.0
+torchmetrics==1.1.0
+einops
+
+# ==============================================================================
+# Transformers & NLP (from bmfm_targets pyproject.toml)
+# ==============================================================================
+transformers>=4.54.0
+peft
+
+# ==============================================================================
+# Data Processing
+# ==============================================================================
+numpy<2
+pandas>=2,<3
+scipy<1.15.0
+anndata>=0.10.9
+scanpy
+h5py
+rdata
+rnanorm
+
+# ==============================================================================
+# Configuration & Utilities
+# ==============================================================================
+hydra-core
+omegaconf
+pydantic
+
+# ==============================================================================
+# Logging & Visualization (for methylation training)
+# ==============================================================================
+wandb
+tensorboardX
+rich
+
+# ==============================================================================
+# bmfm_targets specific dependencies
+# ==============================================================================
+captum
+litdata
+torchdata<0.10
+focal-loss-torch @ git+https://github.com/mathiaszinnen/focal_loss_torch.git
+
+# ClearML (experiment tracking used by bmfm_targets)
+clearml>1.13,<2
+
+# ==============================================================================
+# Biological data packages (required by bmfm_targets)
+# ==============================================================================
+cellxgene_census[experimental]>1.13.0
+tiledbsoma
+pysam
+hic-straw
+
+# ==============================================================================
+# Testing (optional)
+# ==============================================================================
+pytest
+pytest-cov

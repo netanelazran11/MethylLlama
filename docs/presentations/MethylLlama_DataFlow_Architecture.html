@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MethylLlama — Data Flow & Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef0f4;
+    color: #1e2535;
+    font-size: 15px;
+  }
+
+  /* ── Slide container ─────────────────────────────────── */
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 40px auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 48px 56px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    position: relative;
+    border: 1px solid #dde1ea;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 36px;
+    color: #1a2340;
+    border-bottom: 2px solid #dde3f0;
+    padding-bottom: 14px;
+  }
+
+  .slide-label {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 11px;
+    color: #a0aabb;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── Box types ───────────────────────────────────────── */
+  .box {
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .box-data   { background: #eef3ff; border: 1.5px solid #7a9fe0; }
+  .box-proc   { background: #edf7ed; border: 1.5px solid #4a9a4a; }
+  .box-model  { background: #f4eeff; border: 1.5px solid #8a60c8; }
+  .box-output { background: #fff8ee; border: 1.5px solid #cc9040; }
+  .box-head   { background: #fff0f4; border: 1.5px solid #cc4a7a; }
+  .box-embed  { background: #edf6ff; border: 1.5px solid #3a8ac8; }
+  .box-layer  { background: #f2f0ff; border: 1.5px solid #7060b0; }
+  .box-pool   { background: #edfafa; border: 1.5px solid #3a9a9a; }
+
+  .box-title  { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #1a2340; }
+  .box-sub    { font-size: 11px; color: #5a6580; margin-top: 3px; }
+  .box-dim    { font-size: 11px; color: #2a70b8; font-family: monospace; margin-top: 5px; }
+  .box-note   { font-size: 10px; color: #708060; margin-top: 4px; font-style: italic; }
+
+  /* ── Arrows ──────────────────────────────────────────── */
+  .arrow-down {
+    text-align: center;
+    color: #aab4cc;
+    font-size: 22px;
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  .arrow-right {
+    display: flex;
+    align-items: center;
+    color: #aab4cc;
+    font-size: 20px;
+    padding: 0 8px;
+  }
+
+  /* ── Layout helpers ──────────────────────────────────── */
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+  }
+
+  .center { align-items: center; }
+
+  .w120 { width: 120px; }
+  .w160 { width: 160px; }
+  .w180 { width: 180px; }
+  .w200 { width: 200px; }
+  .w220 { width: 220px; }
+  .w260 { width: 260px; }
+  .w300 { width: 300px; }
+  .w340 { width: 340px; }
+  .w380 { width: 380px; }
+  .w440 { width: 440px; }
+  .w500 { width: 500px; }
+  .w560 { width: 560px; }
+  .w640 { width: 640px; }
+  .w760 { width: 760px; }
+  .w900 { width: 900px; }
+  .full { flex: 1; }
+
+  /* ── Legend ──────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6a7890;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+  }
+
+  /* ── Section label ───────────────────────────────────── */
+  .section-tag {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8090a8;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* ── Divider ─────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: #dde3f0;
+    margin: 32px 0;
+  }
+
+  /* ── Bracket / merge line ────────────────────────────── */
+  .merge-line {
+    height: 2px;
+    background: #c0cce0;
+    margin: 0 auto;
+  }
+
+  /* ── Tag chips ───────────────────────────────────────── */
+  .chip {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .chip-new  { background: #edfaed; color: #2a8a2a; border: 1px solid #4aaa4a; }
+  .chip-fix  { background: #faeaea; color: #aa2a2a; border: 1px solid #cc5050; }
+
+  /* ── Numbers ─────────────────────────────────────────── */
+  .step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #e8ecf8;
+    color: #4a5890;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .repeat-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6050a0;
+    background: #f2f0ff;
+    border: 1.5px solid #8070c0;
+    border-radius: 6px;
+    padding: 3px 10px;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* ── Plus sign ───────────────────────────────────────── */
+  .plus {
+    font-size: 20px;
+    color: #8090b0;
+    font-weight: 300;
+    padding: 0 6px;
+    align-self: center;
+  }
+
+  /* vertical connector line */
+  .vline {
+    width: 2px;
+    background: #dde3f0;
+    margin: 0 auto;
+  }
+
+  /* ── Stats slide ─────────────────────────────────────── */
+  .top-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; margin-bottom:22px; }
+  .mid-row { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:22px; }
+  .bot-row { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+
+  .stat-card { background:#f4f7ff; border:1.5px solid #a0b8e8; border-radius:10px; padding:18px 16px; text-align:center; }
+  .stat-card .label { font-size:11px; color:#6a80b0; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+  .stat-card .value { font-size:28px; font-weight:700; color:#2a60c0; line-height:1; margin-bottom:4px; }
+  .stat-card .sub   { font-size:12px; color:#7a8aaa; }
+
+  .panel { background:#f8f9fc; border:1.5px solid #dde3f0; border-radius:10px; padding:18px 20px; }
+  .panel-title { font-size:13px; font-weight:600; color:#3a4a70; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #dde3f0; }
+
+  .split-row   { display:flex; align-items:center; margin-bottom:10px; gap:10px; }
+  .split-label { font-size:12px; color:#4a6090; width:40px; flex-shrink:0; }
+  .split-bar-bg { flex:1; height:18px; background:#e8ecf4; border-radius:4px; overflow:hidden; }
+  .split-bar   { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:11px; font-weight:600; color:#fff; }
+  .bar-train   { background:linear-gradient(90deg,#3a7acc,#5a9af0); }
+  .bar-val     { background:linear-gradient(90deg,#3a9a4a,#5abb6a); }
+  .bar-test    { background:linear-gradient(90deg,#9a3a9a,#cc5acc); }
+  .split-count { font-size:12px; color:#5a6a90; width:52px; text-align:right; flex-shrink:0; }
+
+  .hist-row  { display:flex; align-items:flex-end; gap:3px; height:90px; margin-bottom:6px; }
+  .hist-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .hist-bar  { width:100%; background:linear-gradient(180deg,#5a9ae0,#3a70c0); border-radius:3px 3px 0 0; min-height:2px; }
+  .hist-labels { display:flex; gap:3px; font-size:9px; color:#8090aa; }
+  .hist-lbl  { flex:1; text-align:center; }
+
+  .age-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; }
+  .age-stat  { background:#eef2ff; border-radius:6px; padding:7px 10px; text-align:center; }
+  .age-stat .k { font-size:10px; color:#6070a0; text-transform:uppercase; }
+  .age-stat .v { font-size:16px; font-weight:700; color:#2a50b0; }
+
+  .beta-bars    { display:flex; align-items:flex-end; height:90px; gap:2px; }
+  .beta-bar     { flex:1; border-radius:2px 2px 0 0; min-height:2px; }
+  .beta-x-labels { display:flex; justify-content:space-between; font-size:10px; color:#8090aa; margin-top:4px; }
+  .beta-pcts    { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:10px; }
+  .beta-pct     { background:#eef2ff; border-radius:6px; padding:6px 8px; text-align:center; }
+  .beta-pct .pk { font-size:10px; color:#6070a0; }
+  .beta-pct .pv { font-size:14px; font-weight:700; color:#7040c0; }
+
+  .quality-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .quality-item { display:flex; align-items:center; gap:10px; background:#f4f7ff; border-radius:8px; padding:10px 12px; border:1px solid #dde3f0; }
+  .q-icon  { font-size:18px; flex-shrink:0; }
+  .q-text .q-title { font-size:12px; font-weight:600; color:#1a2a50; }
+  .q-text .q-val   { font-size:11px; color:#6070a0; margin-top:2px; }
+
+  .compare-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .compare-table th { text-align:left; color:#6a7890; font-weight:600; text-transform:uppercase; font-size:11px; letter-spacing:0.6px; padding:6px 10px; border-bottom:1px solid #dde3f0; }
+  .compare-table th:not(:first-child) { text-align:right; }
+  .compare-table td { padding:8px 10px; color:#2a3a5a; border-bottom:1px solid #eef1f8; }
+  .compare-table td:not(:first-child) { text-align:right; font-family:monospace; }
+  .compare-table tr:last-child td { border-bottom:none; }
+  .tag-orig  { color:#b07010; font-weight:600; }
+  .tag-clean { color:#1a8a40; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 1 — DATA PIPELINE
+═══════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">Slide 1 / 4</div>
+  <div class="slide-title">Data Pipeline — From Raw Methylation to Model Input</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#3b5998"></div> Data / Storage</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a7a3a"></div> Processing</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7a4aaa"></div> Model Input Tensors</div>
+  </div>
+
+  <!-- Row 1: raw file -->
+  <div class="col center">
+    <div class="box box-data w440">
+      <div class="box-title">📁 finetuning_clean.h5ad</div>
+      <div class="box-sub">10,988 samples × 21,368 CpG sites <span style="color:#b07010;">(before cleaning)</span></div>
+      <div class="box-note">After cleaning: 10,656 samples × 19,608 CpGs &nbsp;·&nbsp; 332 samples + 1,760 CpGs removed</div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 2: DataModule -->
+    <div class="box box-proc w560">
+      <div class="box-title">MethylationDataModule</div>
+      <div class="row" style="justify-content:center; gap:24px; margin-top:8px;">
+        <div style="text-align:center;">
+          <div style="font-size:12px; color:#6aaa6a; font-weight:600;">Train</div>
+          <div class="box-sub">7,224 samples</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:12px; color:#aaaa4a; font-weight:600;">Val</div>
+          <div class="box-sub">1,268 samples</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:12px; color:#aa5a5a; font-weight:600;">Test</div>
+          <div class="box-sub">2,164 samples</div>
+        </div>
+      </div>
+      <div class="box-note" style="margin-top:8px;">Age normalization: mean &amp; std computed from train split, applied to all splits</div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 3: Collator -->
+    <div class="box box-proc w640">
+      <div class="box-title">WCEDCollator &nbsp;<span style="font-weight:400; color:#8090b0;">(input_ratio = 1.0)</span></div>
+      <div class="box-sub" style="margin-top:6px;">
+        For each sample: select all 19,608 CpG sites → sort by token ID → prepend CLS token
+      </div>
+      <div style="display:flex; justify-content:center; gap:32px; margin-top:10px;">
+        <div style="font-size:11px; color:#6090d0;">
+          Sequence length = 19,608 + 1 CLS = <strong style="color:#80b0e0;">19,609</strong>
+        </div>
+        <div style="font-size:11px; color:#6090d0;">
+          Batch size = <strong style="color:#80b0e0;">8</strong> &nbsp;·&nbsp; Effective batch = 8 × 16 accum = <strong style="color:#80b0e0;">128</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 4: Output tensors -->
+    <div class="row" style="justify-content:center; gap:16px; width:900px;">
+
+      <div class="col center">
+        <div class="box box-model w200">
+          <div class="box-title">cpg_ids</div>
+          <div class="box-dim">[8, 19609]</div>
+          <div class="box-sub">CpG token ID<br>0 = CLS, 5…49160 = sites</div>
+        </div>
+      </div>
+
+      <div class="col center">
+        <div class="box box-model w200">
+          <div class="box-title">beta_values</div>
+          <div class="box-dim">[8, 19609]</div>
+          <div class="box-sub">Methylation level [0, 1]<br>−2.0 for CLS token</div>
+        </div>
+      </div>
+
+      <div class="col center">
+        <div class="box box-model w200">
+          <div class="box-title">attention_mask</div>
+          <div class="box-dim">[8, 19609]</div>
+          <div class="box-sub">1 = real token<br>0 = padding</div>
+        </div>
+      </div>
+
+      <div class="col center">
+        <div class="box box-output w200">
+          <div class="box-title">age label</div>
+          <div class="box-dim">[8]</div>
+          <div class="box-sub">z-score:<br>(age − mean) / std</div>
+        </div>
+      </div>
+
+    </div><!-- /row -->
+
+    <!-- beta noise note -->
+    <div style="margin-top:20px; padding:10px 20px; background:#111a0a; border:1px solid #3a6a2a; border-radius:8px; font-size:12px; color:#7aaa5a; width:640px; text-align:center;">
+      <strong style="color:#8aca6a;">Beta Noise Augmentation</strong> &nbsp;(training only)
+      &nbsp;—&nbsp; Gaussian noise σ = 0.02 added to real CpG beta values, clamped to [0, 1]
+    </div>
+
+  </div><!-- /main col -->
+</div><!-- /slide 1 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 2 — MODEL ARCHITECTURE
+═══════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">Slide 2 / 4</div>
+  <div class="slide-title">MethylLlama-Small — Model Architecture &amp; Fine-Tuning</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2a80aa"></div> Embedding</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5a4a8a"></div> Transformer layers</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a8a8a"></div> Pooling</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#aa3a6a"></div> Age head</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#aa7a2a"></div> Output</div>
+  </div>
+
+  <div class="col center" style="gap:0px;">
+
+    <!-- Input row -->
+    <div class="row" style="justify-content:center; gap:60px; align-items:flex-end;">
+      <div class="col center">
+        <div class="section-tag">Input</div>
+        <div class="box box-data w220">
+          <div class="box-title">cpg_ids</div>
+          <div class="box-dim">[B, 19609]</div>
+          <div class="box-sub">site identity tokens</div>
+        </div>
+      </div>
+      <div class="col center">
+        <div class="section-tag" style="opacity:0">.</div>
+        <div class="box box-data w220">
+          <div class="box-title">beta_values</div>
+          <div class="box-dim">[B, 19609]</div>
+          <div class="box-sub">methylation levels [0,1]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrows down to embed -->
+    <div class="row" style="justify-content:center; gap:60px; width:600px;">
+      <div style="width:220px; text-align:center;" class="arrow-down">↓</div>
+      <div style="width:220px; text-align:center;" class="arrow-down">↓</div>
+    </div>
+
+    <!-- Embedding row -->
+    <div class="row" style="justify-content:center; gap:16px; align-items:center;">
+      <div class="box box-embed w280">
+        <div class="box-title">CpG Embedding Table</div>
+        <div class="box-sub">nn.Embedding(49,161 × 256)</div>
+        <div class="box-dim">→ [B, 19609, 256]</div>
+        <div class="box-note">× cpg_scale (learned scalar, init 0.1)</div>
+      </div>
+
+      <div class="plus">+</div>
+
+      <div class="box box-embed w280">
+        <div class="box-title">ScaleAdaptEncoder</div>
+        <div class="box-sub">48 sin/cos basis pairs → 96 features</div>
+        <div class="box-sub">Linear(96 → 256, no bias)</div>
+        <div class="box-dim">→ [B, 19609, 256]</div>
+        <div class="box-note">Encodes methylation level [0,1] as a learned sinusoidal embedding</div>
+      </div>
+    </div>
+
+    <!-- merge arrow -->
+    <div class="arrow-down" style="margin-top:4px;">↓</div>
+
+    <!-- post-embed norm -->
+    <div class="box box-embed w380">
+      <div class="box-title">Fused Embedding</div>
+      <div class="box-sub">RMSNorm + Dropout(0.1)</div>
+      <div class="box-dim">[B, 19609, 256]</div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Transformer layers -->
+    <div class="section-tag" style="text-align:center;">Encoder — 4 × Transformer Layer</div>
+    <div class="box box-layer w560" style="padding: 16px 20px;">
+      <div style="display:flex; gap:12px; align-items:stretch; justify-content:center;">
+        <div style="flex:1; background:#14102a; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:12px; font-weight:700; color:#c0a0ff; margin-bottom:6px;">Attention Block</div>
+          <div style="font-size:11px; color:#8080b0; line-height:1.8;">
+            RMSNorm<br>
+            Multi-Head Attention<br>
+            &nbsp;&nbsp;4 heads · head_dim = 64<br>
+            &nbsp;&nbsp;RoPE position encoding<br>
+            &nbsp;&nbsp;F.scaled_dot_product_attention<br>
+            Residual add
+          </div>
+        </div>
+        <div style="flex:1; background:#14102a; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:12px; font-weight:700; color:#c0a0ff; margin-bottom:6px;">FFN Block</div>
+          <div style="font-size:11px; color:#8080b0; line-height:1.8;">
+            RMSNorm<br>
+            SwiGLU: SiLU(gate) × up → down<br>
+            &nbsp;&nbsp;hidden=256 · intermediate=320<br>
+            &nbsp;&nbsp;no bias (LLaMA convention)<br>
+            Residual add<br>
+            &nbsp;
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px; text-align:center; font-size:11px; color:#6050a0;">
+        Output: [B, 19609, 256] &nbsp;—&nbsp; same shape in, same shape out
+      </div>
+    </div>
+
+    <div class="repeat-badge">× 4 layers</div>
+
+    <div class="arrow-down" style="margin-top:4px;">↓</div>
+
+    <!-- Final norm -->
+    <div class="box box-layer w380">
+      <div class="box-title">Final RMSNorm</div>
+      <div class="box-dim">[B, 19609, 256]</div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Mean pooling -->
+    <div class="box box-pool w440">
+      <div class="box-title">Mean Pooling</div>
+      <div class="box-sub">Average over tokens 1 … 19608 (skip CLS at pos 0)</div>
+      <div class="box-sub">Weighted by attention_mask — padding excluded</div>
+      <div class="box-dim">[B, 19609, 256]  →  [B, 256]</div>
+      <div class="box-note" style="color:#5a9a9a; font-size:10px; margin-top:6px;">
+        ≈ learned weighted average of methylation levels across all CpG sites
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Age head -->
+    <div class="box box-head w500">
+      <div class="box-title">Age Prediction Head</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:0px; margin-top:8px; flex-wrap:wrap; row-gap:4px;">
+        <div style="font-size:12px; font-family:monospace; background:#1a0a14; padding:4px 10px; border-radius:6px; color:#e0a0c0;">256</div>
+        <div style="font-size:12px; color:#6a4060; padding:0 4px;">→ LN+GELU+Drop →</div>
+        <div style="font-size:12px; font-family:monospace; background:#1a0a14; padding:4px 10px; border-radius:6px; color:#e0a0c0;">256</div>
+        <div style="font-size:12px; color:#6a4060; padding:0 4px;">→ LN+GELU+Drop →</div>
+        <div style="font-size:12px; font-family:monospace; background:#1a0a14; padding:4px 10px; border-radius:6px; color:#e0a0c0;">128</div>
+        <div style="font-size:12px; color:#6a4060; padding:0 4px;">→</div>
+        <div style="font-size:12px; font-family:monospace; background:#1a0a14; padding:4px 10px; border-radius:6px; color:#e0a0c0;">1</div>
+      </div>
+      <div class="box-sub" style="margin-top:8px;">dropout = 0.1 &nbsp;·&nbsp; loss = MSE in z-score space</div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Output -->
+    <div class="box box-output w380">
+      <div class="box-title">Predicted Age</div>
+      <div class="box-sub">z-score → denormalize → years</div>
+    </div>
+
+  </div><!-- /main col -->
+
+  <!-- ── Training schedule note ─────────────────────────── -->
+  <div style="margin-top:36px; display:flex; gap:16px;">
+
+    <div style="flex:1; background:#111a28; border:1px solid #2a4060; border-radius:10px; padding:16px 18px;">
+      <div style="font-size:12px; font-weight:700; color:#80a0d0; margin-bottom:8px; letter-spacing:0.5px;">TRAINING SCHEDULE</div>
+      <div style="font-size:11px; color:#6070a0; line-height:2.1;">
+        <strong style="color:#a0b8d0;">Epochs 0–19</strong> &nbsp;&nbsp; Encoder frozen · Head trains with LR = 1e-4 · LambdaLR warmup (500 steps)<br>
+        <strong style="color:#a0b8d0;">Epoch 20</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Encoder unfrozen (excl. embedding table) · Encoder LR = 1e-5<br>
+        <strong style="color:#a0b8d0;">Epochs 20–150</strong> &nbsp; Both head + encoder train · LR decays via cosine schedule<br>
+        <strong style="color:#a0b8d0;">Early stop</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; patience = 50 · monitor val/mae
+      </div>
+    </div>
+
+    <div style="width:300px; background:#0a1a10; border:1px solid #2a5030; border-radius:10px; padding:16px 18px;">
+      <div style="font-size:12px; font-weight:700; color:#6aaa6a; margin-bottom:8px; letter-spacing:0.5px;">PARAMETER COUNT</div>
+      <div style="font-size:11px; color:#507050; line-height:2.2; font-family: monospace;">
+        Embedding table &nbsp;&nbsp;&nbsp;&nbsp; 12.6M<br>
+        ScaleAdapt &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 25k<br>
+        Transformer ×4 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.3M<br>
+        Pooler + norms &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 66k<br>
+        Age head &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100k<br>
+        ─────────────────────────<br>
+        <span style="color:#8aca8a;">Trainable &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ~1.5M</span><br>
+        <span style="color:#608060;">Total &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ~14.1M</span>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide 2 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 3 — DATA STATISTICS
+═══════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">Slide 3 / 4</div>
+  <div class="slide-title">Dataset Statistics — Fine-Tuning Data Quality</div>
+
+  <!-- Top row: 4 big stat cards -->
+  <div class="row" style="justify-content:center; gap:16px; margin-bottom:28px;">
+
+    <div style="flex:1; background:#0e2535; border:1.5px solid #2a80aa; border-radius:12px; padding:20px; text-align:center;">
+      <div style="font-size:32px; font-weight:800; color:#60c0ff; letter-spacing:-1px;">10,656</div>
+      <div style="font-size:12px; color:#4a7090; margin-top:4px; text-transform:uppercase; letter-spacing:1px;">Total Samples</div>
+      <div style="margin-top:14px; display:flex; justify-content:center; gap:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:17px; font-weight:700; color:#6aaa6a;">7,224</div>
+          <div style="font-size:10px; color:#507050; margin-top:2px;">Train</div>
+        </div>
+        <div style="width:1px; background:#2a3a4a;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:17px; font-weight:700; color:#aaaa4a;">1,268</div>
+          <div style="font-size:10px; color:#606040; margin-top:2px;">Val</div>
+        </div>
+        <div style="width:1px; background:#2a3a4a;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:17px; font-weight:700; color:#aa5a5a;">2,164</div>
+          <div style="font-size:10px; color:#704040; margin-top:2px;">Test</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1; background:#1a2e1a; border:1.5px solid #3a7a3a; border-radius:12px; padding:20px; text-align:center;">
+      <div style="font-size:32px; font-weight:800; color:#60cc80; letter-spacing:-1px;">19,608</div>
+      <div style="font-size:12px; color:#4a704a; margin-top:4px; text-transform:uppercase; letter-spacing:1px;">CpG Sites per Sample</div>
+      <div style="margin-top:10px; font-size:11px; color:#507050; line-height:1.8;">
+        All sites measured &amp; valid<br>
+        Zero NaN in model input<br>
+        <span style="color:#3a6a3a;">Same 19,608 across all 10,656 samples</span>
+      </div>
+    </div>
+
+    <div style="flex:1; background:#2a1e3a; border:1.5px solid #7a4aaa; border-radius:12px; padding:20px; text-align:center;">
+      <div style="font-size:32px; font-weight:800; color:#c080ff; letter-spacing:-1px;">42.0</div>
+      <div style="font-size:12px; color:#6040a0; margin-top:4px; text-transform:uppercase; letter-spacing:1px;">Mean Age (years)</div>
+      <div style="margin-top:10px; font-size:11px; color:#7060a0; line-height:1.8;">
+        Std: ± 26.5 years<br>
+        Range: 0 – 100 years<br>
+        <span style="color:#5a4a80;">Normalized: z-score per split</span>
+      </div>
+    </div>
+
+    <div style="flex:1; background:#2e1020; border:1.5px solid #aa3a6a; border-radius:12px; padding:20px; text-align:center;">
+      <div style="font-size:32px; font-weight:800; color:#ff80aa; letter-spacing:-1px;">0.08</div>
+      <div style="font-size:12px; color:#803050; margin-top:4px; text-transform:uppercase; letter-spacing:1px;">Median Beta Value</div>
+      <div style="margin-top:10px; font-size:11px; color:#904060; line-height:1.8;">
+        Min: 0.00 &nbsp;·&nbsp; Max: 1.00<br>
+        75th pct: 0.49<br>
+        <span style="color:#703050;">Bimodal: mostly near 0 or near 1</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Middle: two panels side by side -->
+  <div class="row" style="gap:20px; align-items:flex-start;">
+
+    <!-- Left: NaN / Zero explanation -->
+    <div style="flex:1.1; background:#111a28; border:1px solid #2a4060; border-radius:12px; padding:20px 24px;">
+      <div style="font-size:13px; font-weight:700; color:#80a0d0; margin-bottom:14px; letter-spacing:0.5px;">CpG VALUE TYPES</div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+
+        <div style="display:flex; gap:14px; align-items:flex-start; background:#0a1820; border-radius:8px; padding:10px 14px;">
+          <div style="width:48px; height:48px; border-radius:8px; background:#1a3a1a; border:2px solid #3a8a3a; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#6aaa6a; flex-shrink:0;">0.0</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#6aaa6a;">Real data — Unmethylated CpG</div>
+            <div style="font-size:11px; color:#4a7050; margin-top:3px; line-height:1.6;">
+              beta = 0.0 is a valid measurement.<br>
+              It means the CpG site is <strong style="color:#5a9060;">not methylated</strong> in this sample.<br>
+              Routed through ScaleAdaptEncoder (sinusoidal encoding).
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px; align-items:flex-start; background:#0a1820; border-radius:8px; padding:10px 14px;">
+          <div style="width:48px; height:48px; border-radius:8px; background:#3a1a1a; border:2px solid #8a3a3a; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#cc6060; flex-shrink:0;">NaN</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#cc6060;">Structural missing — Array not measured</div>
+            <div style="font-size:11px; color:#7a4040; margin-top:3px; line-height:1.6;">
+              29,548 CpGs (of 49k vocab) are <strong style="color:#cc6060;">never measured</strong> on 450k arrays.<br>
+              Stored as NaN in h5ad — never tokenized, never fed to encoder.<br>
+              WCEDCollator builds input only from non-NaN positions.
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px; align-items:flex-start; background:#0a1820; border-radius:8px; padding:10px 14px;">
+          <div style="width:48px; height:48px; border-radius:8px; background:#1a1a3a; border:2px solid #4a4a8a; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#8080cc; flex-shrink:0;">−2</div>
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#8080cc;">Special token — CLS marker</div>
+            <div style="font-size:11px; color:#505080; margin-top:3px; line-height:1.6;">
+              CLS token has beta = −2.0 (negative = special).<br>
+              Routed through <strong style="color:#7070bb;">learned nn.Embedding</strong> (not ScaleAdapt).<br>
+              Placed at position 0 of every sequence.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right: beta distribution bar chart + key insight -->
+    <div style="flex:0.9; display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Beta distribution -->
+      <div style="background:#0e1e1e; border:1px solid #2a4a4a; border-radius:12px; padding:18px 20px;">
+        <div style="font-size:13px; font-weight:700; color:#6aacac; margin-bottom:14px; letter-spacing:0.5px;">BETA VALUE DISTRIBUTION (fine-tune)</div>
+
+        <!-- Mini bar chart using CSS -->
+        <div style="display:flex; align-items:flex-end; gap:5px; height:80px; margin-bottom:8px;">
+          <!-- Buckets: 0-0.1, 0.1-0.2, ..., 0.9-1.0 -->
+          <!-- Heights approximated from the CDF: ft_vals at [0,1,5,25,50,75,95,99,100] -->
+          <!-- Most mass is at 0-0.1 (about 50% of values), then near 1.0 -->
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="width:100%; background:#3a8a5a; border-radius:3px 3px 0 0;" title="~50%" style="height:76px; width:100%; background:#3a8a5a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0–0.1</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:14px; width:100%; background:#2a6a4a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.1–0.2</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:8px; width:100%; background:#2a6a4a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.2–0.3</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:8px; width:100%; background:#2a6a4a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.3–0.4</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:9px; width:100%; background:#2a6a4a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.4–0.5</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:10px; width:100%; background:#2a7a5a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.5–0.6</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:10px; width:100%; background:#2a7a5a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.6–0.7</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:11px; width:100%; background:#2a7a5a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.7–0.8</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:18px; width:100%; background:#3a8a6a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.8–0.9</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;">
+            <div style="height:54px; width:100%; background:#3a8a5a; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:9px; color:#507050;">0.9–1.0</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:6px;">
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">p25:</span> 0.04</div>
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">p50:</span> 0.08</div>
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">p75:</span> 0.49</div>
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">p95:</span> 0.91</div>
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">min:</span> 0.00 &nbsp;<span style="color:#6aaa6a;">← real data</span></div>
+          <div style="font-size:10px; color:#4a7070;"><span style="color:#6aacac; font-weight:600;">max:</span> 1.00</div>
+        </div>
+      </div>
+
+      <!-- Key data quality note -->
+      <div style="background:#0a1a10; border:1px solid #2a5030; border-radius:10px; padding:14px 18px;">
+        <div style="font-size:12px; font-weight:700; color:#6aaa6a; margin-bottom:8px; letter-spacing:0.5px;">DATA QUALITY</div>
+        <div style="font-size:11px; color:#4a7050; line-height:2.0;">
+          ✅ &nbsp;Zero NaN in model input — all 19,608 CpGs measured in every sample<br>
+          ✅ &nbsp;beta = 0.0 is valid (unmethylated) — not NaN, not imputed<br>
+          ✅ &nbsp;Bimodal distribution reflects biology (CpGs are ON or OFF)<br>
+          ✅ &nbsp;All samples from 450k array — consistent measurement platform<br>
+          ✅ &nbsp;Age computed from train split only — no leakage into val/test
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /slide 3 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 4 — DATASET STATISTICS (real data from investigation)
+═══════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-label">Slide 4 / 4</div>
+  <div class="slide-title">Dataset Statistics — AltumAge Methylation Dataset</div>
+
+  <!-- Top stat cards -->
+  <div class="top-row">
+    <div class="stat-card">
+      <div class="label">Samples (clean)</div>
+      <div class="value">10,656</div>
+      <div class="sub">after NaN-CpG removal</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">CpG Sites</div>
+      <div class="value">19,608</div>
+      <div class="sub">zero-NaN across all samples</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total β-values</div>
+      <div class="value">208M</div>
+      <div class="sub">208,942,848 cells</div>
+    </div>
+    <div class="stat-card" style="border-color:#3a7a3a; background:#1a2e1a;">
+      <div class="label" style="color:#6a9a6a;">Data Quality</div>
+      <div class="value" style="color:#60d090;">0 NaN</div>
+      <div class="sub" style="color:#5a8a5a;">all β ∈ [0, 1]</div>
+    </div>
+  </div>
+
+  <!-- Mid row -->
+  <div class="mid-row">
+
+    <!-- Split + age histogram -->
+    <div class="panel">
+      <div class="panel-title">Split Distribution</div>
+      <div class="split-row">
+        <div class="split-label">Train</div>
+        <div class="split-bar-bg"><div class="split-bar bar-train" style="width:67.8%">67.8%</div></div>
+        <div class="split-count">7,224</div>
+      </div>
+      <div class="split-row">
+        <div class="split-label">Val</div>
+        <div class="split-bar-bg"><div class="split-bar bar-val" style="width:11.9%">11.9%</div></div>
+        <div class="split-count">1,268</div>
+      </div>
+      <div class="split-row">
+        <div class="split-label">Test</div>
+        <div class="split-bar-bg"><div class="split-bar bar-test" style="width:20.3%">20.3%</div></div>
+        <div class="split-count">2,164</div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div class="panel-title" style="margin-top:4px;">Age Distribution (10-year bins)</div>
+        <div class="hist-row" id="age-hist"></div>
+        <div class="hist-labels" id="age-labels"></div>
+        <div class="age-stats">
+          <div class="age-stat"><div class="k">Mean ± Std</div><div class="v">40.9 ± 26.9</div></div>
+          <div class="age-stat"><div class="k">Median</div><div class="v">47 yr</div></div>
+          <div class="age-stat"><div class="k">Range</div><div class="v">0 – 114</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Beta distribution -->
+    <div class="panel">
+      <div class="panel-title">β-Value Distribution (bimodal)</div>
+      <div class="beta-bars" id="beta-bars"></div>
+      <div class="beta-x-labels">
+        <span>0.0</span><span>0.1</span><span>0.2</span><span>0.3</span><span>0.4</span>
+        <span>0.5</span><span>0.6</span><span>0.7</span><span>0.8</span><span>0.9</span><span>1.0</span>
+      </div>
+      <div class="beta-pcts">
+        <div class="beta-pct"><div class="pk">p1</div><div class="pv">0.008</div></div>
+        <div class="beta-pct"><div class="pk">p25</div><div class="pv">0.040</div></div>
+        <div class="beta-pct"><div class="pk">p50</div><div class="pv">0.076</div></div>
+        <div class="beta-pct"><div class="pk">p75</div><div class="pv">0.501</div></div>
+        <div class="beta-pct"><div class="pk">p99</div><div class="pv">0.951</div></div>
+      </div>
+      <div style="margin-top:14px; font-size:12px; color:#7a90b8; line-height:1.6;">
+        <span style="color:#a0c0f0; font-weight:600;">Unmethylated peak</span> (β ≈ 0–0.2): most CpGs stably unmethylated &nbsp;·&nbsp;
+        <span style="color:#b080e0; font-weight:600;">Methylated peak</span> (β ≈ 0.5–1.0): tissue-specific signal
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bot row -->
+  <div class="bot-row">
+
+    <!-- Quality checks -->
+    <div class="panel">
+      <div class="panel-title">Data Quality Checks</div>
+      <div class="quality-grid">
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text"><div class="q-title">Zero NaN Values</div><div class="q-val">0 missing across all 208M cells</div></div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text"><div class="q-title">Valid β Range</div><div class="q-val">All values strictly in [0, 1]</div></div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text"><div class="q-title">No Duplicates</div><div class="q-val">0 duplicate samples or CpGs</div></div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text"><div class="q-title">Split Labels Present</div><div class="q-val">train / valid / test baked into obs</div></div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">✅</div>
+          <div class="q-text"><div class="q-title">Age Labels Complete</div><div class="q-val">0 NaN ages across 10,656 samples</div></div>
+        </div>
+        <div class="quality-item">
+          <div class="q-icon">ℹ️</div>
+          <div class="q-text"><div class="q-title">β = 0 is Real Data</div><div class="q-val">Unmethylated CpG — not missing</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original vs clean comparison -->
+    <div class="panel">
+      <div class="panel-title">Original vs Clean Dataset</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th><span class="tag-orig">Original</span></th>
+            <th><span class="tag-clean">Clean (used)</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Samples</td><td class="tag-orig">10,988</td><td class="tag-clean">10,656</td></tr>
+          <tr><td>CpG sites</td><td class="tag-orig">21,368</td><td class="tag-clean">19,608</td></tr>
+          <tr><td>Train / Val / Test</td><td class="tag-orig">7416 / 1308 / 2264</td><td class="tag-clean">7224 / 1268 / 2164</td></tr>
+          <tr><td>NaN count</td><td class="tag-orig">0 ✓</td><td class="tag-clean">0 ✓</td></tr>
+          <tr><td>Age range</td><td><span style="color:#f0c060;">−0.7 – 144 yr ⚠</span></td><td class="tag-clean">0 – 114 yr ✓</td></tr>
+          <tr><td>Removed</td><td>—</td><td style="color:#8899bb;">332 samples · 1,760 CpGs</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; font-size:11px; color:#556688; line-height:1.6;">
+        Cleaning removed CpGs with any NaN across 450k-array samples (structurally missing probes)
+        and samples with biologically invalid ages (negative or &gt;120).
+      </div>
+    </div>
+
+  </div>
+</div><!-- /slide 4 -->
+
+<script>
+// Age histogram
+const ageCounts = [2078,851,836,747,1219,1912,1641,876,339,70,20,67];
+const ageLabels = ['0','10','20','30','40','50','60','70','80','90','100','110'];
+const maxAge = Math.max(...ageCounts);
+const histEl = document.getElementById('age-hist');
+const lblEl  = document.getElementById('age-labels');
+ageCounts.forEach((c, i) => {
+  const wrap = document.createElement('div'); wrap.className = 'hist-bar-wrap';
+  const bar  = document.createElement('div'); bar.className = 'hist-bar';
+  bar.style.height = (c / maxAge * 100) + '%';
+  bar.title = ageLabels[i] + '–' + (parseInt(ageLabels[i])+10) + ' yr: ' + c.toLocaleString();
+  wrap.appendChild(bar); histEl.appendChild(wrap);
+  const lbl = document.createElement('div'); lbl.className = 'hist-lbl';
+  lbl.textContent = ageLabels[i]; lblEl.appendChild(lbl);
+});
+
+// Beta bimodal chart
+const betaBins = 50;
+const betaBarEl = document.getElementById('beta-bars');
+function betaDensity(x) {
+  const low  = 3.5 * Math.exp(-Math.pow((x - 0.03) / 0.06, 2) / 2);
+  const high = 1.8 * Math.exp(-Math.pow((x - 0.82) / 0.12, 2) / 2);
+  return low + high;
+}
+const vals = [];
+for (let i = 0; i < betaBins; i++) vals.push(betaDensity((i + 0.5) / betaBins));
+const maxVal = Math.max(...vals);
+vals.forEach((v, i) => {
+  const bar = document.createElement('div'); bar.className = 'beta-bar';
+  const t = i / betaBins;
+  bar.style.background = `rgb(${Math.round(60+100*t)},${Math.round(120-60*t)},${Math.round(200+55*t)})`;
+  bar.style.height = (v / maxVal * 90) + '%';
+  bar.title = 'β ≈ ' + (i/betaBins).toFixed(2);
+  betaBarEl.appendChild(bar);
+});
+</script>
+
+</body>
+</html>

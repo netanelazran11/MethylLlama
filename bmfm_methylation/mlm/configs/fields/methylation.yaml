@@ -1,0 +1,24 @@
+# Field configuration for methylation data
+# Two fields: cpg_sites (discrete tokens) and beta_values (continuous)
+# Pretraining task: Mask and predict methylation VALUES (not CpG IDs)
+
+- _target_: bmfm_targets.config.FieldInfo
+  field_name: "cpg_sites"
+  vocab_size: 8005  # 8000 CpG sites + 5 special tokens
+  is_input: true
+  is_masked: false  # CpG IDs are fixed - no need to mask/predict them
+  tokenization_strategy: "tokenize"
+
+- _target_: bmfm_targets.config.FieldInfo
+  field_name: "beta_values"
+  is_input: true
+  is_masked: true  # Mask methylation values for pretraining
+  tokenization_strategy: "continuous_value_encoder"
+  num_special_tokens: 5  # PAD, UNK, CLS, SEP, MASK
+  encoder_kwargs:
+    kind: "mlp_with_special_token_embedding"  # Handles mask tokens properly
+    # NOTE: zero_as_special_token defaults to true (treats beta=0.0 as special token).
+    # Existing pretrained checkpoints were saved with this default.
+    # To use false, retrain from scratch.
+  decode_modes:
+    regression: {}  # Predict continuous methylation values with MSE/MAE
