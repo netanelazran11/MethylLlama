@@ -10,7 +10,7 @@
 
 REPO="/sci/labs/benjamin.yakir/netanel.azran/repos/BMFM-RNA/methyl"
 INPUT="/sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_21k_h5ad/altumage_21k_3way.h5ad"
-OUTPUT="${REPO}/methylllama_demo_120samples.h5ad"
+OUTPUT="${REPO}/methylllama_demo_500samples.h5ad"
 
 cd "${REPO}"
 source bmfm_methyl_env/bin/activate
@@ -22,7 +22,7 @@ echo "OUTPUT: ${OUTPUT}"
 python data_prep/extract_demo_samples.py \
     --input  "${INPUT}" \
     --output "${OUTPUT}" \
-    --n_samples 120 \
+    --n_samples 500 \
     --seed 42
 
 echo "Done: $(date)"

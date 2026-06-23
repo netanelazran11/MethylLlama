@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-Extract a representative 120-sample demo subset from the 21k CpG h5ad.
+Extract a representative demo subset from the 21k CpG h5ad.
 
-Goal: a small file (~50 MB) that can be shared publicly with the repo so
+Goal: a compact file that can be shared publicly with the repo so
       tutorial notebooks show real biology, not synthetic data.
 
 Stratification:
-  - Age bins (0-20, 20-30, 30-40, 40-50, 50-60, 60-70, 70-80, 80+): 15 per bin
-  - Tissue diversity: cap 25 samples from any single tissue
+  - Age bins (0-20, 20-30, 30-40, 40-50, 50-60, 60-70, 70-80, 80+): n_samples/8 per bin
+  - Tissue diversity: cap n_samples/8 samples from any single tissue
   - Split: keeps train/valid/test labels intact
   - NaN rate: prefers samples with fewer missing CpGs (lower NaN fraction)
 
 Output:
-  methylllama_demo_120samples.h5ad
+  methylllama_demo_500samples.h5ad  (or as specified by --output)
 
 Usage on cluster:
   cd /path/to/MethylLlama
   python data_prep/extract_demo_samples.py \
       --input  /sci/labs/benjamin.yakir/netanel.azran/data/data_methyl_21k_h5ad/altumage_21k_3way.h5ad \
-      --output ./methylllama_demo_120samples.h5ad \
-      --n_samples 120
+      --output ./methylllama_demo_500samples.h5ad \
+      --n_samples 500
 """
 
 import argparse
@@ -36,8 +36,6 @@ logger = logging.getLogger(__name__)
 
 AGE_BINS = [0, 20, 30, 40, 50, 60, 70, 80, 120]
 AGE_BIN_LABELS = ["0-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80+"]
-MAX_PER_TISSUE = 25
-TARGET_PER_BIN = 15
 
 
 def load_h5ad(path: str) -> ad.AnnData:
@@ -95,6 +93,10 @@ def nan_fraction(X: np.ndarray) -> np.ndarray:
 
 
 def stratified_sample(adata: ad.AnnData, n_samples: int, seed: int = 42) -> ad.AnnData:
+    import math
+    target_per_bin = math.ceil(n_samples / len(AGE_BIN_LABELS))
+    max_per_tissue = max(math.ceil(n_samples / 8), 30)
+
     rng = np.random.default_rng(seed)
     obs = adata.obs.copy()
 
@@ -137,18 +139,18 @@ def stratified_sample(adata: ad.AnnData, n_samples: int, seed: int = 42) -> ad.A
         # Tissue diversity: skip if a tissue is already capped
         chosen: list[str] = []
         for idx in pool.index:
-            if len(chosen) >= TARGET_PER_BIN:
+            if len(chosen) >= target_per_bin:
                 break
             tissue = obs.loc[idx, tissue_col] if tissue_col else "unknown"
-            if tissue_counts.get(str(tissue), 0) >= MAX_PER_TISSUE:
+            if tissue_counts.get(str(tissue), 0) >= max_per_tissue:
                 continue
             chosen.append(idx)
             tissue_counts[str(tissue)] = tissue_counts.get(str(tissue), 0) + 1
 
         # If not enough from tissue-diversity pass, fill without constraint
-        if len(chosen) < TARGET_PER_BIN:
+        if len(chosen) < target_per_bin:
             remaining = pool.index.difference(chosen)
-            fill = list(remaining[: TARGET_PER_BIN - len(chosen)])
+            fill = list(remaining[: target_per_bin - len(chosen)])
             chosen.extend(fill)
 
         logger.info(f"  Bin {bin_label}: selected {len(chosen)} samples")
