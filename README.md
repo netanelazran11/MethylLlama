@@ -29,23 +29,34 @@
 
 ## Quick Start
 
+### Tutorials (inference only — no cluster needed)
+
 ```bash
 git clone https://github.com/netanelazran11/MethylLlama.git
 cd MethylLlama
-python3.10 -m venv bmfm_methyl_env && source bmfm_methyl_env/bin/activate
-pip install --upgrade pip
+pip install -r requirements_tutorials.txt
+pip install -e .
+jupyter lab tutorials/quickstart.ipynb
+```
+
+The checkpoint and tokenizer download automatically from HuggingFace on first run (~330 MB).
+
+### Full training environment (cluster)
+
+```bash
 pip install -r requirements.txt
 pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
 pip install -e .
 ```
 
-Download the pretrained checkpoint:
+Or with conda:
 
 ```bash
-bash scripts/download_checkpoint.sh
+conda env create -f environment.yml
+conda activate bmfm_methyl_env
+pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
+pip install -e .
 ```
-
-Then open `tutorials/quickstart.ipynb`.
 
 ---
 
@@ -160,31 +171,6 @@ The demo dataset (`tutorials/data/methylllama_demo_120samples.h5ad`) contains
 
 ---
 
-## Installation
-
-```bash
-git clone https://github.com/netanelazran11/MethylLlama.git
-cd MethylLlama
-python3.10 -m venv bmfm_methyl_env
-source bmfm_methyl_env/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-# bmfm_targets framework (installed without its own deps to avoid conflicts)
-pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
-# Install bmfm_methylation as an editable package
-pip install -e .
-```
-
-Or with conda:
-
-```bash
-conda env create -f environment.yml
-conda activate bmfm_methyl_env
-pip install git+https://github.com/netanelazran11/BiomedSciAI_ACL_Project.git --no-deps
-pip install -e .
-```
-
----
 
 ## Running on a Cluster (SLURM)
 

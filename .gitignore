@@ -30,6 +30,8 @@ env/
 
 # Jupyter
 .ipynb_checkpoints/
+tutorials/*.png
+tutorials/*.pdf
 
 # Logs / outputs
 *.log

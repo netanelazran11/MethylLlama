@@ -1,0 +1,19 @@
+# Minimal requirements to run the tutorial notebooks only.
+# No cluster/training dependencies needed.
+#
+#   pip install -r requirements_tutorials.txt
+#   pip install -e .
+#   jupyter lab tutorials/quickstart.ipynb
+
+torch>=2.0.0
+numpy<2
+pandas>=2,<3
+scipy<1.15.0
+anndata>=0.10.9
+scanpy
+transformers>=4.30.0
+huggingface_hub
+matplotlib
+umap-learn
+scikit-learn
+jupyter
