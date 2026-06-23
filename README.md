@@ -98,7 +98,7 @@ MethylLlama/
 │   ├── mlm/                   # MLM pretraining variant
 │   └── shared/                # Tokenizer, data module, dataset
 ├── tutorials/
-│   ├── data/                  # Demo dataset (120 samples × 21,368 CpGs)
+│   ├── data/                  # Demo dataset (500 samples × 21,368 CpGs)
 │   ├── quickstart.ipynb       # Load checkpoint → CLS embeddings → age predictions
 │   ├── embedding_analysis.ipynb  # UMAP by age and tissue type
 │   └── age_prediction.ipynb   # Fine-tuning walkthrough + paper results
@@ -166,8 +166,8 @@ sbatch scripts/llama/finetune_llama_random_init.sh
 | [`tutorials/embedding_analysis.ipynb`](tutorials/embedding_analysis.ipynb) | UMAP coloured by age and tissue type |
 | [`tutorials/age_prediction.ipynb`](tutorials/age_prediction.ipynb) | Fine-tuning walkthrough and paper results |
 
-The demo dataset (`tutorials/data/methylllama_demo_120samples.h5ad`) contains
-120 stratified samples (0–92 yr, diverse tissues) from the 21k CpG dataset.
+The demo dataset (`tutorials/data/methylllama_demo_500samples.h5ad`) contains
+500 stratified samples (0–102 yr, 15 tissue types) from the 21k CpG dataset.
 
 ---
 
