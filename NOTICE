@@ -1,0 +1,19 @@
+MethylLlama
+Copyright 2026 Netanel Azran, Hebrew University of Jerusalem
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It builds on BMFM-RNA / biomed-multi-omic (bmfm-targets), Copyright IBM Corporation,
+licensed under the Apache License, Version 2.0:
+  https://github.com/BiomedSciAI/biomed-multi-omic
+  - the multi-field tokenizer and field configuration are used as a dependency
+    (bmfm-targets 0.15.0, commit 7b9c139a9ff1c417ef9424acc865fc513775eec7);
+  - the WCED pretraining objective in bmfm_methylation/llama/wced_llama.py adapts the
+    Whole-cell Expression Decoder of BMFM-RNA to DNA methylation;
+  - the beta-value encoder in bmfm_methylation/llama/scale_adapt.py follows the
+    ScaleAdaptEncoder of bmfm-targets (bmfm_targets/models/predictive/layers.py).
+
+scripts/methylgpt/finetuning/ contains files from MethylGPT, licensed under the Apache License,
+Version 2.0 (https://github.com/albert-ying/MethylGPT, commit ca14cc2,
+tutorials/finetuning_age_prediction/); three of them were modified, as listed in
+scripts/methylgpt/README.md.

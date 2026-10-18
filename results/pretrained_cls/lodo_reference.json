@@ -1,0 +1,11 @@
+{
+  "in_distribution_random_80_20": {
+    "r2": 0.8563,
+    "medae": 5.049,
+    "n_train": 8790,
+    "n_test": 2198,
+    "seed": 0,
+    "alpha": 1.0,
+    "note": "reference for the LODO analysis; recomputed locally from embeddings_cls.npy"
+  }
+}

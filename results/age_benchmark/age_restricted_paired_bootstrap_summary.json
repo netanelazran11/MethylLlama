@@ -1,0 +1,49 @@
+{
+  "source": "results/age_benchmark/paired_per_subject_predictions.csv",
+  "n_bootstrap": 10000,
+  "seed": 0,
+  "sign_convention": {
+    "medae": "MethylGPT minus MethylLlama",
+    "mae": "MethylGPT minus MethylLlama",
+    "r2": "MethylLlama minus MethylGPT"
+  },
+  "subsets": {
+    "adults_age_ge_18": {
+      "n": 1776,
+      "delta_medae": 0.679506,
+      "delta_medae_ci_95": [
+        0.417365,
+        0.948396
+      ],
+      "delta_mae": 0.83001,
+      "delta_mae_ci_95": [
+        0.598723,
+        1.063851
+      ],
+      "delta_r2": 0.069453,
+      "delta_r2_ci_95": [
+        0.048396,
+        0.090945
+      ]
+    },
+    "older_age_ge_40": {
+      "n": 1449,
+      "delta_medae": 0.63589,
+      "delta_medae_ci_95": [
+        0.264797,
+        0.919936
+      ],
+      "delta_mae": 0.658066,
+      "delta_mae_ci_95": [
+        0.404255,
+        0.907179
+      ],
+      "delta_r2": 0.116802,
+      "delta_r2_ci_95": [
+        0.069677,
+        0.162891
+      ]
+    }
+  },
+  "note": "Nested post-hoc age restrictions; confidence intervals are paired percentile-bootstrap intervals over held-out subjects. These are sensitivity analyses, not independent strata."
+}

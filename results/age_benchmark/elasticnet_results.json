@@ -1,0 +1,22 @@
+{
+  "model": "ElasticNet",
+  "selection_method": "sklearn.linear_model.ElasticNetCV, single run, standard settings (l1_ratio grid from sklearn docs, automatic alpha path, 5-fold internal CV on pooled train+valid)",
+  "alpha": 0.10883062344093544,
+  "l1_ratio": 0.7,
+  "n_features": 21368,
+  "n_nonzero_coef": 1036,
+  "cv_pool": {
+    "mae": 4.486251354217529,
+    "medae": 3.2258262634277344,
+    "r2": 0.945231020450592,
+    "pcc": 0.9725464197309218,
+    "n": 8440
+  },
+  "test": {
+    "mae": 4.730579376220703,
+    "medae": 3.436817169189453,
+    "r2": 0.9321950078010559,
+    "pcc": 0.9658593660667663,
+    "n": 2149
+  }
+}

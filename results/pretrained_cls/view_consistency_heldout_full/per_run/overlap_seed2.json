@@ -1,0 +1,41 @@
+{
+  "condition": "overlap",
+  "seed": 2,
+  "checkpoint": "checkpoints/pretrained/methyllama_pretrained_epoch85.ckpt",
+  "data": "methylgpt_pretrain_type3.h5ad",
+  "split": "test",
+  "partition_rows": 16912,
+  "n_profiles": 16912,
+  "n_cpgs_panel": 49156,
+  "input_ratio": 0.5,
+  "measured_min": 0.99,
+  "pools": {
+    "all": {
+      "n_candidates": 16912,
+      "chance_top1": 5.912961210974456e-05,
+      "matched_cos": 0.9955023527145386,
+      "unmatched_cos": 0.3095134598311926,
+      "retrieval_at1": 0.9804872280037843,
+      "retrieval_at5": 0.9990539262062441,
+      "retrieval_at10": 0.9998817407757805
+    },
+    "fully_measured": {
+      "n_candidates": 7845,
+      "chance_top1": 0.00012746972594008922,
+      "matched_cos": 0.9961742758750916,
+      "unmatched_cos": 0.34975583469757143,
+      "retrieval_at1": 0.9877629063097514,
+      "retrieval_at5": 0.9998725302740599,
+      "retrieval_at10": 1.0
+    },
+    "n2000": {
+      "n_candidates": 2000,
+      "chance_top1": 0.0005,
+      "matched_cos": 0.99549400806427,
+      "unmatched_cos": 0.3047741995997999,
+      "retrieval_at1": 0.996,
+      "retrieval_at5": 1.0,
+      "retrieval_at10": 1.0
+    }
+  }
+}

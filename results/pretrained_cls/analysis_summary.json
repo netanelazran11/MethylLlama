@@ -1,0 +1,54 @@
+{
+  "checkpoint": "checkpoints/pretrained/methyllama_pretrained_epoch85.ckpt",
+  "n_samples": 10988,
+  "cpg_embedding_matrix_shape": [
+    49161,
+    256
+  ],
+  "geometry_cls": {
+    "mean_l2_norm": 10.008151054382324,
+    "effective_rank": 18.12,
+    "top1_sv_frac": 0.2709,
+    "top10_sv_frac": 0.7806,
+    "anisotropy_mean_cos": 0.5004,
+    "dead_dims_lt1pct": 2
+  },
+  "geometry_mean": {
+    "mean_l2_norm": 5.358845233917236,
+    "effective_rank": 3.4,
+    "top1_sv_frac": 0.6494,
+    "top10_sv_frac": 0.9847,
+    "anisotropy_mean_cos": 0.8672,
+    "dead_dims_lt1pct": 1
+  },
+  "age_probe_cls": {
+    "linear_ridge_r2": 0.866,
+    "linear_ridge_medae": 5.17,
+    "replica_head_r2": 0.922,
+    "replica_head_medae": 3.57,
+    "n_train": 8724,
+    "n_test": 2264
+  },
+  "age_probe_mean": {
+    "linear_ridge_r2": 0.795,
+    "linear_ridge_medae": 6.53,
+    "replica_head_r2": 0.893,
+    "replica_head_medae": 4.33,
+    "n_train": 8724,
+    "n_test": 2264
+  },
+  "class_probes_cls": {
+    "tissue_type": {
+      "balanced_acc": 0.936,
+      "n_classes": 37,
+      "chance": 0.027,
+      "n_test": 2197
+    },
+    "dataset": {
+      "balanced_acc": 0.956,
+      "n_classes": 85,
+      "chance": 0.012,
+      "n_test": 2006
+    }
+  }
+}
