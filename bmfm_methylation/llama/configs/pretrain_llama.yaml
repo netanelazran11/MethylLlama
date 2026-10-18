@@ -1,0 +1,104 @@
+# MethylLlama pretraining configuration — 6L × 256D × 4H (small)
+#
+# Matches pretrain_methyllama.sh:
+#   - Contrastive WCED: InfoNCE weight=0.05, temp=0.1
+#   - Level 2 Genomic RoPE: CpGs sorted + positioned by chromosomal rank
+#   - Pure reconstruction primary loss, no age auxiliary
+#   - 6L × 256D × 4H encoder (~3.9M params), FFN=512
+#
+# Baseline (pure reconstruction, no contrastive):
+#   pretrain_llama_small.sh → job 44450919, epoch=98, val_loss=0.0059
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Pretraining mode
+# ─────────────────────────────────────────────────────────────────────────────
+pretraining_mode: wced
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+data_path: ???                        # Required: path to .h5ad file
+probe_ids_csv: null                   # Optional: CSV with CpG probe IDs
+resume_checkpoint: null               # Optional: path to .ckpt to resume from
+output_directory: ./outputs/llama_wced
+tokenizer_path: ./tokenizer
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Model architecture — 6L × 256D × 4H (head_dim=64), FFN=512
+# vocab_size is set at runtime from the h5ad tokenizer (n_cpgs + 5 specials)
+# ─────────────────────────────────────────────────────────────────────────────
+model:
+  hidden_size: 256
+  num_hidden_layers: 6
+  num_attention_heads: 4
+  intermediate_size: 512
+  vocab_size: 49161                   # overridden at runtime from tokenizer
+  rope_theta: 10000.0
+  rms_norm_eps: 1e-6
+  hidden_dropout_prob: 0.1
+  n_sin_basis: 48
+  basis_scale: 2.0
+  scale_adapt_trainable: true
+  cpg_scale_init: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Data module
+# Note: fixed_subset / max_length are irrelevant in WCED mode —
+#       WCEDCollator computes its own max_input_len and always uses
+#       random per-sample subset selection.
+# ─────────────────────────────────────────────────────────────────────────────
+data_module:
+  batch_size: 32
+  num_workers: 14
+  subset_k: 49156                     # use ALL 49k CpGs
+  bmfm_style: false                   # WCEDCollator (supports genomic RoPE)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WCED settings
+# ─────────────────────────────────────────────────────────────────────────────
+wced_input_ratio: 0.5                 # each view sees 50% of valid CpGs
+wced_contrastive: true                # InfoNCE between two random 50% views
+wced_contrastive_weight: 0.05         # loss = recon + 0.05 × InfoNCE
+wced_contrastive_temp: 0.1            # InfoNCE temperature τ
+wced_normalize_loss: true
+wced_age_weight: 0.0                  # no age labels in 169k pretrain data
+wced_decoder_dropout: 0.1
+wced_genomic_rank_path: null          # path to cpg_genomic_rank.npy; null = sequential RoPE
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer
+# ─────────────────────────────────────────────────────────────────────────────
+trainer:
+  learning_rate: 3e-4
+  weight_decay: 0.01
+  warmup_steps: 3000
+  lr_decay_steps: 0                   # 0 = auto from trainer.estimated_stepping_batches
+  betas: [0.9, 0.99]
+  epsilon: 1e-8
+
+pretrain_epochs: 300
+accumulate_grad_batches: 2            # eff batch = 32 × 4 GPUs × 2 = 256
+gradient_clip_val: 1.0
+early_stop_patience: 30           # stop if val/recon_loss does not improve for N epochs
+early_stop_min_delta: 1.0e-4      # minimum improvement to count as progress
+save_top_k: 6                     # keep top-6 checkpoints by val/recon_loss
+checkpoint_every_n_epochs: 25     # also save periodic snapshots for analysis
+diag_check_every: 5               # print attention entropy + MSE ratio every N epochs
+precision: "16-mixed"
+limit_train_batches: 1.0             # 1.0 = all; int N = N batches/epoch (mini runs)
+limit_val_batches: 1.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Seed
+# ─────────────────────────────────────────────────────────────────────────────
+seed:
+  seed_value: 42
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WandB logging
+# ─────────────────────────────────────────────────────────────────────────────
+track_wandb:
+  enabled: true
+  project: "pretrain-llama-wced"
+  entity: null
+  name: "llama_wced_pretrain"
