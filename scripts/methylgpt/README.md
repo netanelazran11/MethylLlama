@@ -39,8 +39,8 @@ Run from the repository root, after `scripts/data/create_kfold_splits.py` has wr
 ## Settings
 
 As run for the manuscript (`configs/train_methylgpt_21k_altumage_fold{0..4}.yml`, identical
-apart from the fold): the pretrained encoder is kept frozen and only the age head is trained
-(65.5 thousand trainable parameters); Adam, head learning rate 3e-5, gradient clipping 0.5, batch size 1, no CpG masking, 200 epochs, bf16 mixed precision, seed 42; the three
+apart from the fold): the pretrained encoder and the age head are trained jointly
+(`freeze_encoder: false`); Adam, encoder learning rate 1e-5, head learning rate 3e-5, gradient clipping 0.5, batch size 1, no CpG masking, 200 epochs, bf16 mixed precision, seed 42; the three
 checkpoints with the lowest validation MedAE are kept and the best one is used for the test
 predictions. Of the 21,368 downstream CpGs, 19,608 map to the MethylGPT input vocabulary.
 

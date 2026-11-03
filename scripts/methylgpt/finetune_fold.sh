@@ -15,7 +15,7 @@ set -euo pipefail
 
 # MethylGPT comparison, step 2: fine-tune one fold from the released MethylGPT checkpoint.
 #   sbatch --export=ALL,FOLD=0 scripts/methylgpt/finetune_fold.sh     (FOLD=0..4)
-# The configuration is configs/train_methylgpt_21k_altumage_fold${FOLD}.yml: encoder frozen,
+# The configuration is configs/train_methylgpt_21k_altumage_fold${FOLD}.yml: encoder and
 # age head trained, batch 1, up to 200 epochs, checkpoints ranked by validation MedAE.
 # Training logs to W&B (project methylGPT_medium_21k_altumage_fold${FOLD}); log in with
 # `wandb login` or export WANDB_API_KEY in your shell, never in this file.

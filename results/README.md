@@ -11,7 +11,7 @@ Run names and SLURM jobs are in `docs/PROVENANCE.md`.
 | File | Content | Written by |
 |---|---|---|
 | `methyllama/fold_{0..4}_predictions.csv` | per-profile age predictions of each fold on the 2,149-profile test set | `scripts/finetune/run_kfold_test_predictions.sh` |
-| `methylgpt/fold_{0..4}_predictions.csv` | the same for the five MethylGPT folds (authors' checkpoint and pipeline, same folds) | MethylGPT fine-tuning pipeline (`METHYLGPT_DIR`) |
+| `methylgpt/fold_{0..4}_predictions.csv` | the same for the five MethylGPT folds (released MethylGPT checkpoint, encoder and age head trained, same folds; settings in `scripts/methylgpt/README.md`) | MethylGPT fine-tuning pipeline (`METHYLGPT_DIR`) |
 | `paired_per_subject_predictions.csv` | true age, MethylLlama ensemble, MethylGPT ensemble (same profiles) | `scripts/evaluation/paired_bootstrap_comparison.py` |
 | `paired_bootstrap_summary.json` | point estimates and paired bootstrap intervals (10,000 resamples, seed 0) | same |
 | `age_restricted_paired_bootstrap_summary.json` | the same within age ≥ 18 and age ≥ 40 | |
@@ -20,6 +20,13 @@ Run names and SLURM jobs are in `docs/PROVENANCE.md`.
 
 The scripts write these files to `outputs/bootstrap_predictions/` and `kfold_full_history_analysis/`.
 ElasticNetCV profile-level predictions were not retained.
+
+## splits/ — data partitions (identifiers only)
+
+| File | Content | Written by |
+|---|---|---|
+| `downstream_age_splits.csv` | the 10,589 profiles of the age benchmark: `test` (the common 2,149-profile test set) or the validation `fold` (0–4) of each cross-validation profile; a fold trains on the other four | `scripts/release/export_split_ids.py` (thesis repo), from `outputs/kfold_splits/` |
+| `pretraining_heldout_ids.csv` | the 16,912 profiles of the held-out pretraining partition used in Fig. 2 and Supplementary Fig. S1 | same, from the hard-negative run |
 
 ## pretrained_cls/ — Figs. 2 and 3, Supplementary Table S2
 

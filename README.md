@@ -144,7 +144,7 @@ resources of the original runs in a comment; set a partition if your cluster nee
 | Genomic-rank pilot | `scripts/rope_pilot/` | Supplementary Note 1 |
 | Figures | `scripts/figures/` | `figures/paper/` |
 
-The MethylGPT comparison fine-tunes the released MethylGPT checkpoint (encoder frozen, age head
+The MethylGPT comparison fine-tunes the released MethylGPT checkpoint (encoder and age head
 trained) with MethylGPT's fine-tuning code on the same samples and folds (`scripts/methylgpt/`);
 `scripts/data/compare_splits_21k.py` and `verify_21k_comparison.py` check that both pipelines use
 the same data.
