@@ -10,7 +10,7 @@ test_file:  "data/methylgpt/21k_altumage/finetuning_data_kfold/test.parquet"
 cpg_sites: 49156
 dataset: "21k_altumage_fold0"
 
-freeze_encoder: true
+freeze_encoder: false
 mask_ratio: 0
 mlm_wt: 0
 weight_decay: 0.05
