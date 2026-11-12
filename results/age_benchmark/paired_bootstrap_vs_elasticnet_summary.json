@@ -1,0 +1,45 @@
+{
+  "n_subjects": 2149,
+  "n_bootstrap": 10000,
+  "seed": 0,
+  "point_estimates": {
+    "MethylLlama": {
+      "medae": 3.112260128835871,
+      "mae": 4.332695338502986,
+      "r2": 0.9364605747228277
+    },
+    "ElasticNetCV": {
+      "medae": 3.436816999999998,
+      "mae": 4.730579140891606,
+      "r2": 0.9321950161138469
+    },
+    "gap_elasticnet_minus_llama": {
+      "medae": 0.3245568711641269,
+      "mae": 0.39788380238861976,
+      "r2": -0.004265558608980813
+    }
+  },
+  "paired_bootstrap_gap_elasticnet_minus_llama": {
+    "medae": {
+      "point_estimate": 0.3245568711641269,
+      "bootstrap_mean": 0.32384853595297636,
+      "ci_95_low": 0.07204735753342338,
+      "ci_95_high": 0.5941043146629603,
+      "ci_excludes_zero": true
+    },
+    "mae": {
+      "point_estimate": 0.39788380238861976,
+      "bootstrap_mean": 0.39967613895778925,
+      "ci_95_low": 0.19742775183955655,
+      "ci_95_high": 0.608581943244586,
+      "ci_excludes_zero": true
+    },
+    "r2": {
+      "point_estimate": -0.004265558608980813,
+      "bootstrap_mean": -0.004278031706201847,
+      "ci_95_low": -0.011309938839838185,
+      "ci_95_high": 0.002893797954095439,
+      "ci_excludes_zero": false
+    }
+  }
+}

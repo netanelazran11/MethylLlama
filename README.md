@@ -138,6 +138,7 @@ resources of the original runs in a comment; set a partition if your cluster nee
 | ElasticNetCV | `scripts/baselines/elasticnet_age.sh` | `outputs/baselines/` |
 | MethylGPT fine-tuning and test predictions | `scripts/methylgpt/` (see its README) | `outputs/bootstrap_predictions/methylgpt/` |
 | Paired bootstrap against MethylGPT | `scripts/evaluation/paired_bootstrap_comparison.py` | |
+| Paired bootstrap against ElasticNetCV | `scripts/evaluation/paired_bootstrap_vs_elasticnet.py` | `results/age_benchmark/` |
 | Frozen representations, LODO | `scripts/evaluation/run_full_analysis.sh`, `leave_one_dataset_out_probe.py` | `results/pretrained_cls/` |
 | Withheld-CpG reconstruction | `scripts/evaluation/run_reconstruction_withheld.sh` | `results/pretrained_cls/reconstruction_withheld/` |
 | Cross-view consistency (held-out) | `scripts/evaluation/run_view_consistency_heldout_full.sh`, `run_view_design_heldout.sh` | `results/pretrained_cls/view_*_heldout*/` |

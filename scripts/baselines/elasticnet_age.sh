@@ -44,4 +44,5 @@ python scripts/baselines/elasticnet_age.py \
 echo "============================================================"
 echo "Done: $(date)"
 echo "Results: ${OUTDIR}/elasticnet_results.json"
+echo "Predictions: ${OUTDIR}/elasticnet_test_predictions.csv"
 echo "============================================================"

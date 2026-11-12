@@ -16,10 +16,11 @@ Run names and SLURM jobs are in `docs/PROVENANCE.md`.
 | `paired_bootstrap_summary.json` | point estimates and paired bootstrap intervals (10,000 resamples, seed 0) | same |
 | `age_restricted_paired_bootstrap_summary.json` | the same within age ≥ 18 and age ≥ 40 | |
 | `elasticnet_results.json` | ElasticNetCV selection and test metrics | `scripts/baselines/elasticnet_age.sh` |
+| `elasticnet_test_predictions.csv` | per-profile ElasticNetCV predictions on the 2,149-profile test set | same |
+| `paired_bootstrap_vs_elasticnet_summary.json` | paired bootstrap of the MethylLlama ensemble against ElasticNetCV (10,000 resamples, seed 0) | `scripts/evaluation/paired_bootstrap_vs_elasticnet.py` |
 | `fold0_train_history.csv`, `random_init_fold0_history.csv` | fold-0 validation metrics per epoch, pretrained and random initialisation | `scripts/finetune/kfold_full_history_analysis.py` (W&B) |
 
 The scripts write these files to `outputs/bootstrap_predictions/` and `kfold_full_history_analysis/`.
-ElasticNetCV profile-level predictions were not retained.
 
 ## splits/ — data partitions (identifiers only)
 

@@ -24,6 +24,9 @@ grid.
 train+valid are pooled into one set for ElasticNetCV's internal CV (it does
 its own k-fold split, so a separate fixed validation set isn't needed). test
 is never touched until the single final evaluation.
+
+Outputs: elasticnet_results.json (selection and metrics) and elasticnet_test_predictions.csv
+(per-profile test predictions, used for the paired comparison with MethylLlama).
 """
 
 import argparse
@@ -184,6 +187,8 @@ def main():
     # ── 6. Save ───────────────────────────────────────────────────────────────
     with open(outdir / "elasticnet_results.json", "w") as f:
         json.dump(results, f, indent=2)
+    pd.DataFrame({"sample_id": adata[idx_test].obs_names.astype(str), "true_age": y_test,
+                  "predicted_age": model.predict(X_test)}).to_csv(outdir / "elasticnet_test_predictions.csv", index=False)
 
     summary = (
         f"\n{'='*60}\n"
