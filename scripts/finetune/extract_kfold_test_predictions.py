@@ -2,8 +2,8 @@
 extract_kfold_test_predictions.py
 ===================================
 Per-sample MethylLlama test-set predictions, for a paired subject-level
-bootstrap comparison against MethylGPT (predictions extracted separately in
-the MethylGPT-thesis repo). Isolated, inference-only script -- does not
+bootstrap comparison against MethylGPT (predictions extracted separately with
+scripts/methylgpt/extract_kfold_predictions.py). Isolated, inference-only script -- does not
 modify any existing training/eval code.
 
 Why a new script instead of reusing test_step(): the existing pipeline

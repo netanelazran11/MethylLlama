@@ -14,10 +14,10 @@
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Full MethylLlama pretrain (ep85) representation analysis — new-architecture folder.
-# Runs: (1) extract CLS + CpG-embedding matrices  →  answers Q1-Q4
-#       (2) visualize_cls        (Bonus 1: PCA/UMAP colored by age/tissue)
-#       (3) analyze_cpg_embeddings (Bonus 2: genomic locality in CpG embeddings)
-#       (4) two_view_consistency (Bonus 3: contrastive-quality check, GPU)
+# Runs: (1) extract CLS + CpG-embedding matrices, probes and geometry (Fig. 3, Table S2)
+#       (2) visualize_cls          (PCA/UMAP coloured by age/tissue; UMAP coordinates of Fig. 3a,b)
+#       (3) analyze_cpg_embeddings (genomic locality in the static CpG embeddings; Supplementary Note 1)
+#       (4) two_view_consistency   (two 50% views of 2,000 profiles; Supplementary Fig. S2, GPU)
 # All outputs → results/pretrained_cls/
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -38,23 +38,29 @@ GENOMIC_RANK="${REPO}/resources/cpg_genomic_rank_finetune.npy"
 OUTDIR="${REPO}/results/pretrained_cls"
 D="scripts/evaluation"
 
-echo "=== [1/2] extract CLS + CpG embedding matrices (Q1-Q4) ==="
+echo "=== [1/4] extract CLS + CpG embedding matrices ==="
 python ${D}/extract_pretrain_cls.py \
     --checkpoint "${CKPT}" --data "${DATA}" --tokenizer "${TOKENIZER}" \
     --genomic_rank "${GENOMIC_RANK}" --outdir "${OUTDIR}" \
     --age_col age --label_cols tissue_type sex dataset --split_col split
 
-echo "=== [2/2] visualize CLS (Bonus 1: PCA/UMAP) ==="
+echo "=== [2/4] visualize CLS (PCA/UMAP) ==="
 python ${D}/visualize_cls.py --dir "${OUTDIR}" \
     --color_cols age tissue_type sex dataset
 
-# Two further steps of the original pipeline are not part of this release: the CpG-embedding
-# locality analysis (not reported) and the two-view consistency on 2,000 downstream profiles
-# (superseded by run_view_consistency_heldout_full.sh on the held-out pretraining partition).
+echo "=== [3/4] CpG embedding genomic locality ==="
+python ${D}/analyze_cpg_embeddings.py --dir "${OUTDIR}"
+
+echo "=== [4/4] two-view consistency (2,000 profiles) ==="
+python ${D}/two_view_consistency.py \
+    --checkpoint "${CKPT}" --data "${DATA}" --tokenizer "${TOKENIZER}" \
+    --genomic_rank "${GENOMIC_RANK}" --n_samples 2000 --outdir "${OUTDIR}"
 
 echo "============================================================"
 echo " FULL ANALYSIS DONE: $(date)"
 echo " Outputs → ${OUTDIR}/"
-echo "   report.txt / analysis_summary.json        (Q1-Q4)"
-echo "   cls_pca_panels.png / cls_umap_panels.png   (Bonus 1)"
+echo "   report.txt / analysis_summary.json        (probes, geometry)"
+echo "   cls_pca_panels.png / cls_umap_panels.png   (PCA/UMAP)"
+echo "   cpg_embedding_analysis.json                (CpG-embedding locality)"
+echo "   two_view_consistency.json, two_view_*.npy  (two-view consistency)"
 echo "============================================================"

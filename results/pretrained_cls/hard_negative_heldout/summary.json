@@ -1,0 +1,802 @@
+{
+ "n_profiles": 16912,
+ "n_queries_with_study_and_tissue": 12924,
+ "k_negatives": 31,
+ "negative_draws": 5,
+ "excluded_negatives": {
+  "duplicate_pairs": 1172,
+  "same_individual_links": 1610
+ },
+ "conditions": {
+  "overlap_seed0": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.9999690498297741,
+    "top1_ci95": [
+     0.9999226245744351,
+     1.0
+    ],
+    "top1_range_over_draws": [
+     0.9999226245744351,
+     1.0
+    ],
+    "top1_random_same_queries": 0.9999690498297741,
+    "median_margin": 0.2587346136569977,
+    "frac_margin_below_0.01": 0.0037913958526771896
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9990326103916367,
+    "top1_ci95": [
+     0.998658136994851,
+     0.9993602746138243
+    ],
+    "top1_range_over_draws": [
+     0.9989858012170385,
+     0.9990638165080356
+    ],
+    "top1_random_same_queries": 0.9999687938836012,
+    "median_margin": 0.103302001953125,
+    "frac_margin_below_0.01": 0.03456077391168669
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.9941525250460028,
+    "top1_ci95": [
+     0.9921488448170109,
+     0.9959108566755265
+    ],
+    "top1_range_over_draws": [
+     0.9934573706808424,
+     0.9950930280106318
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.016922354698181152,
+    "frac_margin_below_0.01": 0.2989163770190145
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.9941798941798942,
+    "top1_ci95": [
+     0.9921075837742503,
+     0.9960758377425044
+    ],
+    "top1_range_over_draws": [
+     0.9936067019400353,
+     0.9944885361552028
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.015933364629745483,
+    "frac_margin_below_0.01": 0.3097442680776014
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9884099616858237,
+    "top1_ci95": [
+     0.9840972222222221,
+     0.9924329501915707
+    ],
+    "top1_range_over_draws": [
+     0.9870689655172413,
+     0.9904214559386973
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.011118024587631226,
+    "frac_margin_below_0.01": 0.44588122605363983
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9960693641618497,
+    "top1_ci95": [
+     0.9923699421965319,
+     0.9988439306358381
+    ],
+    "top1_range_over_draws": [
+     0.9942196531791907,
+     0.9976878612716763
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.010774493217468262,
+    "frac_margin_below_0.01": 0.47398843930635837
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.988316310739709,
+    "top1_ci95": [
+     0.9864593005261529,
+     0.9900185701021356
+    ],
+    "median_margin": 0.01659148931503296,
+    "frac_margin_below_0.01": 0.326214794181368
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.988316310739709,
+    "top1_ci95": [
+     0.9864593005261529,
+     0.9900185701021356
+    ],
+    "median_margin": 0.01659148931503296,
+    "frac_margin_below_0.01": 0.326214794181368
+   }
+  },
+  "overlap_seed1": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.9999535747446611,
+    "top1_ci95": [
+     0.9998916744042091,
+     1.0
+    ],
+    "top1_range_over_draws": [
+     0.9999226245744351,
+     1.0
+    ],
+    "top1_random_same_queries": 0.9999535747446611,
+    "median_margin": 0.2583235502243042,
+    "frac_margin_below_0.01": 0.0035592695759826677
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9991262287408332,
+    "top1_ci95": [
+     0.9987985645186457,
+     0.9994226868466219
+    ],
+    "top1_range_over_draws": [
+     0.9988297706350445,
+     0.9993758776720237
+    ],
+    "top1_random_same_queries": 0.9999531908254018,
+    "median_margin": 0.10280859470367432,
+    "frac_margin_below_0.01": 0.034950850366671865
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.9946432222449397,
+    "top1_ci95": [
+     0.9928848906154161,
+     0.9962799018605603
+    ],
+    "top1_range_over_draws": [
+     0.9938662850132897,
+     0.9959108566755265
+    ],
+    "top1_random_same_queries": 0.9999591085667553,
+    "median_margin": 0.016987204551696777,
+    "frac_margin_below_0.01": 0.2868534042118176
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.9934303350970017,
+    "top1_ci95": [
+     0.9913139329805998,
+     0.9954585537918871
+    ],
+    "top1_range_over_draws": [
+     0.9925044091710759,
+     0.9942680776014109
+    ],
+    "top1_random_same_queries": 0.9999559082892416,
+    "median_margin": 0.015843570232391357,
+    "frac_margin_below_0.01": 0.30246913580246915
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9908045977011494,
+    "top1_ci95": [
+     0.9871623563218389,
+     0.9943510536398468
+    ],
+    "top1_range_over_draws": [
+     0.9894636015325671,
+     0.9918582375478927
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.011186450719833374,
+    "frac_margin_below_0.01": 0.4521072796934866
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9928323699421965,
+    "top1_ci95": [
+     0.9877456647398845,
+     0.9967630057803468
+    ],
+    "top1_range_over_draws": [
+     0.991907514450867,
+     0.9953757225433526
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.010605812072753906,
+    "frac_margin_below_0.01": 0.46936416184971097
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.9869235530795419,
+    "top1_ci95": [
+     0.9849117920148561,
+     0.9888579387186629
+    ],
+    "median_margin": 0.01653873920440674,
+    "frac_margin_below_0.01": 0.3235066542865986
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.9869235530795419,
+    "top1_ci95": [
+     0.9849117920148561,
+     0.9888579387186629
+    ],
+    "median_margin": 0.01653873920440674,
+    "frac_margin_below_0.01": 0.32358402971216343
+   }
+  },
+  "overlap_seed2": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.9999380996595482,
+    "top1_ci95": [
+     0.9998761993190962,
+     0.999984524914887
+    ],
+    "top1_range_over_draws": [
+     0.9998452491488703,
+     1.0
+    ],
+    "top1_random_same_queries": 0.9999380996595482,
+    "median_margin": 0.2584945857524872,
+    "frac_margin_below_0.01": 0.003946146703806871
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9989858012170385,
+    "top1_ci95": [
+     0.9986269308784523,
+     0.9993134654392262
+    ],
+    "top1_range_over_draws": [
+     0.9987517553440475,
+     0.9993758776720237
+    ],
+    "top1_random_same_queries": 0.9999375877672023,
+    "median_margin": 0.10300517082214355,
+    "frac_margin_below_0.01": 0.03510688094866594
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.9943978736454713,
+    "top1_ci95": [
+     0.9925577591494582,
+     0.9961970967082395
+    ],
+    "top1_range_over_draws": [
+     0.9934573706808424,
+     0.9952974851768555
+    ],
+    "top1_random_same_queries": 0.9999591085667553,
+    "median_margin": 0.016896545886993408,
+    "frac_margin_below_0.01": 0.29339603353097526
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.9932980599647266,
+    "top1_ci95": [
+     0.9911816578483245,
+     0.9953703703703703
+    ],
+    "top1_range_over_draws": [
+     0.9927248677248677,
+     0.9942680776014109
+    ],
+    "top1_random_same_queries": 0.9999559082892416,
+    "median_margin": 0.016048431396484375,
+    "frac_margin_below_0.01": 0.30401234567901236
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9879310344827587,
+    "top1_ci95": [
+     0.9832375478927203,
+     0.992145593869732
+    ],
+    "top1_range_over_draws": [
+     0.9865900383141762,
+     0.9889846743295019
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.011152327060699463,
+    "frac_margin_below_0.01": 0.46024904214559387
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9932947976878612,
+    "top1_ci95": [
+     0.9886705202312139,
+     0.9974566473988439
+    ],
+    "top1_range_over_draws": [
+     0.991907514450867,
+     0.9953757225433526
+    ],
+    "top1_random_same_queries": 1.0,
+    "median_margin": 0.010499835014343262,
+    "frac_margin_below_0.01": 0.46936416184971097
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.9875425564840606,
+    "top1_ci95": [
+     0.9856081708449397,
+     0.9894769421231817
+    ],
+    "median_margin": 0.016498923301696777,
+    "frac_margin_below_0.01": 0.3309346951408233
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.9875425564840606,
+    "top1_ci95": [
+     0.9856081708449397,
+     0.9894769421231817
+    ],
+    "median_margin": 0.016498923301696777,
+    "frac_margin_below_0.01": 0.3309346951408233
+   }
+  },
+  "disjoint_seed0": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.999473847106159,
+    "top1_ci95": [
+     0.9992726709996905,
+     0.9996595481275147
+    ],
+    "top1_range_over_draws": [
+     0.9989167440420922,
+     0.9997678737233054
+    ],
+    "top1_random_same_queries": 0.999473847106159,
+    "median_margin": 0.2532503604888916,
+    "frac_margin_below_0.01": 0.005416279789538843
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9916679669215166,
+    "top1_ci95": [
+     0.990606958963957,
+     0.9927449680137307
+    ],
+    "top1_range_over_draws": [
+     0.9907161803713528,
+     0.9929006085192698
+    ],
+    "top1_random_same_queries": 0.9994694960212201,
+    "median_margin": 0.09911283850669861,
+    "frac_margin_below_0.01": 0.04680917459822125
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.9420568390922102,
+    "top1_ci95": [
+     0.9362911470047024,
+     0.9478654671846248
+    ],
+    "top1_range_over_draws": [
+     0.9413207932938049,
+     0.9435698221222654
+    ],
+    "top1_random_same_queries": 0.9992639542015948,
+    "median_margin": 0.013802766799926758,
+    "frac_margin_below_0.01": 0.39173993048456346
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.9362874779541446,
+    "top1_ci95": [
+     0.9300264550264551,
+     0.9425044091710756
+    ],
+    "top1_range_over_draws": [
+     0.9349647266313933,
+     0.939594356261023
+    ],
+    "top1_random_same_queries": 0.9992063492063492,
+    "median_margin": 0.012625575065612793,
+    "frac_margin_below_0.01": 0.41027336860670194
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9089080459770115,
+    "top1_ci95": [
+     0.897507183908046,
+     0.9200191570881227
+    ],
+    "top1_range_over_draws": [
+     0.9061302681992337,
+     0.9133141762452107
+    ],
+    "top1_random_same_queries": 0.9990421455938697,
+    "median_margin": 0.007962852716445923,
+    "frac_margin_below_0.01": 0.585727969348659
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9206936416184971,
+    "top1_ci95": [
+     0.9047398843930636,
+     0.9364161849710982
+    ],
+    "top1_range_over_draws": [
+     0.915606936416185,
+     0.9260115606936417
+    ],
+    "top1_random_same_queries": 0.9995375722543353,
+    "median_margin": 0.00790947675704956,
+    "frac_margin_below_0.01": 0.6046242774566474
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.9076911173011452,
+    "top1_ci95": [
+     0.9028164654905602,
+     0.9127978953884246
+    ],
+    "median_margin": 0.01298069953918457,
+    "frac_margin_below_0.01": 0.42448158464871555
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.9076137418755803,
+    "top1_ci95": [
+     0.9027390900649953,
+     0.9127205199628597
+    ],
+    "median_margin": 0.01298069953918457,
+    "frac_margin_below_0.01": 0.42448158464871555
+   }
+  },
+  "disjoint_seed1": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.9995512225317239,
+    "top1_ci95": [
+     0.9993809965954813,
+     0.9997214484679665
+    ],
+    "top1_range_over_draws": [
+     0.9993036211699164,
+     0.9997678737233054
+    ],
+    "top1_random_same_queries": 0.9995512225317239,
+    "median_margin": 0.25327181816101074,
+    "frac_margin_below_0.01": 0.0061900340451872485
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9920112342019036,
+    "top1_ci95": [
+     0.9909342331096894,
+     0.9930570291777189
+    ],
+    "top1_range_over_draws": [
+     0.9914183179903261,
+     0.9930566391012638
+    ],
+    "top1_random_same_queries": 0.9995475113122172,
+    "median_margin": 0.09853559732437134,
+    "frac_margin_below_0.01": 0.04782337338118271
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.9417297076262523,
+    "top1_ci95": [
+     0.9360038846861582,
+     0.9474545082805153
+    ],
+    "top1_range_over_draws": [
+     0.9394806787977918,
+     0.943160907789818
+    ],
+    "top1_random_same_queries": 0.9993457370680843,
+    "median_margin": 0.013758420944213867,
+    "frac_margin_below_0.01": 0.39950930280106317
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.937962962962963,
+    "top1_ci95": [
+     0.9317890211640213,
+     0.9446208112874778
+    ],
+    "top1_range_over_draws": [
+     0.9365079365079365,
+     0.9400352733686067
+    ],
+    "top1_random_same_queries": 0.9992945326278659,
+    "median_margin": 0.012782961130142212,
+    "frac_margin_below_0.01": 0.4177689594356261
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9048850574712644,
+    "top1_ci95": [
+     0.8936781609195402,
+     0.916477490421456
+    ],
+    "top1_range_over_draws": [
+     0.899904214559387,
+     0.9094827586206896
+    ],
+    "top1_random_same_queries": 0.9988505747126437,
+    "median_margin": 0.0076992809772491455,
+    "frac_margin_below_0.01": 0.600095785440613
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9234682080924855,
+    "top1_ci95": [
+     0.9079710982658961,
+     0.9382716763005782
+    ],
+    "top1_range_over_draws": [
+     0.9190751445086706,
+     0.9260115606936417
+    ],
+    "top1_random_same_queries": 0.9993063583815028,
+    "median_margin": 0.007591664791107178,
+    "frac_margin_below_0.01": 0.6196531791907515
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.9086969978334881,
+    "top1_ci95": [
+     0.9039770968740328,
+     0.9137264004952027
+    ],
+    "median_margin": 0.01305738091468811,
+    "frac_margin_below_0.01": 0.4270349736923553
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.9086969978334881,
+    "top1_ci95": [
+     0.9039770968740328,
+     0.9137264004952027
+    ],
+    "median_margin": 0.01305738091468811,
+    "frac_margin_below_0.01": 0.4271123491179202
+   }
+  },
+  "disjoint_seed2": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.9995512225317239,
+    "top1_ci95": [
+     0.9993809965954813,
+     0.9997059733828536
+    ],
+    "top1_range_over_draws": [
+     0.9992262457443516,
+     0.9998452491488703
+    ],
+    "top1_random_same_queries": 0.9995512225317239,
+    "median_margin": 0.25425976514816284,
+    "frac_margin_below_0.01": 0.005416279789538843
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.9925729442970822,
+    "top1_ci95": [
+     0.9914495241067249,
+     0.9936031362146981
+    ],
+    "top1_range_over_draws": [
+     0.9919644250273053,
+     0.9932126696832579
+    ],
+    "top1_random_same_queries": 0.9995475113122172,
+    "median_margin": 0.09875598549842834,
+    "frac_margin_below_0.01": 0.04532688406927758
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.945328153751789,
+    "top1_ci95": [
+     0.9393988959313024,
+     0.9509711715395625
+    ],
+    "top1_range_over_draws": [
+     0.9437742792884891,
+     0.9474545082805153
+    ],
+    "top1_random_same_queries": 0.999386628501329,
+    "median_margin": 0.01370394229888916,
+    "frac_margin_below_0.01": 0.39562461664281334
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.9400352733686067,
+    "top1_ci95": [
+     0.9337731481481483,
+     0.9462962962962962
+    ],
+    "top1_range_over_draws": [
+     0.9389329805996472,
+     0.9411375661375662
+    ],
+    "top1_random_same_queries": 0.9993386243386243,
+    "median_margin": 0.012494117021560669,
+    "frac_margin_below_0.01": 0.4182098765432099
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.9054597701149425,
+    "top1_ci95": [
+     0.8933908045977011,
+     0.9171503831417624
+    ],
+    "top1_range_over_draws": [
+     0.9042145593869731,
+     0.9066091954022989
+    ],
+    "top1_random_same_queries": 0.9991379310344828,
+    "median_margin": 0.0077887773513793945,
+    "frac_margin_below_0.01": 0.5948275862068966
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.9220809248554913,
+    "top1_ci95": [
+     0.9054335260115608,
+     0.9378034682080926
+    ],
+    "top1_range_over_draws": [
+     0.9109826589595376,
+     0.9271676300578034
+    ],
+    "top1_random_same_queries": 0.9990751445086705,
+    "median_margin": 0.007558226585388184,
+    "frac_margin_below_0.01": 0.608092485549133
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.9093933766635717,
+    "top1_ci95": [
+     0.9047489167440421,
+     0.9141906530485918
+    ],
+    "median_margin": 0.013036996126174927,
+    "frac_margin_below_0.01": 0.42463633549984525
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.9093933766635717,
+    "top1_ci95": [
+     0.9047489167440421,
+     0.9141906530485918
+    ],
+    "median_margin": 0.013036996126174927,
+    "frac_margin_below_0.01": 0.42463633549984525
+   }
+  },
+  "pattern_only_seed0": {
+   "random": {
+    "n_queries": 12924,
+    "top1": 0.2055865057257815,
+    "top1_ci95": [
+     0.2001698390591148,
+     0.21106507273290007
+    ],
+    "top1_range_over_draws": [
+     0.20365212008666048,
+     0.20829464562055092
+    ],
+    "top1_random_same_queries": 0.2055865057257815,
+    "median_margin": -0.0014854967594146729,
+    "frac_margin_below_0.01": 0.9749303621169917
+   },
+   "same tissue": {
+    "n_queries": 12818,
+    "top1": 0.18690903417069746,
+    "top1_ci95": [
+     0.18161920736464346,
+     0.19215166172569823
+    ],
+    "top1_range_over_draws": [
+     0.18333593384303323,
+     0.1896551724137931
+    ],
+    "top1_random_same_queries": 0.20602278046497113,
+    "median_margin": -0.001549065113067627,
+    "frac_margin_below_0.01": 0.9793259478857856
+   },
+   "same study": {
+    "n_queries": 4891,
+    "top1": 0.046043753833571864,
+    "top1_ci95": [
+     0.040522388059701486,
+     0.051606011040686975
+    ],
+    "top1_range_over_draws": [
+     0.04354937640564302,
+     0.0488652627274586
+    ],
+    "top1_random_same_queries": 0.15420159476589654,
+    "median_margin": -0.0022016167640686035,
+    "frac_margin_below_0.01": 0.9991821713351053
+   },
+   "same study+tissue": {
+    "n_queries": 4536,
+    "top1": 0.0472663139329806,
+    "top1_ci95": [
+     0.04184193121693122,
+     0.052999338624338616
+    ],
+    "top1_range_over_draws": [
+     0.04497354497354497,
+     0.04894179894179894
+    ],
+    "top1_random_same_queries": 0.15070546737213403,
+    "median_margin": -0.002192258834838867,
+    "frac_margin_below_0.01": 0.9991181657848325
+   },
+   "same study+tissue+sex": {
+    "n_queries": 2088,
+    "top1": 0.041379310344827586,
+    "top1_ci95": [
+     0.03362068965517242,
+     0.04904214559386973
+    ],
+    "top1_range_over_draws": [
+     0.040229885057471264,
+     0.04310344827586207
+    ],
+    "top1_random_same_queries": 0.15909961685823754,
+    "median_margin": -0.00219842791557312,
+    "frac_margin_below_0.01": 0.9995210727969349
+   },
+   "same study+tissue+age decade": {
+    "n_queries": 865,
+    "top1": 0.03745664739884393,
+    "top1_ci95": [
+     0.026820809248554914,
+     0.049017341040462424
+    ],
+    "top1_range_over_draws": [
+     0.03352601156069364,
+     0.04046242774566474
+    ],
+    "top1_random_same_queries": 0.12855491329479768,
+    "median_margin": -0.0021546483039855957,
+    "frac_margin_below_0.01": 1.0
+   },
+   "K nearest neighbours of target": {
+    "n_queries": 12924,
+    "top1": 0.007505416279789539,
+    "top1_ci95": [
+     0.0060352831940575676,
+     0.009052924791086351
+    ],
+    "median_margin": -0.002222299575805664,
+    "frac_margin_below_0.01": 0.9997678737233054
+   },
+   "all candidates": {
+    "n_queries": 12924,
+    "top1": 0.004487774682760755,
+    "top1_ci95": [
+     0.0034045187248529867,
+     0.005648406066233364
+    ],
+    "median_margin": -0.003318220376968384,
+    "frac_margin_below_0.01": 0.9997678737233054
+   }
+  }
+ },
+ "inputs": {
+  "emb_dir": "results/pretrained_cls/view_consistency_heldout_full/per_run",
+  "metadata": "pretrain_metadata.csv.gz",
+  "dups": "results/data_audit/heldout_duplicates_flagged_pairs.csv",
+  "negative_seed": 20261018
+ }
+}

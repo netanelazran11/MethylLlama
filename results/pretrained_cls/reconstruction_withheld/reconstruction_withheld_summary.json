@@ -1,47 +1,74 @@
 {
-  "checkpoint": "checkpoints/pretrained/methyllama_pretrained_epoch85.ckpt",
+  "script": "reconstruction_withheld_eval.py",
+  "checkpoint": "methyllama_pretrained_epoch85.ckpt",
   "data": "methylgpt_pretrain_type3.h5ad",
   "split": "test",
-  "n_samples": 5000,
+  "n_profiles": 16912,
+  "subsampled": false,
   "input_ratio": 0.5,
   "seed": 0,
-  "n_withheld_positions_total": 112398044,
+  "n_withheld_positions_total": 380325804,
   "loss_mask": "valid & ~input (measured CpGs withheld from encoder input only)",
-  "b_mean_source": "per-CpG mean over the evaluated cohort's withheld positions (advantages the baseline -- conservative for the model)",
-  "pearson_withheld_obs_vs_pred": 0.9721050547282144,
+  "b_mean_source": "per-CpG mean over the evaluated cohort's withheld positions (advantages the baseline)",
+  "pearson_withheld_all_positions": 0.9727994269789563,
+  "pearson_withheld_cpg_centred_all_positions": 0.9075901500779257,
   "normalized_mse_model": {
-    "mean": 0.05252248174892738,
-    "median": 0.023572283796966076
+    "mean": 0.051961183250024204,
+    "median": 0.023257846012711525
+  },
+  "hist2d": {
+    "bins": 200,
+    "range": [
+      0,
+      1
+    ],
+    "total_count": 380325804
   },
   "raw_mse_model": {
-    "mean": 0.005628730170428753,
-    "median": 0.0025151579175144434,
-    "std": 0.006916692014783621,
-    "p10": 0.001248769019730389,
-    "p90": 0.014571388345211751
+    "mean": 0.005512589123100042,
+    "median": 0.0024862615391612053,
+    "std": 0.006634748540818691,
+    "p05": 0.0010808864200953395,
+    "p10": 0.0012295590480789543,
+    "p25": 0.0015807129966560751,
+    "p75": 0.00731833535246551,
+    "p90": 0.014081327058374879,
+    "p95": 0.018877586908638475
   },
   "raw_mse_b_mean": {
-    "mean": 0.030611395835876465,
-    "median": 0.024327192455530167,
-    "std": 0.02220522239804268,
-    "p10": 0.012442880775779486,
-    "p90": 0.0553084220737219
+    "mean": 0.030650146305561066,
+    "median": 0.024349765852093697,
+    "std": 0.02323129028081894,
+    "p05": 0.010468274913728237,
+    "p10": 0.012247784063220024,
+    "p25": 0.01587667502462864,
+    "p75": 0.037468234077095985,
+    "p90": 0.054894718900322916,
+    "p95": 0.07068940177559851
   },
   "raw_mse_b_shuffle": {
-    "mean": 0.05519001558423042,
-    "median": 0.050850287079811096,
-    "std": 0.035331375896930695,
-    "p10": 0.014442071318626406,
-    "p90": 0.09805932864546776
+    "mean": 0.055289313197135925,
+    "median": 0.05115748941898346,
+    "std": 0.036054592579603195,
+    "p05": 0.007543237740173936,
+    "p10": 0.013847974408417944,
+    "p25": 0.03035507583990693,
+    "p75": 0.07291590794920921,
+    "p90": 0.09740000590682028,
+    "p95": 0.11816330328583714
   },
   "raw_mse_b_random": {
-    "mean": 0.05050874501466751,
-    "median": 0.047051046043634415,
-    "std": 0.022865470498800278,
-    "p10": 0.028228152357041836,
-    "p90": 0.07392587363719941
+    "mean": 0.050655610859394073,
+    "median": 0.047131478786468506,
+    "std": 0.023995285853743553,
+    "p05": 0.0234518826007843,
+    "p10": 0.028054843097925188,
+    "p25": 0.036687872372567654,
+    "p75": 0.05931765399873257,
+    "p90": 0.07414520829916,
+    "p95": 0.08745238482952114
   },
-  "ratio_model_vs_b_mean": 0.18387694656848907,
-  "ratio_model_vs_b_shuffle": 0.10198819637298584,
-  "ratio_model_vs_b_random": 0.11144070327281952
+  "ratio_model_vs_b_mean": 0.17985522747039795,
+  "ratio_model_vs_b_shuffle": 0.09970442205667496,
+  "ratio_model_vs_b_random": 0.10882484912872314
 }

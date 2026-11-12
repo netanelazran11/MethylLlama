@@ -1,0 +1,132 @@
+{
+  "as_reported": {
+    "n_profiles": 10988,
+    "age_probe": {
+      "r2": 0.866,
+      "medae": 5.18,
+      "n_fit": 8724,
+      "n_eval": 2264
+    },
+    "tissue_probe": {
+      "balanced_acc": 0.936,
+      "n_classes": 37,
+      "n_eval": 2197
+    },
+    "dataset_probe": {
+      "balanced_acc": 0.956,
+      "n_classes": 85,
+      "n_eval": 2006
+    },
+    "neighbours_10": {
+      "both": 84.6,
+      "tissue_only": 7.5,
+      "dataset_only": 1.5
+    },
+    "lodo": {
+      "in_distribution_r2": 0.856,
+      "n_studies": 11,
+      "median_r2": 0.261,
+      "median_medae": 8.32,
+      "negative_r2": 3,
+      "studies": {
+        "E-GEOD-36194": 0.607,
+        "GSE41037": 0.622,
+        "E-GEOD-40279": 0.203,
+        "TCGA_KIRC": 0.261,
+        "GSE42861": 0.68,
+        "E-GEOD-56105": -4.63,
+        "E-GEOD-64511": 0.068,
+        "E-GEOD-53740": -0.529,
+        "GSE15745": 0.791,
+        "GSE34035": 0.422,
+        "TCGA_BRCA": -0.257
+      }
+    }
+  },
+  "no_56105": {
+    "n_profiles": 10706,
+    "age_probe": {
+      "r2": 0.867,
+      "medae": 5.18,
+      "n_fit": 8442,
+      "n_eval": 2264
+    },
+    "tissue_probe": {
+      "balanced_acc": 0.934,
+      "n_classes": 37,
+      "n_eval": 2197
+    },
+    "dataset_probe": {
+      "balanced_acc": 0.954,
+      "n_classes": 84,
+      "n_eval": 2006
+    },
+    "neighbours_10": {
+      "both": 84.1,
+      "tissue_only": 7.7,
+      "dataset_only": 1.5
+    },
+    "lodo": {
+      "in_distribution_r2": 0.877,
+      "n_studies": 10,
+      "median_r2": 0.294,
+      "median_medae": 7.55,
+      "negative_r2": 2,
+      "studies": {
+        "E-GEOD-36194": 0.609,
+        "GSE41037": 0.628,
+        "E-GEOD-40279": 0.216,
+        "TCGA_KIRC": 0.208,
+        "GSE42861": 0.676,
+        "E-GEOD-64511": 0.086,
+        "E-GEOD-53740": -0.495,
+        "GSE15745": 0.784,
+        "GSE34035": 0.372,
+        "TCGA_BRCA": -0.161
+      }
+    }
+  },
+  "no_56105_dedup": {
+    "n_profiles": 10635,
+    "age_probe": {
+      "r2": 0.868,
+      "medae": 5.17,
+      "n_fit": 8387,
+      "n_eval": 2248
+    },
+    "tissue_probe": {
+      "balanced_acc": 0.95,
+      "n_classes": 37,
+      "n_eval": 2183
+    },
+    "dataset_probe": {
+      "balanced_acc": 0.958,
+      "n_classes": 83,
+      "n_eval": 1982
+    },
+    "neighbours_10": {
+      "both": 84.5,
+      "tissue_only": 7.6,
+      "dataset_only": 1.4
+    },
+    "lodo": {
+      "in_distribution_r2": 0.882,
+      "n_studies": 10,
+      "median_r2": 0.289,
+      "median_medae": 7.86,
+      "negative_r2": 3,
+      "studies": {
+        "E-GEOD-36194": 0.608,
+        "GSE41037": 0.605,
+        "E-GEOD-40279": 0.21,
+        "TCGA_KIRC": 0.204,
+        "GSE42861": 0.675,
+        "E-GEOD-53740": -0.502,
+        "E-GEOD-64511": -0.08,
+        "GSE15745": 0.782,
+        "GSE34035": 0.369,
+        "TCGA_BRCA": -0.174
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 """
-Bonus 1 — CLS visualization (PCA + UMAP) colored by age / tissue / sex / dataset.
+visualize_cls.py — CLS visualization (PCA + UMAP) colored by age / tissue / sex / dataset.
 
 Pure post-processing on the saved matrices from extract_pretrain_cls.py — no GPU,
 no checkpoint. Answers "does the CLS space cluster by biology?" visually.

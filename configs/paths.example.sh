@@ -8,6 +8,9 @@
 #   ${METHYLLAMA_DATA}/data_methyl_pretrain_type3_h5ad/probe_ids_type3_pretrain.csv
 #   ${METHYLLAMA_DATA}/data_methyl_21k_h5ad/altumage_21k_3way.h5ad
 #   ${METHYLLAMA_DATA}/manifests/HM450.hg38.manifest.tsv
+#   ${METHYLLAMA_DATA}/pretrain_metadata.csv.gz   annotations that accompany the pretraining corpus
+#                                                (study, tissue, sex, age, PATIENT_ID; data audit and
+#                                                hard-negative analysis only)
 export METHYLLAMA_DATA="${METHYLLAMA_DATA:-/path/to/data}"
 
 # MethylGPT comparison (scripts/methylgpt/; see its README). METHYLGPT_DATA holds the MethylGPT

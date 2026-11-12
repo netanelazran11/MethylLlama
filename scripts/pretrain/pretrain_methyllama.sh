@@ -26,8 +26,6 @@ set -euo pipefail
 #   CpGs sorted by chromosomal position in each sequence → RoPE encodes
 #   true genomic proximity rather than arbitrary probe-ID order.
 #   Requires cpg_genomic_rank.npy (produced by sort_probes_genomic.sh).
-#
-# Baseline: pretrain_llama_small.sh → job 44450919, epoch=98, val_loss=0.0059
 # ─────────────────────────────────────────────────────────────────────────────
 
 REPO="${METHYLLAMA_REPO:-${SLURM_SUBMIT_DIR:-$(pwd)}}"

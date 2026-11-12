@@ -1,0 +1,37 @@
+{
+  "n_shared_cpgs": 19608,
+  "reference_profiles": 5000,
+  "r_ref_all_profiles": {
+    "p01": 0.0018295316136515988,
+    "p05": 0.7478313064138759,
+    "median": 0.9645256194717989
+  },
+  "profiles_r_ref_below_0.8": 748,
+  "studies_with_median_r_ref_below_0.8": [
+    "E-GEOD-56105",
+    "E-GEOD-71678",
+    "E-GEOD-75248",
+    "E-GEOD-64096",
+    "E-GEOD-47627"
+  ],
+  "profiles_with_corpus_copy": 9212,
+  "copies_r_below_0.9": 290,
+  "copies_r_below_0.9_by_study": {
+    "E-GEOD-56105": 282,
+    "E-GEOD-36194": 2,
+    "E-GEOD-58119": 2,
+    "GSE41037": 2,
+    "E-GEOD-72556": 1,
+    "GSE20067": 1
+  },
+  "column_map": {
+    "study": "E-GEOD-56105",
+    "profiles_used": 282,
+    "downstream_cpgs_with_best_r_above_0.95": 0,
+    "downstream_cpgs": 21368,
+    "best_partner_is_the_same_named_cpg": 0,
+    "median_r_with_same_named_cpg": 0.0025392284151166677,
+    "median_best_r": NaN,
+    "distinct_best_partners": 1
+  }
+}

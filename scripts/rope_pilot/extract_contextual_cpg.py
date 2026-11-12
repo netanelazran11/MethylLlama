@@ -11,14 +11,14 @@ so all CpGs present, sorted by genomic rank → sequence position i is the SAME 
 for every sample). Average last_hidden_state at each CpG position across samples
 → one contextualized embedding per CpG. This is what Fig 2 UMAPs.
 
-Outputs (--outdir, default results/cpg_context/):
+Outputs (--outdir, default outputs/ablation_rope/cpg_context/; the run scripts use cpg_context_A/B):
   contextual_cpg_emb.npy   mean contextualized CpG embedding [n_cpg, 256]
   cpg_order.csv            sequence-position → cpg_name → genomic_rank (join key)
 
 Run on cluster (GPU):
   python scripts/rope_pilot/extract_contextual_cpg.py \
      --checkpoint checkpoints/pretrained/methyllama_pretrained_epoch85.ckpt --data <h5ad> --tokenizer <tok> \
-     --genomic_rank <rank.npy> --max_samples 512 --outdir results/cpg_context
+     --genomic_rank <rank.npy> --max_samples 512 --outdir outputs/ablation_rope/cpg_context
 """
 
 import argparse
@@ -37,7 +37,7 @@ def parse_args():
     p.add_argument("--data", required=True)
     p.add_argument("--tokenizer", required=True)
     p.add_argument("--genomic_rank", required=True)
-    p.add_argument("--outdir", default="results/cpg_context")
+    p.add_argument("--outdir", default="outputs/ablation_rope/cpg_context")
     p.add_argument("--max_samples", type=int, default=512)
     p.add_argument("--batch_size", type=int, default=16)
     p.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")

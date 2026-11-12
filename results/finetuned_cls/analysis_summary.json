@@ -1,0 +1,61 @@
+{
+  "checkpoint": "checkpoints/finetuned_age/fold4.ckpt",
+  "n_samples": 10988,
+  "cpg_embedding_matrix_shape": [
+    49161,
+    256
+  ],
+  "geometry_cls": {
+    "mean_l2_norm": 10.207443237304688,
+    "effective_rank": 27.24,
+    "top1_sv_frac": 0.1943,
+    "top10_sv_frac": 0.6905,
+    "anisotropy_mean_cos": 0.3477,
+    "dead_dims_lt1pct": 0
+  },
+  "geometry_mean": {
+    "mean_l2_norm": 4.574574947357178,
+    "effective_rank": 3.99,
+    "top1_sv_frac": 0.6011,
+    "top10_sv_frac": 0.98,
+    "anisotropy_mean_cos": 0.8414,
+    "dead_dims_lt1pct": 0
+  },
+  "age_probe_cls": {
+    "linear_ridge_r2": 0.938,
+    "linear_ridge_medae": 3.33,
+    "replica_head_r2": 0.943,
+    "replica_head_medae": 3.03,
+    "n_train": 8724,
+    "n_test": 2264
+  },
+  "age_probe_mean": {
+    "linear_ridge_r2": 0.856,
+    "linear_ridge_medae": 5.55,
+    "replica_head_r2": 0.907,
+    "replica_head_medae": 3.85,
+    "n_train": 8724,
+    "n_test": 2264
+  },
+  "age_head_actual": {
+    "n_test": 2264,
+    "medae": 2.9508,
+    "mae": 4.286,
+    "r2": 0.9421,
+    "note": "compare against this fold's WandB test/medae, test/mae, test/r2 \u2014 should match closely (extraction correctness gate)"
+  },
+  "class_probes_cls": {
+    "tissue_type": {
+      "balanced_acc": 0.93,
+      "n_classes": 37,
+      "chance": 0.027,
+      "n_test": 2197
+    },
+    "dataset": {
+      "balanced_acc": 0.949,
+      "n_classes": 85,
+      "chance": 0.012,
+      "n_test": 2006
+    }
+  }
+}

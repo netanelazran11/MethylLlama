@@ -4,10 +4,10 @@ Run B (arbitrary/sequential positions), same 5,000-sample subset, same
 architecture, same hyperparameters, checkpoints picked by lowest
 reconstruction loss for each.
 
-Reuses the exact distance-sampling method from analyze_cpg_genomic_locality.py
-(validated earlier against the production model's known result), applied to
-both ablation runs' contextualized CpG embeddings so the two curves are
-computed identically and are directly comparable.
+Uses one distance-sampling method for both ablation runs' contextualized CpG
+embeddings, so the two curves are computed identically and are directly
+comparable (Supplementary Note 1). Writes rope_ablation_summary.json and
+rope_ablation_curve_{A,B}.csv to outputs/ablation_rope/ (shipped in results/rope_pilot/).
 
 Usage:
   python scripts/rope_pilot/analyze_rope_ablation_comparison.py

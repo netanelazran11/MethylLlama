@@ -32,8 +32,8 @@ One (condition, seed) per invocation, so the runs can be a SLURM array.
 `--merge` combines the per-run files into one summary; it imports neither torch
 nor the model and can run on the login node.
 
-INFERENCE ONLY. Same checkpoint and the same encode_views() as
-view_design_eval.py. Writes only under --outdir.
+INFERENCE ONLY. The two views are built and encoded by view_encoding.encode_views().
+Writes only under --outdir.
 """
 import argparse
 import json
@@ -85,7 +85,7 @@ def encode(a):
     import torch
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
-    from view_design_eval import encode_views                      # identical encoder call
+    from view_encoding import encode_views                         # shared view construction + encoder call
     from bmfm_targets.tokenization import MultiFieldTokenizer
     from bmfm_methylation.shared.data_module import MethylationDataset
     from bmfm_methylation.llama.finetune_llama import load_wced_llama_checkpoint

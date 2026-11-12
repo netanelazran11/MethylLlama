@@ -1,0 +1,65 @@
+{
+  "criterion": {
+    "mean_abs_diff_max": 0.005,
+    "pearson_r_min": 0.9999
+  },
+  "n_shared_cpgs": 19608,
+  "downstream_tcga_profiles": 976,
+  "with_a_corpus_profile_of_the_same_participant": 623,
+  "same_measurement_found_in_corpus": 0,
+  "same_measurement_found_in_pretraining_train": 0,
+  "same_measurement_by_corpus_sample_type": {},
+  "calibration_pairs_called_same_measurement": 0,
+  "different participant (calibration) | corpus sample type 11": {
+    "pairs": 976,
+    "pearson_r": {
+      "min": 0.6586713454770113,
+      "median": 0.9551030998698131,
+      "max": 0.9927058880979455
+    },
+    "mean_abs_diff": {
+      "min": 0.025897914439539326,
+      "median": 0.05870183205210934,
+      "max": 0.1590329433595735
+    }
+  },
+  "same participant | corpus sample type 01": {
+    "pairs": 583,
+    "pearson_r": {
+      "min": 0.7438340682276294,
+      "median": 0.9411678099559503,
+      "max": 0.990018576796609
+    },
+    "mean_abs_diff": {
+      "min": 0.027379834147985706,
+      "median": 0.06544673806309077,
+      "max": 0.1599726225959801
+    }
+  },
+  "same participant | corpus sample type 06": {
+    "pairs": 4,
+    "pearson_r": {
+      "min": 0.7584964780732502,
+      "median": 0.9145373898246604,
+      "max": 0.9632934314734405
+    },
+    "mean_abs_diff": {
+      "min": 0.04969490662781453,
+      "median": 0.08279328617411424,
+      "max": 0.11928181925550711
+    }
+  },
+  "same participant | corpus sample type 11": {
+    "pairs": 566,
+    "pearson_r": {
+      "min": 0.9847065216316514,
+      "median": 0.9937756283595679,
+      "max": 0.9973306094877834
+    },
+    "mean_abs_diff": {
+      "min": 0.013918974298838361,
+      "median": 0.021938759992665445,
+      "max": 0.032361428381695666
+    }
+  }
+}

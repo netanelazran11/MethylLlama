@@ -1,28 +1,26 @@
 #!/bin/bash -l
-#SBATCH --job-name=recon-withheld-eval
+#SBATCH --job-name=recon-withheld
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
-#SBATCH --time=4:00:00
-
+#SBATCH --mem=128G
+#SBATCH --time=8:00:00
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 # SLURM partition is site-specific: add one if your cluster requires it.
 # Resources used for the manuscript run (authors' cluster): --partition=salmon --gres=gpu:l40s:1
-
 # ─────────────────────────────────────────────────────────────────────────────
-# Canonical withheld-CpG reconstruction eval (Figure 2C/2D + Supp S3).
-# Replaces the legacy reconstruction_baselines run, which used the wrong
-# checkpoint, input_ratio=1.0 (no withheld CpGs), and no genomic position_ids.
+# Withheld-CpG reconstruction on ALL 16,912 held-out pretraining profiles, with Pearson r and the
+# observed-vs-predicted histogram over ALL withheld positions (Fig. 2c, Supplementary Fig. S1c).
+# Inference only. Writes to results/pretrained_cls/reconstruction_withheld/; then run
+#   python scripts/evaluation/reconstruction_paired_bootstrap.py
+# for the paired bootstrap intervals (CPU, about a minute).
 #
-# Also prints the pretraining h5ad's total row count + split sizes, to close
-# the manuscript's "verify 169,120" todo in the same job.
-#
-# Usage: sbatch scripts/evaluation/run_reconstruction_withheld.sh
+# Usage:   sbatch scripts/evaluation/run_reconstruction_withheld.sh
+# Smoke test first (about 10 min): sbatch --export=ALL,SMOKE=1 scripts/evaluation/run_reconstruction_withheld.sh
+#          -> first 320 profiles only, written to a separate *_smoke folder.
 # ─────────────────────────────────────────────────────────────────────────────
-
 set -euo pipefail
 
 REPO="${METHYLLAMA_REPO:-${SLURM_SUBMIT_DIR:-$(pwd)}}"
@@ -33,8 +31,8 @@ DATA="${METHYLLAMA_DATA}/data_methyl_pretrain_type3_h5ad/methylgpt_pretrain_type
 TOKENIZER="${REPO}/tokenizer"
 GENOMIC_RANK="${REPO}/resources/cpg_genomic_rank.npy"
 OUTDIR="${REPO}/results/pretrained_cls/reconstruction_withheld"
-SPLIT="${SPLIT:-test}"
-MAX_SAMPLES="${MAX_SAMPLES:-5000}"
+EXPECTED_N=16912
+SMOKE="${SMOKE:-0}"
 
 cd "${REPO}"
 methyllama_env   # environment setup, defined in configs/paths.sh
@@ -42,37 +40,43 @@ export PYTHONPATH="${REPO}:${PYTHONPATH:-}"
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 
-[ -f "${CKPT}" ]         || { echo "ERROR: checkpoint not found: ${CKPT}"; exit 1; }
-[ -f "${DATA}" ]         || { echo "ERROR: pretrain h5ad not found: ${DATA}"; exit 1; }
-[ -f "${GENOMIC_RANK}" ] || { echo "ERROR: genomic rank not found: ${GENOMIC_RANK}"; exit 1; }
+for f in "${CKPT}" "${DATA}" "${GENOMIC_RANK}"; do
+    [ -f "${f}" ] || { echo "ERROR: not found: ${f}"; exit 1; }
+done
+[ -d "${TOKENIZER}" ] || { echo "ERROR: tokenizer not found: ${TOKENIZER}"; exit 1; }
 
-echo "============================================================"
-echo "Withheld-CpG reconstruction eval (canonical ep85 checkpoint)"
-echo "Job: ${SLURM_JOB_ID}  Host: $(hostname)  Time: $(date)"
-echo "Split: ${SPLIT}  Max samples: ${MAX_SAMPLES}"
-echo "============================================================"
-
-# ── Manuscript verification: total pretraining corpus size + split counts ────
-python - <<'PY'
-import anndata
-a = anndata.read_h5ad(
-    "${METHYLLAMA_DATA}/data_methyl_pretrain_type3_h5ad/methylgpt_pretrain_type3.h5ad",
-    backed="r",
-)
-print(f"PRETRAIN H5AD VERIFICATION: n_obs={a.n_obs:,}  n_vars={a.n_vars:,}")
-if "split" in a.obs.columns:
-    print("  split counts:", a.obs["split"].value_counts().to_dict())
-else:
-    print("  NOTE: no 'split' column; columns =", list(a.obs.columns))
+SCRIPT="scripts/evaluation/reconstruction_withheld_eval.py"
+if [ "${SMOKE}" = "1" ]; then
+    # smoke: first 320 profiles only, own folder, no population check -- verifies the code path, not results
+    OUTDIR="${OUTDIR}_smoke"
+    python - <<PY
+import runpy, sys
+from bmfm_methylation.shared import data_module as dm
+_orig = dm.MethylationDataset.__len__
+dm.MethylationDataset.__len__ = lambda self: min(320, _orig(self))
+sys.argv = ["${SCRIPT}", "--checkpoint", "${CKPT}", "--data", "${DATA}", "--tokenizer", "${TOKENIZER}",
+            "--genomic_rank", "${GENOMIC_RANK}", "--split", "test", "--expected_n", "0", "--outdir", "${OUTDIR}"]
+runpy.run_path("${SCRIPT}", run_name="__main__")
 PY
+    echo "SMOKE DONE: $(date)  -> ${OUTDIR}"
+    exit 0
+fi
 
-python scripts/evaluation/reconstruction_withheld_eval.py \
+echo "============================================================"
+echo "Withheld-CpG reconstruction, ALL held-out profiles (expected ${EXPECTED_N})"
+echo "Job: ${SLURM_JOB_ID:-local}  Host: $(hostname)  Time: $(date)"
+echo "Output: ${OUTDIR}"
+echo "============================================================"
+
+python "${SCRIPT}" \
     --checkpoint "${CKPT}" \
     --data "${DATA}" \
     --tokenizer "${TOKENIZER}" \
     --genomic_rank "${GENOMIC_RANK}" \
-    --split "${SPLIT}" \
-    --max_samples "${MAX_SAMPLES}" \
+    --split test \
+    --expected_n "${EXPECTED_N}" \
     --outdir "${OUTDIR}"
+
+python scripts/evaluation/reconstruction_paired_bootstrap.py --dir "${OUTDIR}"
 
 echo "DONE: $(date)"

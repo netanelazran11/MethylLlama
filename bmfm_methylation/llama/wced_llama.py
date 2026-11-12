@@ -1,8 +1,8 @@
 """
 WCED Training Module for MethylLlama.
 
-Mirrors WCEDTrainingModule (bmfm_methylation/wced_module.py) but uses
-MethylLlamaModel instead of SCBertModel.
+Mirrors the WCED training module of the authors' earlier BMFM-RNA-based (SCBert) methylation
+model, which is not part of this release, but uses MethylLlamaModel instead of SCBertModel.
 
 Key simplifications vs the original:
   - No monkey-patching: cpg_scale and ScaleAdaptEncoder are built into MethylLlamaEmbeddings

@@ -1,0 +1,96 @@
+{
+  "n_boot": 10000,
+  "seed": 0,
+  "test_profiles_with_individual_identifier": 549,
+  "test_profiles_sharing_an_individual_with_development": 33,
+  "individuals_with_more_than_one_test_profile": 16,
+  "test_profiles_of_such_individuals": 34,
+  "table_1_profile_bootstrap": {
+    "n": 2149,
+    "medae": {
+      "estimate": 0.5885211211641277,
+      "ci_95": [
+        0.33797941374151214,
+        0.8148861300824755
+      ],
+      "excludes_zero": true
+    },
+    "mae": {
+      "estimate": 0.7725247082598816,
+      "ci_95": [
+        0.5831048868590725,
+        0.9682528399092167
+      ],
+      "excludes_zero": true
+    },
+    "r2": {
+      "estimate": 0.025445460217961235,
+      "ci_95": [
+        0.01834180019916478,
+        0.03294977467160019
+      ],
+      "excludes_zero": true
+    }
+  },
+  "A_donor_disjoint_test_set": {
+    "n": 2116,
+    "medae": {
+      "estimate": 0.5676823813449907,
+      "ci_95": [
+        0.2994768201611174,
+        0.7843310152645101
+      ],
+      "excludes_zero": true
+    },
+    "mae": {
+      "estimate": 0.7409431607690955,
+      "ci_95": [
+        0.5468450004052153,
+        0.9361572297893604
+      ],
+      "excludes_zero": true
+    },
+    "r2": {
+      "estimate": 0.024981013489409842,
+      "ci_95": [
+        0.01766827945912127,
+        0.0326701161115723
+      ],
+      "excludes_zero": true
+    }
+  },
+  "B_study_cluster_bootstrap": {
+    "n": 2149,
+    "n_studies": 77,
+    "medae": {
+      "estimate": 0.5885211211641277,
+      "ci_95": [
+        0.30245025295073824,
+        0.8498680662995116
+      ],
+      "excludes_zero": true
+    },
+    "mae": {
+      "estimate": 0.7725247082598816,
+      "ci_95": [
+        0.5262801404574422,
+        1.1456065833232087
+      ],
+      "excludes_zero": true
+    },
+    "r2": {
+      "estimate": 0.025445460217961235,
+      "ci_95": [
+        0.014232590886471564,
+        0.04556725475331052
+      ],
+      "excludes_zero": true
+    }
+  },
+  "per_study": {
+    "studies": 77,
+    "studies_with_lower_mae_for_methyllama": 61,
+    "studies_n_ge_10": 50,
+    "studies_n_ge_10_with_lower_mae_for_methyllama": 41
+  }
+}

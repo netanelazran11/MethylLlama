@@ -1,0 +1,34 @@
+{
+ "embedding": "results/pretrained_cls/embeddings_cls.npy",
+ "k": 10,
+ "rule": "tissues with >= 2 studies of >= 100 profiles; E-GEOD-56105 excluded",
+ "tissues": {
+  "blood cord": {
+   "n_profiles": 838,
+   "n_studies": 11,
+   "same_study_fraction": 0.8532219570405728,
+   "chance": 0.1547805407994799,
+   "matched_same_study_fraction": 0.8225602027883396,
+   "matched_chance": 0.2906026067216724,
+   "matched_n_queries": 789
+  },
+  "blood whole": {
+   "n_profiles": 2807,
+   "n_studies": 31,
+   "same_study_fraction": 0.8516565728535803,
+   "chance": 0.07715539579927079,
+   "matched_same_study_fraction": 0.7870391061452513,
+   "matched_chance": 0.2296583095731686,
+   "matched_n_queries": 2685
+  },
+  "placenta": {
+   "n_profiles": 637,
+   "n_studies": 11,
+   "same_study_fraction": 0.8623233908948195,
+   "chance": 0.20561693472744688,
+   "matched_same_study_fraction": 0.8620560747663552,
+   "matched_chance": 0.3920071967614573,
+   "matched_n_queries": 535
+  }
+ }
+}

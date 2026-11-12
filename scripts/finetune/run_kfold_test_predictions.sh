@@ -15,7 +15,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Per-sample test predictions for one MethylLlama k-fold checkpoint, for a paired
 # subject-level bootstrap comparison against MethylGPT (extracted separately
-# in the MethylGPT-thesis repo, same fixed 2,149-sample test set, joined by
+# with scripts/methylgpt/, same fixed 2,149-sample test set, joined by
 # real GSM sample ID). Inference-only, isolated script -- does not modify or
 # resubmit any training job.
 #

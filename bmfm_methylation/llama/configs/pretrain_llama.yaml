@@ -5,9 +5,6 @@
 #   - Level 2 Genomic RoPE: CpGs sorted + positioned by chromosomal rank
 #   - Pure reconstruction primary loss, no age auxiliary
 #   - 6L × 256D × 4H encoder (~3.9M params), FFN=512
-#
-# Baseline (pure reconstruction, no contrastive):
-#   pretrain_llama_small.sh → job 44450919, epoch=98, val_loss=0.0059
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Pretraining mode

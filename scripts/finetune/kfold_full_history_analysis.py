@@ -3,7 +3,8 @@
 kfold_full_history_analysis.py
 ===============================
 Full-history analysis of the MethylLlama pretrain -> 5-fold finetune pipeline,
-compared against the MethylGPT 21k baseline (see docs/presentations/methylgpt_21k_baseline.md).
+with an earlier single-split MethylGPT 21k reference run drawn as a reference line in the diagnostic
+plots only (the manuscript's MethylGPT comparison is the five-fold benchmark in results/age_benchmark/).
 
 Produces:
   - Pretrain curve (encoder recon loss / PCC) for the winning MethylLlama WCED run
@@ -54,11 +55,7 @@ FOLD_TESTEVAL_RUNS = {
     4: "7e1cb9bw",   # fold4-testeval (standalone testeval_kfold.sh, job 45633084)
 }
 
-METHYLGPT_TRAJECTORY_CSV = Path("docs/presentations/methylgpt_21k_trajectory.csv")
-if not METHYLGPT_TRAJECTORY_CSV.exists():
-    METHYLGPT_TRAJECTORY_CSV = Path("../docs/presentations/methylgpt_21k_trajectory.csv")
-
-MethylGPT_BASELINE = {"medae": 3.839, "mae": 5.521, "r2": 0.9044}  # best-val_medae ckpt (epoch 253), see methylgpt_21k_baseline.md
+MethylGPT_BASELINE = {"medae": 3.839, "mae": 5.521, "r2": 0.9044}  # earlier single-split MethylGPT 21k run, best-val_medae ckpt (epoch 253); diagnostic plots only
 
 FOLD_COLORS = {0: "#4DBBD5", 1: "#00A087", 2: "#3C5488", 3: "#F39B7F", 4: "#8491B4"}
 

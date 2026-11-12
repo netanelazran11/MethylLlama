@@ -41,7 +41,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers.modeling_outputs import BaseModelOutputWithPoolingAndCrossAttentions
 
-# ScaleAdaptEncoder lives in the parent package (bmfm_methylation/scale_adapt.py)
+# ScaleAdaptEncoder lives in this package (bmfm_methylation/llama/scale_adapt.py)
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -439,7 +439,7 @@ class MethylLlamaEmbeddings(nn.Module):
         # CpG site identity embeddings
         self.cpg_sites_embeddings = nn.Embedding(config.vocab_size, config.hidden_size)
 
-        # Beta value encoder: ScaleAdaptEncoder (from bmfm_methylation/scale_adapt.py)
+        # Beta value encoder: ScaleAdaptEncoder (from bmfm_methylation/llama/scale_adapt.py)
         # zero_as_special_token=False: beta=0 is real (unmethylated CpG), beta<0 is special
         self.beta_values_embeddings = ScaleAdaptEncoder(
             hidden_size=config.hidden_size,

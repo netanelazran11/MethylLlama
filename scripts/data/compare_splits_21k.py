@@ -9,9 +9,17 @@ Same logic as compare_splits.py (19k), adapted for the 21k dataset:
 
 Verifies both models used identical valid & test sets → fair comparison.
 
-Usage on cluster:
-  cd <repository root>
-  source bmfm_methyl_env/bin/activate
+Scope: these checks were written for the earlier single-split MethylGPT run on the original
+three-way partition of altumage_21k_3way.h5ad, before the five-fold benchmark. GPT_YAML points to
+that run's MethylGPT config (train_methylgpt_21k_altumage.yml in the MethylGPT checkout), which is
+not shipped; without it the YAML step is skipped (compare_splits_21k.py then tries its fallback
+parquet directories) and the remaining checks still run. For the
+five-fold benchmark of the manuscript, the same-sample checks are
+scripts/evaluation/paired_bootstrap_comparison.py (both models joined on all 2,149 test sample ids,
+true ages identical), scripts/methylgpt/validate_kfold_predictions.py and
+scripts/baselines/verify_elasticnet_test_set.py.
+
+Usage (from the repository root, with configs/paths.sh sourced):
   python scripts/data/compare_splits_21k.py
 """
 

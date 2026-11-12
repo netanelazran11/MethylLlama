@@ -1,0 +1,26 @@
+{
+ "Per-CpG mean": {
+  "mean_diff": 0.02514,
+  "ci95": [
+   0.02484,
+   0.02543
+  ],
+  "frac_profiles_control_worse": 1.0
+ },
+ "Shuffled CLS": {
+  "mean_diff": 0.04978,
+  "ci95": [
+   0.04927,
+   0.05028
+  ],
+  "frac_profiles_control_worse": 0.9687
+ },
+ "Random CLS": {
+  "mean_diff": 0.04514,
+  "ci95": [
+   0.04482,
+   0.04547
+  ],
+  "frac_profiles_control_worse": 1.0
+ }
+}

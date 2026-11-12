@@ -1,0 +1,333 @@
+{
+  "pretraining": {
+    "n_profiles": 169120,
+    "unique_sample_ids": 169120,
+    "partition": {
+      "train": 135296,
+      "heldout": 16912,
+      "valid": 16912
+    },
+    "source_by_id_prefix": {
+      "GSM": 158534,
+      "TCGA": 9039,
+      "TWPID": 648,
+      "TARGET": 381,
+      "X": 288,
+      "ENCSR": 154,
+      "HPSI": 54,
+      "other": 22
+    },
+    "annotation_coverage": {
+      "profiles_with_any_annotation": 136860,
+      "with_tissue": 129373,
+      "with_study": 136860,
+      "with_age": 64741,
+      "with_sex": 93563,
+      "with_patient_id": 25479,
+      "with_individual_identifier_any_source": 34953,
+      "with_reliable_individual_identifier": 34137
+    },
+    "tissue": {
+      "categories": 32,
+      "profiles_annotated": 129373,
+      "counts": {
+        "Whole Blood": 50236,
+        "Brain": 18815,
+        "Cells": 14651,
+        "Other": 13993,
+        "Breast": 5089,
+        "Lung": 4050,
+        "Colon": 3968,
+        "Liver": 3403,
+        "Skin": 1999,
+        "Prostate": 1985,
+        "Ovary": 1332,
+        "Stomach": 1155,
+        "Muscle": 991,
+        "Kidney": 948,
+        "Adipose": 857,
+        "Pancreas": 788,
+        "Testis": 785,
+        "Esophagus": 706,
+        "Uterus": 608,
+        "Cervix": 559,
+        "Thyroid": 537,
+        "Adrenal Gland": 482,
+        "Bladder": 365,
+        "Nerve": 222,
+        "Small Intestine": 205,
+        "Minor Salivary Gland": 161,
+        "Pituitary": 104,
+        "Heart": 103,
+        "Artery": 101,
+        "Fallopian Tube": 94,
+        "Spleen": 57,
+        "Vagina": 24
+      },
+      "categories_in_heldout": 32,
+      "heldout_categories_absent_from_train": [],
+      "in_vitro_profiles": 16973,
+      "cell_line_profiles": 11395
+    },
+    "study": {
+      "studies": 1816,
+      "profiles_annotated": 136860,
+      "studies_with_heldout_profiles": 1516,
+      "heldout_profiles_annotated": 13699,
+      "heldout_profiles_whose_study_is_in_train": 13695,
+      "heldout_profiles_whose_study_is_not_in_train": 4,
+      "studies_present_in_all_three_partitions": 1361,
+      "profiles_per_study_median": 32.5,
+      "profiles_per_study_max": 2798
+    },
+    "individual": {
+      "all_identifiers": {
+        "groups": 25722,
+        "samples": 34953,
+        "groups_with_more_than_one_sample": 4827,
+        "samples_in_such_groups": 14058,
+        "groups_spanning_partitions": 2089,
+        "samples_in_groups_spanning_partitions": 7580,
+        "heldout_profiles_with_identifier": 3621,
+        "heldout_profiles_whose_individual_is_also_in_train": 1326
+      },
+      "reliable_identifiers": {
+        "groups": 25711,
+        "samples": 34137,
+        "groups_with_more_than_one_sample": 4816,
+        "samples_in_such_groups": 13242,
+        "groups_spanning_partitions": 2078,
+        "samples_in_groups_spanning_partitions": 6764,
+        "heldout_profiles_with_identifier": 3545,
+        "heldout_profiles_whose_individual_is_also_in_train": 1250
+      },
+      "keys_treated_as_labels": [
+        "GSE27097|HG_CTL",
+        "GSE27097|s1",
+        "GSE30653|F",
+        "GSE30653|M",
+        "GSE59091|230",
+        "GSE59091|700",
+        "GSE59091|852",
+        "GSE64511|487",
+        "GSE88821|case3",
+        "GSE99863|F",
+        "GSE99863|M"
+      ],
+      "by_source": {
+        "GSM": {
+          "groups": 17046,
+          "samples": 24663,
+          "groups_with_more_than_one_sample": 4058,
+          "samples_in_such_groups": 11675,
+          "groups_spanning_partitions": 1790,
+          "samples_in_groups_spanning_partitions": 6158
+        },
+        "HPSI": {
+          "groups": 54,
+          "samples": 54,
+          "groups_with_more_than_one_sample": 0,
+          "samples_in_such_groups": 0,
+          "groups_spanning_partitions": 0,
+          "samples_in_groups_spanning_partitions": 0
+        },
+        "TARGET": {
+          "groups": 293,
+          "samples": 381,
+          "groups_with_more_than_one_sample": 70,
+          "samples_in_such_groups": 158,
+          "groups_spanning_partitions": 28,
+          "samples_in_groups_spanning_partitions": 67
+        },
+        "TCGA": {
+          "groups": 8318,
+          "samples": 9039,
+          "groups_with_more_than_one_sample": 688,
+          "samples_in_such_groups": 1409,
+          "groups_spanning_partitions": 260,
+          "samples_in_groups_spanning_partitions": 539
+        }
+      },
+      "individuals_with_more_than_one_tissue_category": 684,
+      "tcga_sample_type_codes": {
+        "01": 7834,
+        "11": 672,
+        "06": 289,
+        "03": 194,
+        "02": 38,
+        "05": 11,
+        "07": 1
+      }
+    },
+    "cell_lines": {
+      "groups": 2567,
+      "samples": 11395,
+      "groups_with_more_than_one_sample": 794,
+      "samples_in_such_groups": 9622,
+      "groups_spanning_partitions": 498,
+      "samples_in_groups_spanning_partitions": 8690,
+      "heldout_profiles_of_a_cell_line": 1142,
+      "heldout_profiles_whose_cell_line_is_in_train": 944,
+      "most_profiled_lines": {
+        "placenta": 511,
+        "whole blood": 401,
+        "cells": 353,
+        "hct116": 236,
+        "cd4+ cell": 214,
+        "monocytes": 162,
+        "hapmap yoruba lymphoblastoid cell line": 160,
+        "bulk": 128
+      }
+    },
+    "ids_that_are_not_single_sample_accessions": [
+      "CB11130",
+      "CB11171",
+      "CB152",
+      "CB660",
+      "G7.1",
+      "G7.2",
+      "G7_1",
+      "G7_2",
+      "GSE84397",
+      "GSE84399",
+      "M-iG7_1",
+      "M-iG7_2",
+      "M.iG7.1",
+      "M.iG7.2",
+      "N-iG7_1",
+      "N-iG7_2",
+      "N.iG7.1",
+      "N.iG7.2",
+      "iG7.1",
+      "iG7.2",
+      "iG7_1",
+      "iG7_2"
+    ]
+  },
+  "downstream": {
+    "n_profiles": 10988,
+    "source_by_id_prefix": {
+      "GSM": 9941,
+      "TCGA": 976
+    },
+    "original_partition": {
+      "train": 7416,
+      "test": 2264,
+      "valid": 1308
+    },
+    "benchmark_membership": {
+      "development": 8440,
+      "test": 2149,
+      "excluded": 399
+    },
+    "note_development_pool": "from outputs/kfold_splits when present (8,440 = age filter and 71 redundant profiles removed); otherwise original train+valid after the age filter only",
+    "tissue_labels_raw": 82,
+    "studies_as_named": 149,
+    "studies_after_merging_E-GEOD_with_GSE": 149,
+    "profiles_per_study": {
+      "median": 36.0,
+      "max": 844,
+      "studies_with_fewer_than_10": 6
+    },
+    "benchmark": {
+      "test_profiles": 2149,
+      "development_profiles": 8440,
+      "studies_in_test": 77,
+      "studies_in_development": 143,
+      "studies_in_both": 77,
+      "test_profiles_whose_study_is_in_development": 2149,
+      "test_profiles_whose_study_is_not_in_development": 0,
+      "tissue_labels_in_test": 44,
+      "test_profiles_whose_tissue_label_is_in_development": 2146,
+      "test_tissue_labels_absent_from_development": [
+        "vaginal swab"
+      ]
+    },
+    "studies_with_more_than_one_tissue_label": {
+      "studies": 24,
+      "profiles": 1563
+    },
+    "individual": {
+      "groups": 1530,
+      "samples": 1727,
+      "groups_with_more_than_one_sample": 106,
+      "samples_in_such_groups": 303,
+      "groups_spanning_partitions": 26,
+      "samples_in_groups_spanning_partitions": 69,
+      "benchmark_profiles_with_identifier": 1727,
+      "benchmark_profiles_total": 10589,
+      "test_profiles_with_identifier": 549,
+      "test_profiles_whose_individual_is_also_in_development": 33
+    }
+  },
+  "benchmark_test_vs_pretraining": {
+    "test_profiles": 2149,
+    "tcga_in_test": 395,
+    "tcga_id_format": {
+      "downstream": "participant, 12 characters",
+      "corpus": "aliquot barcode, 28 characters"
+    },
+    "tcga_downstream_participants": {
+      "profiles": 976,
+      "participant_in_corpus": 623,
+      "participant_in_corpus_with_normal_tissue_profile": 566,
+      "participant_in_pretraining_train": 577,
+      "participant_in_pretraining_train_with_normal_tissue_profile": 444
+    },
+    "exposure_of_test_profiles": {
+      "1 profile in pretraining train (same accession)": {
+        "profiles": 1284,
+        "with_individual_identifier": 112,
+        "studies": 57
+      },
+      "2 TCGA: normal-tissue profile of the same participant in pretraining train": {
+        "profiles": 174,
+        "with_individual_identifier": 174,
+        "studies": 11
+      },
+      "3 same individual in pretraining train (other sample)": {
+        "profiles": 65,
+        "with_individual_identifier": 65,
+        "studies": 15
+      },
+      "4 profile in corpus, validation or held-out partition only": {
+        "profiles": 329,
+        "with_individual_identifier": 35,
+        "studies": 54
+      },
+      "5 not found in corpus: study in pretraining train": {
+        "profiles": 147,
+        "with_individual_identifier": 147,
+        "studies": 11
+      },
+      "6 not found in corpus: study not in pretraining train": {
+        "profiles": 150,
+        "with_individual_identifier": 16,
+        "studies": 8
+      }
+    },
+    "studies_of_test_profiles_in_class_6": {
+      "GSE26126": 62,
+      "GSE37008": 37,
+      "GSE34639": 20,
+      "GSE56606": 9,
+      "GSE20242": 8,
+      "GSE38608": 7,
+      "GSE39004": 4,
+      "E-MTAB-2344": 3
+    },
+    "studies_of_test_profiles_in_class_5": {
+      "TCGA_KIRC": 75,
+      "TCGA_COAD": 22,
+      "TCGA_BRCA": 12,
+      "TCGA_STAD": 11,
+      "TCGA_LUSC": 10,
+      "TCGA_LUAD": 9,
+      "TCGA_HNSC": 2,
+      "TCGA_KIRP": 2,
+      "TCGA_PRAD": 2,
+      "TCGA_THCA": 1,
+      "TCGA_UCEC": 1
+    }
+  }
+}

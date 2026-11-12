@@ -1,0 +1,12 @@
+{
+  "run_A_genomic": {
+    "adjacent_cos_dist1": 0.9831079791961574,
+    "random_pair_baseline": 0.8856836847969037,
+    "cos_at_dist100": 0.9566886221650837
+  },
+  "run_B_nogenomic": {
+    "adjacent_cos_dist1": 0.9931151145787537,
+    "random_pair_baseline": 0.9621038859212404,
+    "cos_at_dist100": 0.9825547992321836
+  }
+}
