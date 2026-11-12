@@ -7,6 +7,34 @@ RELEASE TODO (remove this block before tagging v1.0.0)
 
 # MethylLlama
 
+**A self-supervised foundation model for human DNA methylation profiles.**
+
+[Model weights (Hugging Face)](https://huggingface.co/netanelazran1/MethylLlama) ·
+[Results](results/README.md) · [Tutorials](tutorials/) · License: Apache 2.0
+
+<p align="center">
+  <img src="docs/images/fig1_methylllama_overview.png" alt="MethylLlama overview" width="100%">
+</p>
+
+<sub><b>Overview.</b> (a) 169,120 public DNA methylation profiles at 49,156 CpGs, without phenotype labels.
+(b) Two random views of each profile, each keeping 50 % of its measured CpGs. (c) A shared Transformer
+encoder with genomic-rank rotary positions pools each view into one 256-dimensional representation.
+(d) WCED pretraining: reconstruct the CpGs withheld from each view and align the two views of a profile
+(InfoNCE). (e) Fine-tuning a task head on the pretrained encoder. (f) Downstream tasks; the CNS tumour
+classification results will be added with the next manuscript update.
+[PDF](docs/images/fig1_methylllama_overview.pdf)</sub>
+
+### Key results
+
+| Age prediction, common test set of 2,149 profiles | MedAE (years) | MAE (years) | R² |
+|---|---|---|---|
+| **MethylLlama** (five-fold ensemble) | **3.112** | **4.333** | **0.9365** |
+| ElasticNetCV | 3.437 | 4.731 | 0.9322 |
+| MethylGPT (five-fold ensemble) | 3.701 | 5.105 | 0.9110 |
+
+Paired bootstrap of the MedAE gap (10,000 resamples): 0.589 years [0.338, 0.815] against MethylGPT and
+0.325 years [0.072, 0.594] against ElasticNetCV. Full tables and intervals: [results/README.md](results/README.md).
+
 MethylLlama is a Transformer encoder for DNA methylation profiles, pretrained without phenotype
 labels on 169,120 array profiles and fine-tuned here for chronological-age prediction. It is
 pretrained with the **Whole-CpG Encoder–Decoder (WCED)** objective: two random partial views of
