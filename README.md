@@ -1,10 +1,3 @@
-<!--
-RELEASE TODO (remove this block before tagging v1.0.0)
-- (done) tokenizer/ and resources/ added from the cluster bundle; scripts point at them.
-- (done 2026-10-18) checkpoints on Hugging Face (commit 350dd50), download script verified end to end.
-- Fill in the two data-source links in "Data" and the citation once the preprint exists.
--->
-
 # MethylLlama
 
 **A self-supervised foundation model for human DNA methylation profiles.**
@@ -214,19 +207,32 @@ Apart from the 500-profile demo subset in `tutorials/data/` and the derived resu
 `results/`, they are not redistributed here.
 
 - **Pretraining corpus**: the processed 49,156-CpG matrix assembled for MethylGPT
-  (Ying et al., 2024) from the EWAS Data Hub and ClockBase (169,120 profiles in the version used).
-  <!-- TODO: link -->
+  (Ying et al., 2024) from the EWAS Data Hub and ClockBase (169,120 profiles in the version used),
+  available through the [MethylGPT repository](https://github.com/albert-ying/MethylGPT).
 - **Downstream corpus**: the AltumAge collection (de Lima Camillo et al., 2022), 10,988 profiles at
   21,368 CpGs, as organised in the [AltumAge repository](https://github.com/rsinghlab/AltumAge)
   (MIT licence).
-- **CpG coordinates**: Illumina HumanMethylation450 manifest, hg38.
+- **CpG coordinates**: Illumina HumanMethylation450 manifest, hg38
+  ([InfiniumAnnotation](https://zwdzwd.github.io/InfiniumAnnotation); Zhou et al., 2017).
 - **Pretraining annotations**: the study, tissue, sex, age and individual (`PATIENT_ID`) annotations that
   accompany the pretraining corpus (`pretrain_metadata.csv.gz`); used only by the data-structure audit
   and the hard-negative analysis.
 
 ## Citation
 
-<!-- TODO: preprint reference and BibTeX -->
+The manuscript is in preparation. Until a preprint is available, please cite this repository:
+
+```bibtex
+@software{azran2026methyllama,
+  author = {Azran, Netanel and Rosen-Zvi, Michal and Yakir, Benjamin and Danziger, Michael M.},
+  title  = {{MethylLlama}: self-supervised foundation modelling of human {DNA} methylation profiles},
+  year   = {2026},
+  url    = {https://github.com/netanelazran11/MethylLlama}
+}
+```
+
+Please also cite MethylGPT (Ying et al., 2024, doi:10.1101/2024.10.30.621013) for the pretraining
+corpus and AltumAge (de Lima Camillo et al., npj Aging 8, 4, 2022) for the downstream collection.
 
 ## Licence
 
