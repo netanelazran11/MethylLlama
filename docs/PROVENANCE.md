@@ -158,3 +158,32 @@ determinism check; identical output).
 | 3 | `methylGPT_medium_21k_altumage_fold3` | `pmcs6y12` | epoch 161 (3.3652) |
 | 4 | `methylGPT_medium_21k_altumage_fold4` | `6ezzcivo` | epoch 126 (3.3242) |
 
+
+## CNS tumour classification
+
+Runs of 2026-10-25 to 2026-11-12 (embedding extraction and raw-β probes on the cluster, embedding probes and
+figures locally). The original scripts were in `scripts/cns_task/` and wrote to `outputs/cns_task/`; here they
+are `scripts/cns/` writing to `outputs/cns/`, with cluster paths replaced by `configs/paths.sh`, the released
+checkpoint, `tokenizer/` and `resources/`. Computation is unchanged. Two renames:
+
+| Then | Now |
+|---|---|
+| `scripts/cns_task/cns_check_cluster.py` | `scripts/cns/cns_preflight.py` |
+| `open_stream`, `series_dir` of `scripts/cns_task/external_feasibility.py` (a survey of candidate external cohorts, not part of the release) | `scripts/cns/geo_stream.py` |
+
+The result directories behind the manuscript: complete profiles `outputs/cns_task/probe_all/` (all
+representations, default C grid) and `compare/`; Scenario A `sparse/probe/A/`; Scenario B
+`sparse/probe_wideC/B/` (C grid to 10⁴); both scenarios `sparse/compare_wideC_all/`; external cohort
+`external/probe/`, `external/sparse/probe/` and `probe_B/`. The SLURM submission scripts of these runs
+(`submit_*.sh`), preliminary checks, an earlier set of figure drafts and the per-family confusion figure are not
+part of the release; `scripts/cns/README.md` lists the steps in the order they were run.
+
+## Contrastive-weight pilot
+
+Runs of 2026-10-18 to 2026-10-21. The original package was `ablation_infonce/`; here it is `objective_pilot/`,
+with cluster paths replaced by `configs/paths.sh` and the released files; computation unchanged. The pilot's
+reconstruction evaluation used the 5,000-profile version of `reconstruction_withheld_eval.py`
+(`scripts/repr_analysis_v7b/` at the time), shipped as `objective_pilot/reconstruction_withheld_subset.py`.
+W&B project `pretrain-llama-infonce-pilot`, runs `pilot-lam<λ>_seed42-<job>`. The module also
+supports a full-corpus reconstruction-only run (`WCEDLlamaReconOnlyModule`), which was not run. An age
+fine-tuning of the pilot models is not reported in the manuscript and is not included.

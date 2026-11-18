@@ -13,8 +13,8 @@
 (b) Two random views of each profile, each keeping 50 % of its measured CpGs. (c) A shared Transformer
 encoder with genomic-rank rotary positions pools each view into one 256-dimensional representation.
 (d) WCED pretraining: reconstruct the CpGs withheld from each view and align the two views of a profile
-(InfoNCE). (e) Fine-tuning a task head on the pretrained encoder. (f) Downstream tasks; the CNS tumour
-classification results will be added with the next manuscript update.
+(InfoNCE). (e) Fine-tuning a task head on the pretrained encoder. (f) Downstream tasks: frozen probes, CNS
+tumour classification and cross-view consistency use the frozen encoder; age prediction uses the fine-tuned one.
 [PDF](docs/images/fig1_methylllama_overview.pdf)</sub>
 
 ### Key results
@@ -26,10 +26,21 @@ classification results will be added with the next manuscript update.
 | MethylGPT (five-fold ensemble) | 3.701 | 5.105 | 0.9110 |
 
 Paired bootstrap of the MedAE gap (10,000 resamples): 0.589 years [0.338, 0.815] against MethylGPT and
-0.325 years [0.072, 0.594] against ElasticNetCV. Full tables and intervals: [results/README.md](results/README.md).
+0.325 years [0.072, 0.594] against ElasticNetCV.
+
+| CNS tumour classification, 91 classes, frozen representation + linear classifier (balanced accuracy) | complete profiles | 5 % of CpGs (classifier trained and tested at 5 %) |
+|---|---|---|
+| **MethylLlama** | 0.95 | **0.83** |
+| best raw-β baseline | **0.97** | 0.56 |
+| MethylGPT | 0.84 | 0.49 |
+
+With classifiers trained and tested on incomplete profiles, MethylLlama is the most accurate representation at
+every level from 0.5 % to 50 % of the CpGs (Holm-adjusted p < 0.05), the methods do not differ at 60–70 %, and the
+raw-β classifier is more accurate from 80 % upwards. Full tables and intervals: [results/README.md](results/README.md).
 
 MethylLlama is a Transformer encoder for DNA methylation profiles, pretrained without phenotype
-labels on 169,120 array profiles and fine-tuned here for chronological-age prediction. It is
+labels on 169,120 array profiles, fine-tuned here for chronological-age prediction and used frozen for CNS
+tumour classification. It is
 pretrained with the **Whole-CpG Encoder–Decoder (WCED)** objective: two random partial views of
 each profile are encoded, the sample representation of each view must reconstruct the measured
 CpGs withheld from it, and a contrastive term aligns the two views of the same profile.
@@ -73,7 +84,11 @@ scripts/
                 partition, paired bootstrap and its sensitivity analyses
   rope_pilot/   genomic-rank versus sequential positions (Supplementary Note 1)
   methylgpt/    MethylGPT comparison: fold data, fine-tuning, test predictions
-  figures/      the manuscript figures
+  cns/          CNS tumour classification, complete and incomplete input (Figs. 5-6, S5-S8, Table S3;
+                scripts/cns/README.md)
+  figures/      the manuscript figures (Figs. 2-4, S1-S4)
+objective_pilot/  contrastive-weight pilot: λ = 0 arm, pretraining, evaluation (Supplementary Note 2;
+                objective_pilot/README.md)
 configs/        paths.example.sh (copy to paths.sh)
 results/        result files of the manuscript (results/README.md)
 tutorials/      notebooks and a 500-profile demo dataset; reproduce_paper_results.ipynb
@@ -142,10 +157,11 @@ manuscript's stored representations (cosine similarity 1.000000, CPU versus the 
 
 ## Reproducing the manuscript
 
-`tutorials/reproduce_paper_results.ipynb` recomputes the numbers of Table 1, Figs. 2–4,
-Supplementary Figs. S1–S4, Supplementary Tables S1–S2, Supplementary Note 1 and the data-structure
-counts of the Methods from the result files in `results/`, and compares each with the value printed in
-the manuscript; it needs no GPU and no data download (a few minutes on a laptop CPU). The figure
+`tutorials/reproduce_paper_results.ipynb` recomputes the numbers of Table 1, Figs. 2–6,
+Supplementary Figs. S1–S4 and S6–S8, Supplementary Tables S1–S3, Supplementary Notes 1–2 and the
+data-structure counts of the Methods from the result files in `results/`, and compares each with the value
+printed in the manuscript (403 values, all reproduced in the pinned environment); it needs no GPU and no data
+download (a few minutes on a laptop CPU). The figure
 scripts in `scripts/figures/` draw every data figure from the same files (below). To produce the
 result files themselves from the public data:
 
@@ -175,6 +191,8 @@ resources of the original runs in a comment; set a partition if your cluster nee
 | Cross-view consistency (held-out) | `scripts/evaluation/run_view_consistency_heldout_full.sh`, then `view_consistency_heldout_full.py --merge` | `results/pretrained_cls/view_consistency_heldout_full/` |
 | Hard-negative retrieval (held-out) | `scripts/evaluation/hard_negative_heldout.py` (reads the view embeddings of the previous step) | `results/pretrained_cls/hard_negative_heldout/` |
 | Genomic-rank pilot | `scripts/rope_pilot/` | `outputs/ablation_rope/` (copies in `results/rope_pilot/`) |
+| CNS tumour classification: dataset, frozen embeddings of both models, complete and incomplete input, external cohort | `scripts/cns/` (steps in its README) | `outputs/cns/` (copies in `results/cns/`) |
+| Contrastive-weight pilot | `objective_pilot/` (steps in its README) | `outputs/objective_pilot/` (copies in `results/objective_pilot/`) |
 | Figures | see below | `figures/paper/` |
 
 The data figures are drawn from `results/` alone (no GPU, no data); each script writes PDF, PNG and
@@ -189,6 +207,9 @@ SVG under the file name used in the manuscript sources, plus a provenance JSON w
 | Supplementary Fig. S1 | `scripts/figures/figS_crossview.py` | `figS2_crossview` |
 | Supplementary Fig. S2 | `scripts/figures/figS_panel_independence.py` | `figS_panel_independence` |
 | Supplementary Fig. S3 | `scripts/figures/figS_finetuning_effect.py` | `figS_finetuning_effect` |
+
+The CNS figures (Figs. 5–6, Supplementary Figs. S5–S8) are drawn by `scripts/cns/fig_cns_*.py` from the outputs
+of the CNS pipeline (`scripts/cns/README.md`, step 13); their plotted values are in `results/cns/figure_data/`.
 
 The MethylGPT comparison fine-tunes the released MethylGPT checkpoint (encoder and age head
 trained) with MethylGPT's fine-tuning code on the same samples and folds (`scripts/methylgpt/`);
@@ -214,6 +235,9 @@ Apart from the 500-profile demo subset in `tutorials/data/` and the derived resu
   (MIT licence).
 - **CpG coordinates**: Illumina HumanMethylation450 manifest, hg38
   ([InfiniumAnnotation](https://zwdzwd.github.io/InfiniumAnnotation); Zhou et al., 2017).
+- **CNS tumours**: the Capper et al. (2018) reference and validation cohorts (GEO GSE90496 and GSE109379), read
+  from the pretraining corpus on its 49,156-CpG panel; sample sheet in `resources/cns/`. External cohort:
+  GSE215240 (Sturm et al., 2023), with the reference-classifier classes of that paper's Supplementary Table 1.
 - **Pretraining annotations**: the study, tissue, sex, age and individual (`PATIENT_ID`) annotations that
   accompany the pretraining corpus (`pretrain_metadata.csv.gz`); used only by the data-structure audit
   and the hard-negative analysis.
@@ -232,7 +256,8 @@ The manuscript is in preparation. Until a preprint is available, please cite thi
 ```
 
 Please also cite MethylGPT (Ying et al., 2024, doi:10.1101/2024.10.30.621013) for the pretraining
-corpus and AltumAge (de Lima Camillo et al., npj Aging 8, 4, 2022) for the downstream collection.
+corpus, AltumAge (de Lima Camillo et al., npj Aging 8, 4, 2022) for the downstream collection, and Capper et al.
+(Nature 555, 469–474, 2018) and Sturm et al. (Nat. Med. 29, 917–926, 2023) for the CNS cohorts.
 
 ## Licence
 

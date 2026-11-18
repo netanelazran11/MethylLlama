@@ -1,0 +1,92 @@
+abbr,name,family,who_relation,prefix_group
+ETMR,methylation class embryonal tumor with multilayered rosettes,,WHO equivalent,ETMR
+"MB, G3","methylation class medulloblastoma, subclass group 3",,WHO equivalent,MB
+"MB, G4","methylation class medulloblastoma, subclass group 4",,WHO equivalent,MB
+"MB, WNT","methylation class medulloblastoma, WNT",,WHO equivalent,MB
+"MB, SHH CHL AD","methylation class medulloblastoma, subclass SHH A (children and adult)",,WHO subclass,MB
+"MB, SHH INF","methylation class medulloblastoma, subclass SHH B (infant)",,WHO subclass,MB
+"ATRT, MYC","methylation class atypical teratoid/rhabdoid tumor, subclass MYC",atypical teratoid/rhabdoid tumor,WHO subclass,ATRT
+"ATRT, SHH","methylation class atypical teratoid/rhabdoid tumor, subclass SHH",atypical teratoid/rhabdoid tumor,WHO subclass,ATRT
+"ATRT, TYR","methylation class atypical teratoid/rhabdoid tumor, subclass TYR",atypical teratoid/rhabdoid tumor,WHO subclass,ATRT
+"CNS NB, FOXR2",methylation class CNS neuroblastoma with FOXR2 activation,,WHO subclass,CNS NB
+"HGNET, BCOR",methylation class CNS high grade neuroepithelial tumor with BCOR alteration,,not equivalent to WHO,HGNET
+"DMG, K27",methylation class diffuse midline glioma H3 K27M mutant,,WHO equivalent,DMG
+"GBM, G34","methylation class glioblastoma, IDH wildtype, H3.3 G34 mutant",,WHO subclass,GBM
+"GBM, MES","methylation class glioblastoma, IDH wildtype, subclass mesenchymal",,WHO subclass,GBM
+"GBM, RTK I","methylation class glioblastoma, IDH wildtype, subclass RTK I",,WHO subclass,GBM
+"GBM, RTK II","methylation class glioblastoma, IDH wildtype, subclass RTK II",,WHO subclass,GBM
+"GBM, RTK III","methylation class glioblastoma, IDH wildtype, subclass RTK III",,WHO subclass,GBM
+"GBM, MID","methylation class glioblastoma, IDH wildtype, subclass midline ",,WHO subclass,GBM
+"GBM, MYCN","methylation class glioblastoma, IDH wildtype, subclass MYCN",,WHO subclass,GBM
+CN,methylation class central neurocytoma,,WHO equivalent,CN
+DLGNT,methylation class diffuse leptomeningeal glioneuronal tumor,,WHO equivalent,DLGNT
+LIPN,methylation class cerebellar liponeurocytoma,,WHO equivalent,LIPN
+"LGG, DIG/DIA","methylation class low grade glioma, desmoplastic infantile astrocytoma / ganglioglioma",,WHO equivalent,LGG
+"LGG, DNT","methylation class low grade glioma, dysembryoplastic neuroepithelial tumor",,WHO equivalent,LGG
+"LGG, RGNT","methylation class low grade glioma, rosette forming glioneuronal tumor",,WHO equivalent,LGG
+RETB,methylation class retinoblastoma,,WHO equivalent,RETB
+"ENB, A","methylation class esthesioneuroblastoma, subclass A",,WHO subclass,ENB
+"ENB, B","methylation class esthesioneuroblastoma, subclass B",,WHO subclass,ENB
+"PGG, nC","methylation class paraganglioma, spinal non-CIMP",,WHO subclass,PGG
+"LGG, GG","methylation class low grade glioma, ganglioglioma",,not equivalent to WHO,LGG
+SCHW,methylation class schwannoma,,WHO equivalent,SCHW
+"SCHW, MEL",methylation class melanotic schwannoma,,WHO equivalent,SCHW
+"CPH, ADM","methylation class craniopharyngioma, adamantinomatous",,WHO equivalent,CPH
+"CPH, PAP","methylation class craniopharyngioma, papillary",,WHO equivalent,CPH
+"PITAD, ACTH","methylation class pituitary adenoma, ACTH",,WHO equivalent,PITAD
+"PITAD, FSH LH","methylation class pituitary adenoma, FSH/LH",,WHO equivalent,PITAD
+"PITAD, PRL","methylation class pituitary adenoma, prolactin",,WHO equivalent,PITAD
+"PITAD, STH SPA","methylation class pituitary adenoma, STH sparsely granulated",,WHO equivalent,PITAD
+"PITAD, TSH","methylation class pituitary adenoma, TSH",,WHO equivalent,PITAD
+"PITAD, STH DNS A","methylation class pituitary adenoma, STH densely granulated, group A",,WHO subclass,PITAD
+"PITAD, STH DNS B","methylation class pituitary adenoma, STH densely granulated, group B",,WHO subclass,PITAD
+PITUI,methylation class pituicytoma / granular cell tumor / spindle cell oncocytoma,,not equivalent to WHO,PITUI
+"EPN, RELA","methylation class ependymoma, RELA fusion",,WHO equivalent,EPN
+"EPN, PF A","methylation class ependymoma, posterior fossa group A",,WHO subclass,EPN
+"EPN, PF B","methylation class ependymoma, posterior fossa group B",,WHO subclass,EPN
+"EPN, SPINE","methylation class ependymoma, spinal",,WHO subclass,EPN
+"EPN, YAP","methylation class ependymoma, YAP fusion",,WHO subclass,EPN
+"EPN, MPE","methylation class ependymoma, myxopapillary",,not equivalent to WHO,EPN
+"SUBEPN, PF","methylation class subependymoma, posterior fossa",,not equivalent to WHO,SUBEPN
+"SUBEPN, SPINE","methylation class subependymoma, spinal",,not equivalent to WHO,SUBEPN
+"SUBEPN, ST","methylation class subependymoma, supratentorial",,not equivalent to WHO,SUBEPN
+CHGL,methylation class chordoid glioma of the third ventricle,,WHO equivalent,CHGL
+"LGG, SEGA","methylation class low grade glioma, subependymal giant cell astrocytoma",,WHO equivalent,LGG
+"LGG, PA PF","methylation class low grade glioma, subclass posterior fossa pilocytic astrocytoma",,WHO subclass,LGG
+"LGG, PA MID","methylation class low grade glioma, subclass midline pilocytic astrocytoma",,WHO subclass,LGG
+ANA PA,methylation class anaplastic pilocytic astrocytoma,,not equivalent to WHO,ANA PA
+"HGNET, MN1",methylation class CNS high grade neuroepithelial tumor with MN1 alteration,,not equivalent to WHO,HGNET
+IHG,methylation class infantile hemispheric glioma,,not equivalent to WHO,IHG
+"LGG, MYB","methylation class low grade glioma, MYB/MYBL1",,not equivalent to WHO,LGG
+"LGG, PA/GG ST","methylation class low grade glioma, subclass hemispheric pilocytic astrocytoma and ganglioglioma",,not equivalent to WHO,LGG
+PXA,methylation class (anaplastic) pleomorphic xanthoastrocytoma,,not equivalent to WHO,PXA
+"PTPR, A",methylation class papillary tumor of the pineal region group A,,WHO subclass,PTPR
+"PTPR, B",methylation class papillary tumor of the pineal region group B,,WHO subclass,PTPR
+"PIN T, PB A",methylation class pineoblastoma group A / intracranial retinoblastoma,,not equivalent to WHO,PIN T
+"PIN T, PB B",methylation class pineoblastoma group B,,WHO subclass,PIN T
+"PIN T, PPT",methylation class pineal parenchymal tumor ,,not equivalent to WHO,PIN T
+CHORDM,methylation class chordoma,,WHO equivalent,CHORDM
+EWS,methylation class Ewing sarcoma,,WHO equivalent,EWS
+HMB,methylation class hemangioblastoma,,WHO equivalent,HMB
+MNG,methylation class meningioma,,WHO equivalent,MNG
+SFT HMPC,methylation class solitary fibrous tumor / hemangiopericytoma,,WHO equivalent,SFT HMPC
+"EFT, CIC",methylation class CNS Ewing sarcoma family tumor with CIC alteration,,not equivalent to WHO,EFT
+MELAN,methylation class melanoma,,WHO equivalent,MELAN
+MELCYT,methylation class melanocytoma,,WHO equivalent,MELCYT
+"PLEX, AD","methylation class plexus tumor, subclass adult",,not equivalent to WHO,PLEX
+"PLEX, PED A","methylation class plexus tumor, subclass pediatric A",,not equivalent to WHO,PLEX
+"PLEX, PED B","methylation class plexus tumor, subclass pediatric B",,not equivalent to WHO,PLEX
+A IDH,"methylation class IDH glioma, subclass astrocytoma","Glioma, IDH mutant",WHO equivalent,A IDH
+"A IDH, HG","methylation class IDH glioma, subclass high grade astrocytoma ",,WHO equivalent,A IDH
+O IDH,"methylation class IDH glioma, subclass 1p/19q codeleted oligodendroglioma",,WHO equivalent,O IDH
+LYMPHO,methylation class lymphoma,,WHO equivalent,LYMPHO
+PLASMA,methylation class plasmacytoma,,WHO equivalent,PLASMA
+"CONTR, ADENOPIT","methylation class control tissue, pituitary gland anterior lobe",,,CONTR
+"CONTR, CEBM","methylation class control tissue, cerebellar hemisphere",,,CONTR
+"CONTR, HEMI","methylation class control tissue, hemispheric cortex",,,CONTR
+"CONTR, HYPTHAL","methylation class control tissue, hypothalamus",,,CONTR
+"CONTR, INFLAM","methylation class control tissue, inflammatory ",,,CONTR
+"CONTR, PINEAL","methylation class control tissue, pineal gland",,,CONTR
+"CONTR, PONS","methylation class control tissue, pons",,,CONTR
+"CONTR, REACT","methylation class control tissue, reactive brain",,,CONTR
+"CONTR, WM","methylation class control tissue, white matter",,,CONTR

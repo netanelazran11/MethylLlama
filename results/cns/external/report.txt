@@ -1,0 +1,9 @@
+External test GSE215240: 796 profiles scored (v11b4 score >= 0.9) in 57 groups; head trained on 2798 Capper reference profiles
+
+  llama_cls   BA 0.802 [0.770,0.849]  acc 0.888  1-NN BA 0.752  EPIC 0.797 (n=649)  450K 0.928 (n=147)  C=10
+  gpt_cls     BA 0.592 [0.557,0.652]  acc 0.711  1-NN BA 0.459  EPIC 0.601 (n=649)  450K 0.627 (n=147)  C=1
+  raw_top5k   BA 0.955 [0.925,0.978]  acc 0.976  1-NN BA 0.913  EPIC 0.959 (n=649)  450K 0.938 (n=147)  C=100
+  raw_pca256  BA 0.962 [0.935,0.985]  acc 0.984  1-NN BA 0.951  EPIC 0.967 (n=649)  450K 0.969 (n=147)  C=10
+
+  llama_cls - gpt_cls          +0.210 [+0.155,+0.255] *
+  llama_cls - raw_pca256       -0.160 [-0.198,-0.109] *

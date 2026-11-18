@@ -1,0 +1,95 @@
+{
+ "1_llama_above_gpt_all_levels_le20": {
+  "levels": {
+   "20": {
+    "diff": 0.7237,
+    "ci": [
+     0.7107,
+     0.7356
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "10": {
+    "diff": 0.8383,
+    "ci": [
+     0.8282,
+     0.8487
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "5": {
+    "diff": 0.7945,
+    "ci": [
+     0.7832,
+     0.8056
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "2": {
+    "diff": 0.5154,
+    "ci": [
+     0.5017,
+     0.5289
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "1": {
+    "diff": 0.2642,
+    "ci": [
+     0.2527,
+     0.2751
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "0.5": {
+    "diff": 0.1104,
+    "ci": [
+     0.1035,
+     0.1179
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   }
+  },
+  "complete": true,
+  "met": true
+ },
+ "2_llama_above_best_raw_5_and_1": {
+  "levels": {
+   "5": {
+    "diff": -0.1061,
+    "ci": [
+     -0.1172,
+     -0.0952
+    ],
+    "met": false,
+    "vs": "llama_cls - best raw (raw_top5k)"
+   },
+   "1": {
+    "diff": -0.4585,
+    "ci": [
+     -0.474,
+     -0.4444
+    ],
+    "met": false,
+    "vs": "llama_cls - best raw (raw_top5k)"
+   }
+  },
+  "complete": true,
+  "met": false
+ },
+ "3_report_no_advantage": false,
+ "label_shuffle_control_A_5pct": {
+  "ba": {
+   "llama_cls": 0.011632629439651746,
+   "gpt_cls": 0.011291848738666496
+  },
+  "chance": 0.011
+ },
+ "missing": []
+}

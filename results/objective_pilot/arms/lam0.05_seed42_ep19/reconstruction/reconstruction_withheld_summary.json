@@ -1,0 +1,47 @@
+{
+  "checkpoint": "outputs/objective_pilot/pilot/lam0.05_seed42/checkpoints/analysis/epoch=19-analysis.ckpt",
+  "data": "data/data_methyl_pretrain_type3_h5ad/methylgpt_pretrain_type3.h5ad",
+  "split": "test",
+  "n_samples": 5000,
+  "input_ratio": 0.5,
+  "seed": 0,
+  "n_withheld_positions_total": 112398044,
+  "loss_mask": "valid & ~input (measured CpGs withheld from encoder input only)",
+  "b_mean_source": "per-CpG mean over the evaluated cohort's withheld positions (advantages the baseline -- conservative for the model)",
+  "pearson_withheld_obs_vs_pred": 0.9310010313813865,
+  "normalized_mse_model": {
+    "mean": 0.09422701520668343,
+    "median": 0.04454531520605087
+  },
+  "raw_mse_model": {
+    "mean": 0.06243591383099556,
+    "median": 0.05897536128759384,
+    "std": 0.0196729376912117,
+    "p10": 0.040589595958590505,
+    "p90": 0.0901391126215458
+  },
+  "raw_mse_b_mean": {
+    "mean": 0.030611395835876465,
+    "median": 0.024327192455530167,
+    "std": 0.02220522239804268,
+    "p10": 0.012442880775779486,
+    "p90": 0.0553084220737219
+  },
+  "raw_mse_b_shuffle": {
+    "mean": 0.07458963990211487,
+    "median": 0.07340958714485168,
+    "std": 0.020053349435329437,
+    "p10": 0.05003840029239655,
+    "p90": 0.10027720779180527
+  },
+  "raw_mse_b_random": {
+    "mean": 0.09477151930332184,
+    "median": 0.09324940294027328,
+    "std": 0.01836739107966423,
+    "p10": 0.0734967552125454,
+    "p90": 0.11856599375605584
+  },
+  "ratio_model_vs_b_mean": 2.0396296977996826,
+  "ratio_model_vs_b_shuffle": 0.8370587825775146,
+  "ratio_model_vs_b_random": 0.6588045954704285
+}

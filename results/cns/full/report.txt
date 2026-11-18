@@ -1,0 +1,28 @@
+CNS (Capper) - frozen representation + identical logistic head
+
+llama_cls    full BA 0.951  1-NN 0.925  3-shot 0.901  5-shot 0.933  family acc 0.989  validation 0.801
+gpt_cls      full BA 0.841  1-NN 0.646  3-shot 0.608  5-shot 0.713  family acc 0.933  validation 0.684
+llama_mean   full BA 0.823  1-NN 0.421  3-shot 0.493  5-shot 0.646  family acc 0.935  validation 0.614
+gpt_mean     full BA 0.815  1-NN 0.578  3-shot 0.547  5-shot 0.665  family acc 0.927  validation 0.601
+raw_pca256   full BA 0.964  1-NN 0.958  3-shot 0.932  5-shot 0.946  family acc 0.991  validation 0.829
+raw_top5k    full BA 0.972  1-NN 0.930  3-shot 0.912  5-shot 0.948  family acc 0.992  validation 0.867
+raw_top10k   full BA 0.971  1-NN 0.922  3-shot 0.906  5-shot 0.945  family acc 0.992  validation 0.851
+raw_top32k   full BA 0.963  1-NN 0.902  3-shot 0.893  5-shot 0.936  family acc 0.991  validation 0.851
+raw_all      full BA 0.954  1-NN 0.846  3-shot 0.862  5-shot 0.916  family acc 0.990  validation 0.811
+
+Paired differences (A - B, 95 % bootstrap CI):
+  primary_full                                  +0.1102  [+0.0956, +0.1264]  *
+  primary_full_small_classes_lt20               +0.1454  [+0.1168, +0.1759]  *
+  primary_full_mixed_material_FFPE              +0.1208  [+0.0951, +0.1420]  *
+  primary_full_mixed_material_frozen            +0.0845  [+0.0511, +0.1200]  *
+  primary_full_pretrain_train                   +0.1083  [+0.0902, +0.1247]  *
+  primary_full_pretrain_not_train               +0.1175  [+0.0868, +0.1442]  *
+  primary_full_nan_le_5pct                      +0.1117  [+0.0915, +0.1267]  *
+  primary_full_nan_gt_5pct                      +0.2050  [+0.1327, +0.2469]  *
+  primary_full_tumour_only                      +0.1148  [+0.0983, +0.1314]  *
+  primary_fewshot3                              +0.2924  [+0.2814, +0.3032]  *
+  primary_fewshot5                              +0.2193  [+0.2074, +0.2319]  *
+  llama_cls_vs_raw_top5k_fewshot5               -0.0153  [-0.0213, -0.0087]  *
+  llama_cls_vs_raw_top5k_full                   -0.0202  [-0.0295, -0.0110]  *
+
+Success criteria: {'1_llama_beats_gpt_full_and_5shot': True, '2_llama_beats_best_raw_5shot': False, '3_report_no_advantage': False}

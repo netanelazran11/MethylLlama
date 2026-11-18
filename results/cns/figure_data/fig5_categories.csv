@@ -1,0 +1,92 @@
+methylation_class,category
+"PLEX, AD",Choroid plexus
+"PLEX, PED A",Choroid plexus
+"PLEX, PED B",Choroid plexus
+"ATRT, MYC",Embryonal
+"ATRT, SHH",Embryonal
+"ATRT, TYR",Embryonal
+"CNS NB, FOXR2",Embryonal
+"EFT, CIC",Embryonal
+ETMR,Embryonal
+"HGNET, BCOR",Embryonal
+"MB, G3",Embryonal
+"MB, G4",Embryonal
+"MB, SHH CHL AD",Embryonal
+"MB, SHH INF",Embryonal
+"MB, WNT",Embryonal
+RETB,Embryonal
+"EPN, MPE",Ependymal
+"EPN, PF A",Ependymal
+"EPN, PF B",Ependymal
+"EPN, RELA",Ependymal
+"EPN, SPINE",Ependymal
+"EPN, YAP",Ependymal
+"SUBEPN, PF",Ependymal
+"SUBEPN, SPINE",Ependymal
+"SUBEPN, ST",Ependymal
+"DMG, K27",Glioblastoma & paediatric HGG
+"GBM, G34",Glioblastoma & paediatric HGG
+"GBM, MES",Glioblastoma & paediatric HGG
+"GBM, MID",Glioblastoma & paediatric HGG
+"GBM, MYCN",Glioblastoma & paediatric HGG
+"GBM, RTK I",Glioblastoma & paediatric HGG
+"GBM, RTK II",Glioblastoma & paediatric HGG
+"GBM, RTK III",Glioblastoma & paediatric HGG
+IHG,Glioblastoma & paediatric HGG
+LYMPHO,Haematolymphoid
+PLASMA,Haematolymphoid
+A IDH,IDH-mutant glioma
+"A IDH, HG",IDH-mutant glioma
+O IDH,IDH-mutant glioma
+ANA PA,Low-grade glial & glioneuronal
+CHGL,Low-grade glial & glioneuronal
+CN,Low-grade glial & glioneuronal
+DLGNT,Low-grade glial & glioneuronal
+"HGNET, MN1",Low-grade glial & glioneuronal
+"LGG, DIG/DIA",Low-grade glial & glioneuronal
+"LGG, DNT",Low-grade glial & glioneuronal
+"LGG, GG",Low-grade glial & glioneuronal
+"LGG, MYB",Low-grade glial & glioneuronal
+"LGG, PA MID",Low-grade glial & glioneuronal
+"LGG, PA PF",Low-grade glial & glioneuronal
+"LGG, PA/GG ST",Low-grade glial & glioneuronal
+"LGG, RGNT",Low-grade glial & glioneuronal
+"LGG, SEGA",Low-grade glial & glioneuronal
+LIPN,Low-grade glial & glioneuronal
+PXA,Low-grade glial & glioneuronal
+MELAN,Melanocytic
+MELCYT,Melanocytic
+CHORDM,Meningioma & mesenchymal
+EWS,Meningioma & mesenchymal
+HMB,Meningioma & mesenchymal
+MNG,Meningioma & mesenchymal
+SFT HMPC,Meningioma & mesenchymal
+"PGG, nC",Nerve sheath & paraganglioma
+SCHW,Nerve sheath & paraganglioma
+"SCHW, MEL",Nerve sheath & paraganglioma
+"CONTR, ADENOPIT",Non-tumour control
+"CONTR, CEBM",Non-tumour control
+"CONTR, HEMI",Non-tumour control
+"CONTR, HYPTHAL",Non-tumour control
+"CONTR, INFLAM",Non-tumour control
+"CONTR, PINEAL",Non-tumour control
+"CONTR, PONS",Non-tumour control
+"CONTR, REACT",Non-tumour control
+"CONTR, WM",Non-tumour control
+"ENB, A",Olfactory neuroblastoma
+"ENB, B",Olfactory neuroblastoma
+"PIN T, PB A",Pineal
+"PIN T, PB B",Pineal
+"PIN T, PPT",Pineal
+"PTPR, A",Pineal
+"PTPR, B",Pineal
+"CPH, ADM",Sellar
+"CPH, PAP",Sellar
+"PITAD, ACTH",Sellar
+"PITAD, FSH LH",Sellar
+"PITAD, PRL",Sellar
+"PITAD, STH DNS A",Sellar
+"PITAD, STH DNS B",Sellar
+"PITAD, STH SPA",Sellar
+"PITAD, TSH",Sellar
+PITUI,Sellar

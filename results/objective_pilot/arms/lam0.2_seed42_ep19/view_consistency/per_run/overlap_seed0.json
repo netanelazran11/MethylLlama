@@ -1,0 +1,41 @@
+{
+  "condition": "overlap",
+  "seed": 0,
+  "checkpoint": "outputs/objective_pilot/pilot/lam0.2_seed42/checkpoints/analysis/epoch=19-analysis.ckpt",
+  "data": "data/data_methyl_pretrain_type3_h5ad/methylgpt_pretrain_type3.h5ad",
+  "split": "test",
+  "partition_rows": 16912,
+  "n_profiles": 16912,
+  "n_cpgs_panel": 49156,
+  "input_ratio": 0.5,
+  "measured_min": 0.99,
+  "pools": {
+    "all": {
+      "n_candidates": 16912,
+      "chance_top1": 5.912961210974456e-05,
+      "matched_cos": 0.988537609577179,
+      "unmatched_cos": 0.30038021973460366,
+      "retrieval_at1": 0.8397587511825922,
+      "retrieval_at5": 0.9701986754966887,
+      "retrieval_at10": 0.9881149479659413
+    },
+    "fully_measured": {
+      "n_candidates": 7845,
+      "chance_top1": 0.00012746972594008922,
+      "matched_cos": 0.9900224804878235,
+      "unmatched_cos": 0.35537815314502785,
+      "retrieval_at1": 0.8811982154238368,
+      "retrieval_at5": 0.9801147227533461,
+      "retrieval_at10": 0.9926067558954749
+    },
+    "n2000": {
+      "n_candidates": 2000,
+      "chance_top1": 0.0005,
+      "matched_cos": 0.9883742928504944,
+      "unmatched_cos": 0.2916044272136068,
+      "retrieval_at1": 0.959,
+      "retrieval_at5": 0.9995,
+      "retrieval_at10": 1.0
+    }
+  }
+}

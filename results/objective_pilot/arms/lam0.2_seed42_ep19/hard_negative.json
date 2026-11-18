@@ -1,0 +1,55 @@
+{
+ "disjoint_seed0": {
+  "n_profiles": 16912,
+  "n_with_metadata": 13699,
+  "k_negatives": 31,
+  "pools": {
+   "random": {
+    "n": 13699,
+    "skipped_pool_too_small": 0,
+    "top1": 0.9961311044601796,
+    "median_margin": 0.1940147876739502
+   },
+   "same tissue": {
+    "n": 13593,
+    "skipped_pool_too_small": 106,
+    "top1": 0.9608622084896637,
+    "median_margin": 0.09518098831176758
+   },
+   "same study": {
+    "n": 5032,
+    "skipped_pool_too_small": 8667,
+    "top1": 0.7309220985691574,
+    "median_margin": 0.006954401731491089
+   },
+   "same study+tissue": {
+    "n": 4656,
+    "skipped_pool_too_small": 9043,
+    "top1": 0.7179982817869416,
+    "median_margin": 0.005895406007766724
+   },
+   "same study+tissue+sex": {
+    "n": 2108,
+    "skipped_pool_too_small": 11591,
+    "top1": 0.6404174573055028,
+    "median_margin": 0.0025233328342437744
+   },
+   "same study+tissue+age decade": {
+    "n": 865,
+    "skipped_pool_too_small": 12834,
+    "top1": 0.6416184971098265,
+    "median_margin": 0.00344085693359375
+   },
+   "same study+tissue+|coverage diff|<0.005": {
+    "n": 3433,
+    "skipped_pool_too_small": 10266,
+    "top1": 0.6854063501310806,
+    "median_margin": 0.00482255220413208
+   },
+   "K nearest neighbours of target": {
+    "n": 13699,
+    "top1": 0.6020147456018687
+   }
+  }
+ }
+}

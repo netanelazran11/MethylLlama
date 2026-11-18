@@ -1,0 +1,263 @@
+== Scenario A: balanced accuracy, full-data setting (95% CI; seed min-max)
+    100%  llama_cls 0.953 [0.943,0.962]  gpt_cls 0.841 [0.824,0.857]  raw_pca256 0.964 [0.955,0.972]  raw_top5k 0.972 [0.964,0.978]
+     50%  llama_cls 0.951 [0.941,0.959]  gpt_cls 0.476 [0.462,0.489]  raw_pca256 0.955 [0.946,0.963]  raw_top5k 0.971 [0.964,0.978]
+     20%  llama_cls 0.935 [0.925,0.944]  gpt_cls 0.211 [0.202,0.220]  raw_pca256 0.858 [0.847,0.869]  raw_top5k 0.965 [0.958,0.971]
+     10%  llama_cls 0.906 [0.897,0.916]  gpt_cls 0.068 [0.063,0.073]  raw_pca256 0.679 [0.666,0.692]  raw_top5k 0.956 [0.948,0.963]
+      5%  llama_cls 0.828 [0.817,0.839]  gpt_cls 0.033 [0.030,0.036]  raw_pca256 0.232 [0.223,0.240]  raw_top5k 0.934 [0.926,0.942]
+      2%  llama_cls 0.535 [0.522,0.549]  gpt_cls 0.020 [0.018,0.022]  raw_pca256 0.032 [0.031,0.033]  raw_top5k 0.870 [0.860,0.881]
+      1%  llama_cls 0.277 [0.266,0.288]  gpt_cls 0.012 [0.011,0.014]  raw_pca256 0.018 [0.017,0.018]  raw_top5k 0.735 [0.723,0.747]
+    0.5%  llama_cls 0.122 [0.115,0.130]  gpt_cls 0.012 [0.010,0.013]  raw_pca256 0.014 [0.013,0.014]  raw_top5k 0.508 [0.495,0.520]
+-- Scenario A: differences (all settings)
+    100% full       llama_cls - gpt_cls                +0.111 [+0.097,+0.127] *
+    100% full       llama_cls - best raw (raw_top5k)   -0.019 [-0.028,-0.010] *
+    100% 5-shot     llama_cls - gpt_cls                +0.219 [+0.207,+0.232] *
+    100% 5-shot     llama_cls - best raw (raw_top5k)   -0.015 [-0.021,-0.009] *
+    100% 3-shot     llama_cls - gpt_cls                +0.292 [+0.282,+0.304] *
+    100% 3-shot     llama_cls - best raw (raw_pca256)  -0.032 [-0.039,-0.025] *
+    100% validation llama_cls - gpt_cls                +0.117 [+0.070,+0.172] *
+    100% validation llama_cls - best raw (raw_top5k)   -0.066 [-0.097,-0.025] *
+     50% full       llama_cls - gpt_cls                +0.475 [+0.460,+0.489] *
+     50% full       llama_cls - best raw (raw_top5k)   -0.020 [-0.029,-0.012] *
+     50% 5-shot     llama_cls - gpt_cls                +0.500 [+0.489,+0.511] *
+     50% 5-shot     llama_cls - best raw (raw_top5k)   -0.016 [-0.023,-0.010] *
+     50% 3-shot     llama_cls - gpt_cls                +0.518 [+0.508,+0.529] *
+     50% 3-shot     llama_cls - best raw (raw_pca256)  -0.032 [-0.040,-0.025] *
+     50% validation llama_cls - gpt_cls                +0.409 [+0.345,+0.440] *
+     50% validation llama_cls - best raw (raw_top5k)   -0.053 [-0.085,-0.017] *
+     20% full       llama_cls - gpt_cls                +0.724 [+0.711,+0.736] *
+     20% full       llama_cls - best raw (raw_top5k)   -0.031 [-0.040,-0.022] *
+     20% 5-shot     llama_cls - gpt_cls                +0.723 [+0.712,+0.733] *
+     20% 5-shot     llama_cls - best raw (raw_pca256)  -0.014 [-0.022,-0.005] *
+     20% 3-shot     llama_cls - gpt_cls                +0.720 [+0.709,+0.730] *
+     20% 3-shot     llama_cls - best raw (raw_pca256)  -0.040 [-0.048,-0.032] *
+     20% validation llama_cls - gpt_cls                +0.575 [+0.526,+0.619] *
+     20% validation llama_cls - best raw (raw_top5k)   -0.060 [-0.089,-0.027] *
+     10% full       llama_cls - gpt_cls                +0.838 [+0.828,+0.849] *
+     10% full       llama_cls - best raw (raw_top5k)   -0.049 [-0.059,-0.039] *
+     10% 5-shot     llama_cls - gpt_cls                +0.822 [+0.813,+0.831] *
+     10% 5-shot     llama_cls - best raw (raw_top5k)   +0.008 [+0.000,+0.015] *
+     10% 3-shot     llama_cls - gpt_cls                +0.799 [+0.790,+0.808] *
+     10% 3-shot     llama_cls - best raw (raw_pca256)  -0.051 [-0.059,-0.043] *
+     10% validation llama_cls - gpt_cls                +0.659 [+0.614,+0.697] *
+     10% validation llama_cls - best raw (raw_top5k)   -0.094 [-0.124,-0.064] *
+      5% full       llama_cls - gpt_cls                +0.794 [+0.783,+0.806] *
+      5% full       llama_cls - best raw (raw_top5k)   -0.106 [-0.117,-0.095] *
+      5% 5-shot     llama_cls - gpt_cls                +0.791 [+0.781,+0.801] *
+      5% 5-shot     llama_cls - best raw (raw_top5k)   -0.024 [-0.033,-0.015] *
+      5% 3-shot     llama_cls - gpt_cls                +0.768 [+0.758,+0.777] *
+      5% 3-shot     llama_cls - best raw (raw_pca256)  -0.089 [-0.098,-0.080] *
+      5% validation llama_cls - gpt_cls                +0.582 [+0.547,+0.628] *
+      5% validation llama_cls - best raw (raw_top5k)   -0.190 [-0.217,-0.146] *
+      2% full       llama_cls - gpt_cls                +0.515 [+0.502,+0.529] *
+      2% full       llama_cls - best raw (raw_top5k)   -0.335 [-0.349,-0.320] *
+      2% 5-shot     llama_cls - gpt_cls                +0.568 [+0.556,+0.579] *
+      2% 5-shot     llama_cls - best raw (raw_top5k)   -0.184 [-0.196,-0.172] *
+      2% 3-shot     llama_cls - gpt_cls                +0.564 [+0.554,+0.575] *
+      2% 3-shot     llama_cls - best raw (raw_pca256)  -0.222 [-0.233,-0.211] *
+      2% validation llama_cls - gpt_cls                +0.372 [+0.337,+0.402] *
+      2% validation llama_cls - best raw (raw_top5k)   -0.315 [-0.364,-0.271] *
+      1% full       llama_cls - gpt_cls                +0.264 [+0.253,+0.275] *
+      1% full       llama_cls - best raw (raw_top5k)   -0.459 [-0.474,-0.444] *
+      1% 5-shot     llama_cls - gpt_cls                +0.320 [+0.310,+0.331] *
+      1% 5-shot     llama_cls - best raw (raw_top5k)   -0.282 [-0.294,-0.269] *
+      1% 3-shot     llama_cls - gpt_cls                +0.326 [+0.316,+0.337] *
+      1% 3-shot     llama_cls - best raw (raw_pca256)  -0.317 [-0.329,-0.306] *
+      1% validation llama_cls - gpt_cls                +0.182 [+0.156,+0.202] *
+      1% validation llama_cls - best raw (raw_top5k)   -0.400 [-0.442,-0.364] *
+    0.5% full       llama_cls - gpt_cls                +0.110 [+0.103,+0.118] *
+    0.5% full       llama_cls - best raw (raw_top5k)   -0.386 [-0.399,-0.371] *
+    0.5% 5-shot     llama_cls - gpt_cls                +0.144 [+0.137,+0.152] *
+    0.5% 5-shot     llama_cls - best raw (raw_top5k)   -0.221 [-0.233,-0.209] *
+    0.5% 3-shot     llama_cls - gpt_cls                +0.152 [+0.144,+0.160] *
+    0.5% 3-shot     llama_cls - best raw (raw_pca256)  -0.278 [-0.289,-0.267] *
+    0.5% validation llama_cls - gpt_cls                +0.077 [+0.063,+0.100] *
+    0.5% validation llama_cls - best raw (raw_top5k)   -0.335 [-0.374,-0.294] *
+== Scenario B: balanced accuracy, full-data setting (95% CI; seed min-max)
+    100%  llama_cls 0.953 [0.944,0.962]  gpt_cls 0.841 [0.825,0.858]  raw_pca256 0.964 [0.956,0.972]  raw_top5k 0.972 [0.965,0.978]
+     50%  llama_cls 0.950 [0.941,0.959]  gpt_cls 0.807 [0.791,0.822]  raw_pca256 0.935 [0.923,0.946]  raw_top5k 0.937 [0.926,0.947]
+     20%  llama_cls 0.930 [0.920,0.939]  gpt_cls 0.706 [0.690,0.721]  raw_pca256 0.859 [0.847,0.869]  raw_top5k 0.786 [0.775,0.796]
+     10%  llama_cls 0.897 [0.887,0.906]  gpt_cls 0.611 [0.598,0.625]  raw_pca256 0.733 [0.722,0.744]  raw_top5k 0.608 [0.600,0.617]
+      5%  llama_cls 0.830 [0.819,0.841]  gpt_cls 0.487 [0.475,0.499]  raw_pca256 0.564 [0.554,0.574]  raw_top5k 0.431 [0.424,0.438]
+      2%  llama_cls 0.621 [0.609,0.633]  gpt_cls 0.314 [0.305,0.323]  raw_pca256 0.331 [0.324,0.337]  raw_top5k 0.223 [0.219,0.228]
+      1%  llama_cls 0.369 [0.359,0.379]  gpt_cls 0.197 [0.190,0.205]  raw_pca256 0.169 [0.165,0.173]  raw_top5k 0.137 [0.134,0.141]
+    0.5%  llama_cls 0.174 [0.167,0.181]  gpt_cls 0.119 [0.113,0.124]  raw_pca256 0.070 [0.068,0.071]  raw_top5k 0.076 [0.073,0.079]
+-- Scenario B: differences (all settings)
+    100% full       llama_cls - gpt_cls                +0.111 [+0.096,+0.128] *
+    100% full       llama_cls - best raw (raw_top5k)   -0.019 [-0.028,-0.010] *
+    100% 5-shot     llama_cls - gpt_cls                +0.219 [+0.206,+0.232] *
+    100% 5-shot     llama_cls - best raw (raw_top5k)   -0.015 [-0.022,-0.009] *
+    100% 3-shot     llama_cls - gpt_cls                +0.292 [+0.281,+0.303] *
+    100% 3-shot     llama_cls - best raw (raw_pca256)  -0.032 [-0.039,-0.025] *
+    100% validation llama_cls - gpt_cls                +0.117 [+0.070,+0.175] *
+    100% validation llama_cls - best raw (raw_top5k)   -0.066 [-0.098,-0.023] *
+     50% full       llama_cls - gpt_cls                +0.144 [+0.129,+0.158] *
+     50% full       llama_cls - best raw (raw_top5k)   +0.013 [+0.004,+0.024] *
+     50% 5-shot     llama_cls - gpt_cls                +0.232 [+0.219,+0.245] *
+     50% 5-shot     llama_cls - best raw (raw_top5k)   +0.002 [-0.005,+0.009]
+     50% 3-shot     llama_cls - gpt_cls                +0.300 [+0.290,+0.311] *
+     50% 3-shot     llama_cls - best raw (raw_pca256)  -0.014 [-0.021,-0.007] *
+     50% validation llama_cls - gpt_cls                +0.157 [+0.113,+0.200] *
+     50% validation llama_cls - best raw (raw_pca256)  -0.033 [-0.069,-0.011] *
+     20% full       llama_cls - gpt_cls                +0.224 [+0.210,+0.239] *
+     20% full       llama_cls - best raw (raw_pca256)  +0.071 [+0.060,+0.082] *
+     20% 5-shot     llama_cls - gpt_cls                +0.311 [+0.299,+0.324] *
+     20% 5-shot     llama_cls - best raw (raw_top5k)   +0.072 [+0.064,+0.080] *
+     20% 3-shot     llama_cls - gpt_cls                +0.363 [+0.352,+0.374] *
+     20% 3-shot     llama_cls - best raw (raw_pca256)  +0.051 [+0.044,+0.059] *
+     20% validation llama_cls - gpt_cls                +0.224 [+0.176,+0.255] *
+     20% validation llama_cls - best raw (raw_pca256)  +0.009 [-0.037,+0.028]
+     10% full       llama_cls - gpt_cls                +0.285 [+0.270,+0.300] *
+     10% full       llama_cls - best raw (raw_pca256)  +0.164 [+0.152,+0.175] *
+     10% 5-shot     llama_cls - gpt_cls                +0.381 [+0.369,+0.393] *
+     10% 5-shot     llama_cls - best raw (raw_top5k)   +0.187 [+0.177,+0.197] *
+     10% 3-shot     llama_cls - gpt_cls                +0.422 [+0.412,+0.433] *
+     10% 3-shot     llama_cls - best raw (raw_pca256)  +0.151 [+0.143,+0.158] *
+     10% validation llama_cls - gpt_cls                +0.281 [+0.234,+0.312] *
+     10% validation llama_cls - best raw (raw_pca256)  +0.025 [-0.026,+0.055]
+      5% full       llama_cls - gpt_cls                +0.342 [+0.328,+0.357] *
+      5% full       llama_cls - best raw (raw_pca256)  +0.265 [+0.254,+0.277] *
+      5% 5-shot     llama_cls - gpt_cls                +0.429 [+0.417,+0.440] *
+      5% 5-shot     llama_cls - best raw (raw_top5k)   +0.350 [+0.340,+0.360] *
+      5% 3-shot     llama_cls - gpt_cls                +0.452 [+0.443,+0.461] *
+      5% 3-shot     llama_cls - best raw (raw_pca256)  +0.316 [+0.308,+0.324] *
+      5% validation llama_cls - gpt_cls                +0.259 [+0.221,+0.302] *
+      5% validation llama_cls - best raw (raw_pca256)  +0.089 [+0.035,+0.126] *
+      2% full       llama_cls - gpt_cls                +0.307 [+0.293,+0.322] *
+      2% full       llama_cls - best raw (raw_pca256)  +0.290 [+0.278,+0.302] *
+      2% 5-shot     llama_cls - gpt_cls                +0.347 [+0.337,+0.357] *
+      2% 5-shot     llama_cls - best raw (raw_top5k)   +0.430 [+0.419,+0.440] *
+      2% 3-shot     llama_cls - gpt_cls                +0.339 [+0.331,+0.347] *
+      2% 3-shot     llama_cls - best raw (raw_pca256)  +0.408 [+0.399,+0.416] *
+      2% validation llama_cls - gpt_cls                +0.280 [+0.235,+0.311] *
+      2% validation llama_cls - best raw (raw_pca256)  +0.146 [+0.085,+0.171] *
+      1% full       llama_cls - gpt_cls                +0.172 [+0.161,+0.184] *
+      1% full       llama_cls - best raw (raw_pca256)  +0.200 [+0.190,+0.211] *
+      1% 5-shot     llama_cls - gpt_cls                +0.200 [+0.192,+0.208] *
+      1% 5-shot     llama_cls - best raw (raw_top5k)   +0.271 [+0.263,+0.280] *
+      1% 3-shot     llama_cls - gpt_cls                +0.185 [+0.178,+0.191] *
+      1% 3-shot     llama_cls - best raw (raw_pca256)  +0.247 [+0.240,+0.253] *
+      1% validation llama_cls - gpt_cls                +0.099 [+0.071,+0.148] *
+      1% validation llama_cls - best raw (raw_pca256)  +0.070 [+0.034,+0.100] *
+    0.5% full       llama_cls - gpt_cls                +0.055 [+0.047,+0.064] *
+    0.5% full       llama_cls - best raw (raw_top5k)   +0.098 [+0.091,+0.106] *
+    0.5% 5-shot     llama_cls - gpt_cls                +0.078 [+0.071,+0.084] *
+    0.5% 5-shot     llama_cls - best raw (raw_top5k)   +0.122 [+0.117,+0.128] *
+    0.5% 3-shot     llama_cls - gpt_cls                +0.070 [+0.066,+0.075] *
+    0.5% 3-shot     llama_cls - best raw (raw_pca256)  +0.104 [+0.100,+0.109] *
+    0.5% validation llama_cls - gpt_cls                +0.063 [+0.040,+0.084] *
+    0.5% validation llama_cls - best raw (raw_pca256)  +0.069 [+0.036,+0.084] *
+== Embedding stability (mean over seeds)
+             cos_self  cos_other   top1  median_rank
+model level                                         
+gpt   0.5       0.624      0.620  0.000     1502.667
+      1.0       0.666      0.659  0.001     1194.000
+      2.0       0.751      0.738  0.001      740.500
+      5.0       0.854      0.831  0.001      276.833
+      10.0      0.920      0.889  0.004      112.167
+      20.0      0.965      0.925  0.027       34.333
+      50.0      0.991      0.941  0.256        3.000
+      100.0     1.000      0.947  1.000        0.000
+llama 0.5       0.638      0.451  0.062       51.333
+      1.0       0.752      0.496  0.191        8.000
+      2.0       0.858      0.525  0.471        1.000
+      5.0       0.947      0.536  0.851        0.000
+      10.0      0.977      0.535  0.969        0.000
+      20.0      0.991      0.534  0.998        0.000
+      50.0      0.998      0.532  1.000        0.000
+      100.0     1.000      0.532  1.000        0.000
+== Criteria
+{
+ "1_llama_above_gpt_all_levels_le20": {
+  "levels": {
+   "20": {
+    "diff": 0.7237,
+    "ci": [
+     0.7107,
+     0.7356
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "10": {
+    "diff": 0.8383,
+    "ci": [
+     0.8282,
+     0.8487
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "5": {
+    "diff": 0.7945,
+    "ci": [
+     0.7832,
+     0.8056
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "2": {
+    "diff": 0.5154,
+    "ci": [
+     0.5017,
+     0.5289
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "1": {
+    "diff": 0.2642,
+    "ci": [
+     0.2527,
+     0.2751
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   },
+   "0.5": {
+    "diff": 0.1104,
+    "ci": [
+     0.1035,
+     0.1179
+    ],
+    "met": true,
+    "vs": "llama_cls - gpt_cls"
+   }
+  },
+  "complete": true,
+  "met": true
+ },
+ "2_llama_above_best_raw_5_and_1": {
+  "levels": {
+   "5": {
+    "diff": -0.1061,
+    "ci": [
+     -0.1172,
+     -0.0952
+    ],
+    "met": false,
+    "vs": "llama_cls - best raw (raw_top5k)"
+   },
+   "1": {
+    "diff": -0.4585,
+    "ci": [
+     -0.474,
+     -0.4444
+    ],
+    "met": false,
+    "vs": "llama_cls - best raw (raw_top5k)"
+   }
+  },
+  "complete": true,
+  "met": false
+ },
+ "3_report_no_advantage": false,
+ "label_shuffle_control_A_5pct": {
+  "ba": {
+   "llama_cls": 0.011632629439651746,
+   "gpt_cls": 0.011291848738666496
+  },
+  "chance": 0.011
+ },
+ "missing": []
+}

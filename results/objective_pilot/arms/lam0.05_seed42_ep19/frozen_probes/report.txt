@@ -1,0 +1,16 @@
+MethylLlama PRETRAIN (ep85) — CLS representation analysis
+=======================================================
+checkpoint: outputs/objective_pilot/pilot/lam0.05_seed42/checkpoints/analysis/epoch=19-analysis.ckpt
+samples: 10988
+
+[CLS] geometry:
+  eff_rank=6.38/256  top1_sv=0.5283  anisotropy=0.6769  dead_dims=9
+[MEAN] geometry:
+  eff_rank=3.56/256  top1_sv=0.4909  anisotropy=0.8912  dead_dims=1
+
+[CLS] age probe (pretrain — weak is EXPECTED, no age supervision):
+  linear R²=0.658  replica-head R²=0.778  MedAE=6.48yr
+
+[CLS] biological structure (balanced-acc vs chance):
+  tissue_type: 0.827 (chance 0.027, 37 classes)
+  dataset: 0.801 (chance 0.012, 85 classes)

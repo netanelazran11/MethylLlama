@@ -1,7 +1,8 @@
 # Result files of the manuscript
 
 Outputs of the original runs, from which `tutorials/reproduce_paper_results.ipynb` recomputes the
-numbers of the manuscript and `scripts/figures/` draws Figs. 2–4 and Supplementary Figs. S1–S4.
+numbers of the manuscript and `scripts/figures/` draws Figs. 2–4 and Supplementary Figs. S1–S4 (the CNS
+figures are drawn by `scripts/cns/`).
 Values are unchanged; cluster paths in the run records were replaced by the released file names,
 the internal model label by "MethylLlama", and the per-row checkpoint path column of the fold
 prediction files was dropped. Run names, SLURM jobs and the original file names are in
@@ -116,3 +117,40 @@ scikit-learn version and differs only in four balanced accuracies at the third d
 
 The script writes these files to `outputs/ablation_rope/`. The pilot checkpoints and their
 reconstruction diagnostics are listed in `docs/PROVENANCE.md`.
+
+## cns/ — CNS tumour classification: Figs. 5–6, Supplementary Figs. S5–S8, Supplementary Table S3
+
+Outputs of `scripts/cns/` (`scripts/cns/README.md`); the scripts write them under `outputs/cns/`. The Capper
+profiles are read from the pretraining corpus; their sample sheet is `resources/cns/capper_samples.csv`.
+
+| File | Content | Written by |
+|---|---|---|
+| `full/comparison.json`, `full/report.txt` | complete profiles, every representation (MethylLlama and MethylGPT CLS and mean-pooled, five raw-β variants): balanced accuracy with all training profiles and with 5 or 3 per class, 1-NN, family accuracy, validation cohort, paired MethylLlama − MethylGPT differences (Supplementary Fig. S6; the five raw-β variants of Methods) | `scripts/cns/compare_cns.py` |
+| `sparse_correctness.npz` | every cell of the incomplete-input grids, Scenario A (classifier trained on complete profiles) and B (trained and tested at the same level): key `<scenario>|<representation>|<level and seed tag>`, each reference profile's mean correctness over the five cross-validation repeats; `gsm` and `methylation_class` give the profile order. Recomputes Fig. 6 and Supplementary Table S3 (`scripts/cns/tests_from_correctness.py`) | exported for the release from the per-profile predictions of `scripts/cns/probe_sparse.py` and `probe_sparse_wideC.py`, with `compare_sparse.load_setting` |
+| `sparse/compare/` | both scenarios: balanced accuracy and paired differences per level and setting, embedding stability (self-retrieval of masked embeddings), criteria and report (Supplementary Fig. S7) | `scripts/cns/compare_sparse.py` (`outputs/cns/sparse/compare_wideC_all/`) |
+| `external/metrics.csv`, `differences.csv`, `report.txt` | external cohort GSE215240 (796 tumours, 57 scoring groups): balanced accuracy per representation with bootstrap CI, per array, paired differences (Supplementary Fig. S8a) | `scripts/cns/probe_external.py` |
+| `figure_data/fig5*.csv` | Fig. 5: tumour category of each class (`fig5_categories.csv`); per model, share of CpGs and mask seed, the share of profiles whose 10 nearest complete-profile neighbours are mostly of their category, and the share of those neighbours of their class (`fig5d_neighbours.csv`) | `scripts/cns/fig_cns_landscape.py` |
+| `figure_data/fig6_*.csv` | Fig. 6 and Supplementary Table S3: balanced accuracy with CI per scenario, level and representation; MethylLlama minus the best raw-β baseline and minus MethylGPT with CI, p and Holm-adjusted p; embedding stability | `scripts/cns/fig_cns_sparse_B.py` |
+| `figure_data/figS5_taxonomy.csv` | the 91 classes, their categories and sizes (Supplementary Fig. S5) | `scripts/cns/fig_cns_taxonomy.py` |
+| `figure_data/figS6*.csv` | Supplementary Fig. S6: balanced accuracy with all training profiles and 5 or 3 per class, differences, profiles and balanced accuracy per tumour family | `scripts/cns/fig_cns_data.py` |
+| `figure_data/figS7_*.csv` | Supplementary Fig. S7 (Scenario A): accuracy, differences, stability | `scripts/cns/fig_cns_sparse.py` |
+| `figure_data/figS8_*.csv` | Supplementary Fig. S8: balanced accuracy per representation and array, accuracy against coverage, incomplete input on the external cohort | `scripts/cns/fig_cns_external.py` |
+
+Not included: anything that holds β values (the Capper and external h5ad files, the masks), the per-profile
+embeddings of the masked and external runs (several GB; the scripts recompute them), the per-profile UMAP
+coordinates, and the labels and per-profile predictions of the external cohort, which are derived from the
+patient-level Supplementary Table 1 of Sturm et al. (2023).
+
+## objective_pilot/ — contrastive-weight pilot: Supplementary Note 2
+
+Outputs of `objective_pilot/` (`objective_pilot/README.md`); the scripts write them under `outputs/objective_pilot/`.
+
+| File | Content | Written by |
+|---|---|---|
+| `pilot_table.csv` | one row per arm (λ = 0, 0.01, 0.05, 0.2 at epoch 19, and the released checkpoint as pipeline check): cross-view and hard-negative retrieval, reconstruction, frozen probes, geometry | `objective_pilot/summarize_pilot.py` |
+| `pilot_verdict.json` | paired differences from λ = 0 with bootstrap CIs over query profiles (B = 2,000) and the decision rule fixed before the results | same |
+| `arms/<arm>/` | the per-arm files `summarize_pilot.py` reads: `view_consistency/per_run/{overlap,disjoint}_seed0.{json,npz}` (retrieval among the 16,912 held-out profiles), `hard_negative.json` and `hard_negative_queries.npz` (per query: hit and margin against 31 negatives), `reconstruction/` (summary and per-profile MSE, 5,000 held-out profiles), `frozen_probes/` (probe and geometry summary) | `objective_pilot/evaluate_pilot.sh`, `objective_pilot/hard_negative_eval.py` |
+
+`python -m objective_pilot.summarize_pilot --eval-root results/objective_pilot/arms` rebuilds both summary files
+from `arms/` exactly. Not included: the pilot checkpoints, the view embeddings and the reconstruction scatter
+sample (it holds β values).
