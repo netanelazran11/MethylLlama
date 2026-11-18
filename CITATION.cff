@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "MethylLlama: self-supervised foundation modelling of human DNA methylation profiles"
+type: software
+version: 1.0.0
+license: Apache-2.0
+repository-code: "https://github.com/netanelazran11/MethylLlama"
+url: "https://huggingface.co/netanelazran1/MethylLlama"
+abstract: >-
+  MethylLlama is a Transformer encoder for human DNA methylation profiles, pretrained without phenotype
+  labels on 169,120 array profiles with the Whole-CpG Encoder-Decoder (WCED) objective. This repository
+  contains the model code, the scripts that produced every result of the manuscript, the result files and
+  the exact software environment of those runs.
+keywords:
+  - DNA methylation
+  - foundation model
+  - self-supervised learning
+  - Transformer
+  - epigenetics
+authors:
+  - given-names: Netanel
+    family-names: Azran
+    affiliation: "The Hebrew University of Jerusalem"
+  - given-names: Michal
+    family-names: Rosen-Zvi
+    affiliation: "The Hebrew University of Jerusalem"
+  - given-names: Benjamin
+    family-names: Yakir
+    affiliation: "The Hebrew University of Jerusalem"
+  - given-names: Michael M.
+    family-names: Danziger
+    affiliation: "The Hebrew University of Jerusalem"
+references:
+  - type: article
+    title: "MethylGPT: a foundation model for the DNA methylome"
+    authors:
+      - family-names: Ying
+        given-names: Kejun
+    year: 2024
+    doi: "10.1101/2024.10.30.621013"
+    notes: "Source of the pretraining corpus and CpG panel, and the comparator model."
